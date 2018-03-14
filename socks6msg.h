@@ -38,17 +38,19 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+struct S6M_Addr
+{
+	enum SOCKS6AddressType type;
+	struct in_addr ipv4;
+	struct in6_addr ipv6;
+	char *domain;
+};
+
 struct S6M_Request
 {
 	enum SOCKS6RequestCode reqCode;
 	
-	struct
-	{
-		enum SOCKS6AddressType type;
-		struct in_addr ipv4;
-		struct in6_addr ipv6;
-		char *domain;
-	} addr;
+	struct S6M_Addr addr;
 	
 	uint16_t port;
 	
@@ -93,13 +95,7 @@ struct S6M_AuthReply
 
 struct S6M_OpReply
 {
-	struct
-	{
-		enum SOCKS6AddressType type;
-		struct in_addr ipv4;
-		struct in6_addr ipv6;
-		char *domain;
-	} addr;
+	struct S6M_Addr addr;
 	
 	uint16_t port;
 	
