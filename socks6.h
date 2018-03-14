@@ -1,5 +1,31 @@
-#ifndef SOCKS6_HH
-#define SOCKS6_HH
+/*-
+ * Copyright (c) 2018 University Politehnica of Bucharest
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+#ifndef SOCKS6_H
+#define SOCKS6_H
 
 #ifdef __cplusplus
 extern "C"
@@ -7,15 +33,18 @@ extern "C"
 #endif /* __cplusplus */
 
 #include <stdint.h>
+#include <endian.h>
 
 #define SOCKS6_VERSION_MAJOR 6
 /**
  * @brief VERSION_MINOR
  * < 100 standardized
  * 100 + draft revision: accurately represents draft revision
+ * 200 + draft revision: builds upon draft revision (subject to heavy API change)
  * 255: no particular draft revision
+ * currently: post-draft-02 (202)
  */
-#define SOCKS6_VERSION_MINOR 255
+#define SOCKS6_VERSION_MINOR 202
 
 struct SOCKS6Version
 {
@@ -25,12 +54,13 @@ struct SOCKS6Version
 
 struct SOCKS6Request
 {
-	uint8_t address[16];
-	uint16_t port;
-	uint16_t initialDataLen;
 	uint8_t commandCode;
-	uint8_t optionCount;
-	uint8_t options[0];
+	uint16_t port;
+	uint8_t addresType;
+	uint8_t address[0];
+	
+	
+	
 } __attribute__((packed));
 
 enum SOCKS6RequestCode
@@ -39,17 +69,35 @@ enum SOCKS6RequestCode
 	SOCKS6_REQUEST_CONNECT    = 0x01,
 	SOCKS6_REQUEST_BIND       = 0x02,
 	SOCKS6_REQUEST_UDP_ASSOC  = 0x03,
+	/* for future revisions */
 //	SOCKS6_REQUEST_TCP_ASSOC  = 0x04,
 //	SOCKS6_REQUEST_DTLS_ASSOC = 0x05,
 //	SOCKS6_REQUEST_TLS_ASSOC  = 0x06,
+};
+
+enum SOCKS6AddressType
+{
+	SOCKS6_ADDR_IPV4   = 0x01,
+	SOCKS6_ADDR_DOMAIN = 0x03,
+	SOCKS6_ADDR_IPV6   = 0x04,
+};
+
+struct SOCKS6Options
+{
+	uint8_t optionCount;
+	uint8_t options[0];
+};
+
+struct SOCKS6InitialData
+{
+	uint16_t initialDataLen;
+	uint8_t initialData[0];
 };
 
 struct SOCKS6AuthReply
 {
 	uint8_t type;
 	uint8_t method;
-	uint8_t optionCount;
-	uint8_t options[0];
 } __attribute__((packed));
 
 enum SOCKS6AuthReplyCode
@@ -78,12 +126,11 @@ enum SOCKS6Method
 
 struct SOCKS6OperationReply
 {
-	uint8_t bindAddress[16];
-	uint16_t bindPort;
-	uint16_t initialDataOffset;
 	uint8_t code;
-	uint8_t optionCount;
-	uint8_t options[0];
+	uint16_t initialDataOffset;
+	uint16_t bindPort;
+	uint8_t addressType;
+	uint8_t bindAddress[0];
 } __attribute__((packed));
 
 enum SOCKS6OperationReplyCode
@@ -103,16 +150,74 @@ struct SOCKS6Option
 {
 	uint8_t kind;
 	uint8_t len;
+	uint8_t type;
 	uint8_t data[0];
 } __attribute__((packed));
 
 enum SOCKS6OptionKind
 {
-	SOCKS6_OPTION_AUTH_METHOD = 0x01,
-	SOCKS6_OPTION_AUTH_DATA   = 0x02,
-	SOCKS6_OPTION_IDEMPOTENCE = 0x03,
-	SOCKS6_OPTION_DOMAIN_RES  = 0x04,
-	SOCKS6_OPTION_FEATURE     = 0x05,
+	SOCKS6_OPTION_SOCKET      = 0x01,
+	SOCKS6_OPTION_AUTH_METHOD = 0x02,
+	SOCKS6_OPTION_AUTH_DATA   = 0x03,
+	SOCKS6_OPTION_IDEMPOTENCE = 0x04,
+	SOCKS6_OPTION_SALT        = 0x05,
+};
+
+struct SOCKS6SocketOption
+{
+	struct SOCKS6Option optionHead;
+#if BYTE_ORDER == LITTLE_ENDIAN
+	uint8_t level: 6,
+		leg: 2;
+#elif BYTE_ORDER == BIG_ENDIAN
+	uint8_t leg: 2,
+		level: 6;
+#else
+#error Fix BYTE_ORDER
+#endif
+	uint8_t code;
+	uint8_t data[0];
+} __attribute__((packed));
+
+enum SOCKS6SocketOptionLeg
+{
+	SOCKS6_SOCKOPT_LEG_CLIENT_PROXY = 0x01,
+	SOCKS6_SOCKOPT_LEG_PROXY_CLIENT = 0x02,
+	SOCKS6_SOCKOPT_LEG_BOTH         = 0x03,
+};
+
+enum SOCKS6SocketOptionLevel
+{
+	SOCKS6_SOCKOPT_LEVEL_SOCKET = 0x01,
+	SOCKS6_SOCKOPT_LEVEL_IPV4   = 0x02,
+	SOCKS6_SOCKOPT_LEVEL_IPV6   = 0x03,
+	SOCKS6_SOCKOPT_LEVEL_TCP    = 0x04,
+	SOCKS6_SOCKOPT_LEVEL_UDP    = 0x05,
+};
+
+enum SOCKS6SocketOptionCode
+{
+	/* socket */
+	/* ipv4 */
+	/* ipv6 */
+	/* tcp */
+	SOCKS6_SOCKOPT_CODE_TFO      = 0x17,
+	SOCKS6_SOCKOPT_CODE_MPTCP    = 0x2a,
+	SOCKS6_SOCKOPT_CODE_MP_SCHED = 0x2b,
+	/* udp */
+};
+
+struct SOCKS6MPTCPSchedulerOption
+{
+	struct SOCKS6SocketOption socketOptionHead;
+	uint8_t scheduler;
+};
+
+enum SOCKS6MPTCPScheduler
+{
+	SOCKS6_MPTCP_SCHEDULER_DEFAULT   = 0x01,
+	SOCKS6_MPTCP_SCHEDULER_RR        = 0x02,
+	SOCKS6_MPTCP_SCHEDULER_REDUNDANT = 0x03,
 };
 
 struct SOCKS6AuthMethodOption
@@ -148,112 +253,37 @@ enum SOCKS6IDempotenceType
 
 struct SOCKS6WindowRequestOption
 {
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
+	struct SOCKS6Option optionHead;
 	uint32_t windowSize;
 } __attribute__((packed));
 
 struct SOCKS6WindowAdvertOption
 {
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
+	struct SOCKS6Option optionHead;
 	uint32_t windowBase;
 	uint32_t windowSize;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureOption
 {
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
+	struct SOCKS6Option optionHead;
 	uint32_t token;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureReplyOption
 {
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
+	struct SOCKS6Option optionHead;
 	uint8_t code;
 } __attribute__((packed));
 
-struct SOCKS6DomainResolutionOption
+struct SOCKS6SaltOption
 {
-	uint8_t kind;
-	uint8_t len;
-	uint8_t preferedIPVer;
-	uint8_t domain[0];
-} __attribute__((packed));
-
-struct SOCKS6FeatureOption
-{
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
-	uint8_t data[0];
-} __attribute__((packed));
-
-enum SOCKS6FeatureType
-{
-	SOCKS6_FEATURE_NODELAY = 0x00,
-	SOCKS6_FEATURE_IPTOS   = 0x01,
-	SOCKS6_FEATURE_TCPOPT  = 0x02,
-	SOCKS6_FEATURE_MPSCHED = 0x03,
-};
-
-struct SOCKS6NoDelayFeatureOption
-{
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
-	uint8_t nodelayFlags;
-} __attribute__((packed));
-
-enum SOCKS6NoDelayFlags
-{
-	SOCKS6_NODELAY_CLIENT_PROXY = 0x01,
-	SOCKS6_NODELAY_PROXY_SERVER = 0x02,
-	SOCKS6_NODELAY_BOTH         = 0x03,
-};
-
-struct SOCKS6IPTOSFeatureOption
-{
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
-	uint8_t clientProxyTOS;
-	uint8_t proxyServerTOS;
-} __attribute__((packed));
-
-struct SOCKS6TCPOptionFeatureOption
-{
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
-	uint8_t options[0];
-} __attribute__((packed));
-
-struct SOCKS6MPSchedFeatureOption
-{
-	uint8_t kind;
-	uint8_t len;
-	uint8_t type;
-	uint8_t clientProxySched;
-	uint8_t proxyServerSched;
-} __attribute__((packed));
-
-enum SOCKS6MPSched
-{
-	SOCKS6_MP_SCHED_INDIFFERENT    = 0x00,
-	SOCKS6_MP_SCHED_MAX_THROUGHPUT = 0x01,
-	SOCKS6_MP_SCHED_MIN_DELAY      = 0x02,
-	SOCKS6_MP_SCHED_MIN_COST       = 0x03,
+	struct SOCKS6Option optionHead;
+	uint32_t salt;
 } __attribute__((packed));
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif // SOCKS6_WIRE_HH
+#endif // SOCKS6_H
