@@ -70,13 +70,11 @@ using namespace std;
  * pregenerated stuff
  */
 
-static const SOCKS6Option socketOptionHead = {
-	.kind = SOCKS6_OPTION_SOCKET,
-	.len = sizeof(SOCKS6SocketOption),
-};
-
 static const SOCKS6SocketOption tfoOption = {
-	.optionHead = socketOptionHead,
+	.optionHead = {
+		.kind = SOCKS6_OPTION_SOCKET,
+		.len = sizeof(SOCKS6SocketOption),
+	},
 	.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
 	.level = SOCKS6_SOCKOPT_LEVEL_TCP,
 	.code = SOCKS6_SOCKOPT_CODE_TFO,
