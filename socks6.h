@@ -58,9 +58,6 @@ struct SOCKS6Request
 	uint16_t port;
 	uint8_t addresType;
 	uint8_t address[0];
-	
-	
-	
 } __attribute__((packed));
 
 enum SOCKS6RequestCode
@@ -86,13 +83,13 @@ struct SOCKS6Options
 {
 	uint8_t optionCount;
 	uint8_t options[0];
-};
+} __attribute__((packed));
 
 struct SOCKS6InitialData
 {
 	uint16_t initialDataLen;
 	uint8_t initialData[0];
-};
+} __attribute__((packed));
 
 struct SOCKS6AuthReply
 {
@@ -150,7 +147,6 @@ struct SOCKS6Option
 {
 	uint8_t kind;
 	uint8_t len;
-	uint8_t type;
 	uint8_t data[0];
 } __attribute__((packed));
 
@@ -160,7 +156,6 @@ enum SOCKS6OptionKind
 	SOCKS6_OPTION_AUTH_METHOD = 0x02,
 	SOCKS6_OPTION_AUTH_DATA   = 0x03,
 	SOCKS6_OPTION_IDEMPOTENCE = 0x04,
-	SOCKS6_OPTION_SALT        = 0x05,
 };
 
 struct SOCKS6SocketOption
@@ -182,7 +177,7 @@ struct SOCKS6SocketOption
 enum SOCKS6SocketOptionLeg
 {
 	SOCKS6_SOCKOPT_LEG_CLIENT_PROXY = 0x01,
-	SOCKS6_SOCKOPT_LEG_PROXY_CLIENT = 0x02,
+	SOCKS6_SOCKOPT_LEG_PROXY_SERVER = 0x02,
 	SOCKS6_SOCKOPT_LEG_BOTH         = 0x03,
 };
 
@@ -211,7 +206,7 @@ struct SOCKS6MPTCPSchedulerOption
 {
 	struct SOCKS6SocketOption socketOptionHead;
 	uint8_t scheduler;
-};
+} __attribute__((packed));
 
 enum SOCKS6MPTCPScheduler
 {
@@ -274,12 +269,6 @@ struct SOCKS6TokenExpenditureReplyOption
 {
 	struct SOCKS6Option optionHead;
 	uint8_t code;
-} __attribute__((packed));
-
-struct SOCKS6SaltOption
-{
-	struct SOCKS6Option optionHead;
-	uint32_t salt;
 } __attribute__((packed));
 
 #ifdef __cplusplus

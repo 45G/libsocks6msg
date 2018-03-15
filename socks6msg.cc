@@ -67,6 +67,32 @@ using namespace std;
 #define S6M_PROG_END() S6M_crt;
 
 /*
+ * pregenerated stuff
+ */
+
+static const SOCKS6Option socketOptionHead = {
+	.kind = SOCKS6_OPTION_SOCKET,
+	.len = sizeof(SOCKS6SocketOption),
+};
+
+static const SOCKS6SocketOption tfoOption = {
+	.optionHead = socketOptionHead,
+	.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+	.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+	.code = SOCKS6_SOCKOPT_CODE_TFO,
+};
+
+static const SOCKS6SocketOption mptcpOption = {
+	.optionHead = {
+		.kind = SOCKS6_OPTION_SOCKET,
+		.len = sizeof(SOCKS6SocketOption),
+	},
+	.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+	.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+	.code = SOCKS6_SOCKOPT_CODE_TFO,
+};
+
+/*
  * raw
  */
 
@@ -212,7 +238,7 @@ ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum 
  */
 ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err) {}
 ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, enum S6M_Error *err) {}
-ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err) {}int tfo
+ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err) {}
 
 void S6M_Request_Free(struct S6M_Request *req)
 {
@@ -327,9 +353,6 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 	if (opReply->idempotence.advertise)
 		size += sizeof(SOCKS6WindowAdvertOption);
 	
-	if (opReply->salt.use)
-		size += sizeof(SOCKS6SaltOption);
-	
 	return size;
 }
 
@@ -398,6 +421,7 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 		return -1;
 	
 	list<SOCKS6Option *> options;
+	int optionCount = 0;
 	
 	S6M_PROG_BEGIN();
 	
@@ -409,32 +433,32 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	};
 	S6M_PROG(S6M_Raw_Pack(&rawOpReply, buf, size, err));
 	
-	int optionCount = 0;
+	
 	if (opReply->tfo)
 		optionCount++;
+	if (opReply->mptcp)
+		optionCount++;
+	if (opReply->mptcpSched.clientProxy > 0)
+	{
+		optionCount++;
+		if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
+			optionCount++;
+	}
+	if (opReply->idempotence.advertise)
+		optionCount++;
 	
+	SOCKS6Options opts = { .optionCount = optionCount };
+	S6M_PROG(S6M_Raw_Pack(opts, buf, size, err));
+	
+	if (opReply->tfo)
+		S6M_PROG(S6M_Raw_Pack(&tfoOption, buf, size, err));
+	
+	if (opReply->mptcp)
+	{
 		
+		S6M_PROG(S6M_Raw_Pack(&mptcpOption, buf, size, err));
+	}
 	
-	int mptcp;
-	
-	struct
-	{
-		enum SOCKS6MPTCPScheduler clientProxy;
-		enum SOCKS6MPTCPScheduler proxyServer;
-	} mptcpSched;
-	
-	struct
-	{
-		int advertise;
-		uint32_t base;
-		uint32_t windowSize;
-	} idempotence;
-	
-	struct
-	{
-		int use;
-		uint32_t value;
-	} salt;
 	
 error:
 	BOOST_FOREACH(SOCKS6Option *op, options)

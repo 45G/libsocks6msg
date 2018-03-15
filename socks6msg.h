@@ -51,7 +51,6 @@ struct S6M_Request
 	enum SOCKS6RequestCode reqCode;
 	
 	struct S6M_Addr addr;
-	
 	uint16_t port;
 	
 	uint16_t initialDataLen;
@@ -70,12 +69,6 @@ struct S6M_Request
 		int spend;
 		uint32_t token;
 	} idempotence;
-	
-	struct
-	{
-		int use;
-		uint32_t value;
-	} salt;
 	
 	uint8_t *supportedMethods;
 	
@@ -98,7 +91,6 @@ struct S6M_OpReply
 	enum SOCKS6OperationReplyCode code;
 	
 	struct S6M_Addr addr;
-	
 	uint16_t port;
 	
 	uint16_t initDataOff;
@@ -119,12 +111,6 @@ struct S6M_OpReply
 		uint32_t base;
 		uint32_t windowSize;
 	} idempotence;
-	
-	struct
-	{
-		int use;
-		uint32_t value;
-	} salt;
 };
 
 struct S6M_PasswdReq
@@ -144,7 +130,7 @@ enum S6M_Error
 	S6M_ERROR_INVALID     = -1,   /* some invalid field */
 	S6M_ERROR_ALLOC       = -2,   /* malloc fail */
 	S6M_ERROR_BUFFER      = -3,   /* reached end of buffer */
-	S6M_ERROR_OTHERVER    = -4,   /* socks version other than 105 */
+	S6M_ERROR_OTHERVER    = -4,   /* socks version other than the one supported */
 	S6M_ERROR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
 };
 
