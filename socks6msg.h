@@ -95,9 +95,13 @@ struct S6M_AuthReply
 
 struct S6M_OpReply
 {
+	enum SOCKS6OperationReplyCode code;
+	
 	struct S6M_Addr addr;
 	
 	uint16_t port;
+	
+	uint16_t initDataOff;
 	
 	int tfo;
 	
@@ -144,11 +148,11 @@ enum S6M_Error
 	S6M_ERROR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
 };
 
-ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       char *buf, int size, enum S6M_Error *err);
-ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, char *buf, int size, enum S6M_Error *err);
-ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   char *buf, int size, enum S6M_Error *err);
-ssize_t S6M_PasswdReq_Pack  (const struct S6M_PasswdReq   *pwReq,     char *buf, int size, enum S6M_Error *err);
-ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply,   char *buf, int size, enum S6M_Error *err);
+ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size, enum S6M_Error *err);
+ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, int size, enum S6M_Error *err);
+ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   uint8_t *buf, int size, enum S6M_Error *err);
+ssize_t S6M_PasswdReq_Pack  (const struct S6M_PasswdReq   *pwReq,     uint8_t *buf, int size, enum S6M_Error *err);
+ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply,   uint8_t *buf, int size, enum S6M_Error *err);
 
 ssize_t S6M_Request_Packed_Size    (const struct S6M_Request     *req,       enum S6M_Error *err);
 ssize_t S6M_AuthReply_Packed_Size  (const struct S6M_AuthReply   *authReply, enum S6M_Error *err);
@@ -156,11 +160,11 @@ ssize_t S6M_OpReply_Packed_Size    (const struct S6M_OpReply     *opReply,   enu
 ssize_t S6M_PasswdReq_Packed_Size  (const struct S6M_PasswdReq   *pwReq,     enum S6M_Error *err);
 ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply,   enum S6M_Error *err);
 
-struct S6M_Request     *S6M_Request_Parse    (char *buf, int size, enum S6M_Error *err);
-struct S6M_AuthReply   *S6M_AuthReply_Parse  (char *buf, int size, enum S6M_Error *err);
-struct S6M_OpReply     *S6M_OpReply_Parse    (char *buf, int size, enum S6M_Error *err);
-struct S6M_PasswdReq   *S6M_PasswdReq_Parse  (char *buf, int size, enum S6M_Error *err);
-struct S6M_PasswdReply *S6M_PasswdReply_Parse(char *buf, int size, enum S6M_Error *err);
+ssize_t S6M_Request_Parse    (uint8_t *buf, size_t size, struct S6M_Request     **preq,       enum S6M_Error *err);
+ssize_t S6M_AuthReply_Parse  (uint8_t *buf, size_t size, struct S6M_AuthReply   **pauthReply, enum S6M_Error *err);
+ssize_t S6M_OpReply_Parse    (uint8_t *buf, size_t size, struct S6M_OpReply     **popReply,   enum S6M_Error *err);
+ssize_t S6M_PasswdReq_Parse  (uint8_t *buf, size_t size, struct S6M_PasswdReq   **ppwReq,     enum S6M_Error *err);
+ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReply **ppwReply,   enum S6M_Error *err);
 
 void S6M_Request_Free    (struct S6M_Request     *req);
 void S6M_AuthReply_Free  (struct S6M_AuthReply   *authReply);
