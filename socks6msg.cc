@@ -32,6 +32,62 @@
 
 using namespace std;
 
+namespace S6M {
+
+class ByteBufferException: exception
+{
+	
+};
+
+class ByteBuffer
+{
+	char *buf;
+	size_t used;
+	size_t totalSize;
+	
+public:
+	ByteBuffer(char *buf, size_t size)
+		: buf(buf), used(0), totalSize(size) {}
+	
+	char *getBuf() const
+	{
+		return buf;
+	}
+	
+	size_t getUsed() const
+	{
+		return used;
+	}
+	
+	
+	size_t getTotalSize() const
+	{
+		return totalSize;
+	}
+	
+	template <typename T> void put(T *what, size_t count = 1)
+	{
+		size_t req = sizeof(T) * count;
+		
+		if (req + used > totalSize)
+			throw ByteBufferException;
+		
+		memcpy(buf + used, what, req);
+		used += req;
+	}
+	
+	template <typename T> T* get(size_t count = 1)
+	{
+		size_t req = sizeof(T) * count;
+		
+		if (req + used > totalSize)
+			throw ByteBufferException;
+	}
+};
+
+}
+
+
 /*
  * helpers
  */
