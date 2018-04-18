@@ -34,22 +34,33 @@ using namespace std;
 
 namespace S6M {
 
-class ByteBufferException: exception
+class Exception: exception
 {
+	enum S6M_Error error;
 	
+public:
+	Exception(enum S6M_Error error)
+		: error(error) {}
+
+	//const char *what() const;
+	
+	S6M_Error getError() const
+	{
+		return error;
+	}
 };
 
 class ByteBuffer
 {
-	char *buf;
+	uint8_t *buf;
 	size_t used;
 	size_t totalSize;
 	
 public:
-	ByteBuffer(char *buf, size_t size)
+	ByteBuffer(uint8_t *buf, size_t size)
 		: buf(buf), used(0), totalSize(size) {}
 	
-	char *getBuf() const
+	uint8_t *getBuf() const
 	{
 		return buf;
 	}
@@ -70,22 +81,29 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw ByteBufferException;
+			throw Exception(S6M_ERROR_BUFFER);
 		
 		memcpy(buf + used, what, req);
 		used += req;
 	}
 	
-	template <typename T> T* get(size_t count = 1)
+	template <typename T> T *get(size_t count = 1)
 	{
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw ByteBufferException;
+			throw Exception(S6M_ERROR_BUFFER);
+		
+		T *ret = reinterpret_cast<T *>(buf + used);
+		used += req;
+		return ret;
+		
 	}
 };
 
 }
+
+using namespace S6M;
 
 
 /*
@@ -198,24 +216,23 @@ static ssize_t S6M_String_Pack(const char *str, uint8_t *buf, size_t size, enum 
 	return len + 1;
 }
 
-static ssize_t S6M_String_Parse(uint8_t *buf, size_t size, char **pstr, enum S6M_Error *err)
+char *String_Parse(ByteBuffer *bb)
 {
-	if (size < 1)
-		S6M_DIE(S6M_ERROR_BUFFER);
+	uint8_t *len = bb->get<uint8_t>();
+	uint8_t *rawStr = bb->get<uint8_t>(*len);
 	
-	size_t len = buf[0];
-	if (size < len + 1)
-		S6M_DIE(S6M_ERROR_BUFFER);
+	for (int i = 0; i < (int)(*len); i++)
+	{
+		if (__builtin_expect(!!(rawStr[i] == '\0'), 0))
+			throw Exception(S6M_ERROR_INVALID);
+	}
 	
-	char *str = (char *)malloc(len + 1);
-	if (!str)
-		S6M_DIE(S6M_ERROR_ALLOC);
+	char *str = new char[*len + 1];
 	
-	memcpy(str, &buf[1], len);
-	str[len] = 0;
+	memcpy(str, rawStr, len);
+	str[len] = '\0';
 	
-	*pstr = str;
-	return len + 1;
+	return str;
 }
 
 /*
@@ -562,60 +579,46 @@ error:
 
 ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **ppwReq, enum S6M_Error *err)
 {
-	if (size < 3)
-		S6M_DIE(S6M_ERROR_BUFFER);
-	
-	ssize_t crt = 0;
-	
-	{
-		uint8_t ver = buf[0];
-		if (ver != 0x01)
-			S6M_DIE(S6M_ERROR_INVALID);
-		crt += 1;
-	}
-	
 	char *username = NULL;
 	char *passwd = NULL;
-	S6M_PasswdReq *pwReq = NULL;
 	
+	try
 	{
-		ssize_t rawSize = S6M_String_Parse(buf, size, &username, err);
-		if (rawSize < 0)
-			goto error;
-		crt += rawSize;
+		ByteBuffer bb(buf, size);
+		
+		uint8_t *ver = bb.get<uint8_t>();
+		if (*ver != 0x01)
+			throw Exception(S6M_ERROR_INVALID);
+		
+		username = String_Parse(&bb);
+		passwd = String_Parse(&bb);
+		
+		pwReq = new S6M_PasswdReq();
+		pwReq->username = username;
+		pwReq->passwd = passwd;
+		
+		*ppwReq = pwReq;
+		return bb.getUsed();
 	}
-	
+	catch (S6M::Exception ex)
 	{
-		ssize_t rawSize = S6M_String_Parse(buf, size, &passwd, err);
-		if (rawSize < 0)
-			goto error;
-		crt += rawSize;
+		*err = ex.getError();
 	}
-	
-	pwReq = (S6M_PasswdReq *)malloc(sizeof(S6M_PasswdReq));
-	if (!pwReq)
+	catch (bad_alloc)
 	{
 		*err = S6M_ERROR_ALLOC;
-		goto error;
 	}
-	pwReq->username = username;
-	pwReq->passwd = passwd;
 	
-	*ppwReq = pwReq;
-	return crt;
-	
-error:
-	free(username);
-	free(passwd);
-	free(pwReq);
+	delete username;
+	delete passwd;
 	return -1;
 }
 
 void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
 {
-	free(pwReq->username);
-	free(pwReq->passwd);
-	free(pwReq);
+	delete pwReq->username;
+	delete pwReq->passwd;
+	delete pwReq;
 }
 
 /*
@@ -630,35 +633,67 @@ ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply, enum 
 
 ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
-	S6M_SIZE_CHECK(PasswdReply, pwReply);
+	try
+	{
+		S6M::ByteBuffer bb(buf, size);
+		
+		if (pwReply->fail != 0 && pwReply->fail != 1)
+			throw S6M::Exception(S6M_ERROR_INVALID);
+		
+		uint8_t ver = 0x01;
+		uint8_t fail = pwReply->fail;
+		
+		bb.put(&ver);
+		bb.put(&fail);
+		
+		return bb.getUsed();
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERROR_ALLOC;
+	}
 	
-	buf[0] = 0x01;
-	buf[1] = pwReply->fail;
-	return size;
+	return -1;
 }
 
 ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwReply, enum S6M_Error *err)
 {
-	if (size < 2)
-		S6M_DIE(S6M_ERROR_BUFFER);
-	if (buf[0] != 0x01)
-		S6M_DIE(S6M_ERROR_INVALID);
+	try
+	{
+		S6M::ByteBuffer bb(buf, size);
+		
+		uint8_t *ver = bb.get<uint8_t>();
+		uint8_t *fail = bb.get<uint8_t>();
+		
+		if (*ver != 0x01 ||
+			(*fail != 0 && *fail != 1))
+		{
+			throw S6M::Exception(S6M_ERROR_INVALID);
+		}
+		
+		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
+		pwReply->fail = *fail;
+		*ppwReply = pwReply;
+		
+		return bb.getUsed();
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERROR_ALLOC;
+	}
 	
-	int fail = buf[1];
-	if (fail != 0 && fail != 1)
-		S6M_DIE(S6M_ERROR_INVALID);
-	
-	S6M_PasswdReply *pwReply = (struct S6M_PasswdReply *)malloc(2);
-	if (!pwReply)
-		S6M_DIE(S6M_ERROR_INVALID);
-	
-	pwReply->fail = fail;
-	
-	*ppwReply = pwReply;
-	return 2;
+	return -1;
 }
 
 void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply)
 {
-	free(pwReply);
+	delete pwReply;
 }
