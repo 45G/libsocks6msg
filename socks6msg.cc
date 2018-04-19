@@ -195,7 +195,7 @@ template <typename T> static ssize_t S6M_Raw_Parse(uint8_t *buf, size_t size, T 
 static ssize_t String_Packed_Size(const char *str)
 {
 	if (!str)
-		throw Exception(S6M_ERROR_INVALID);
+		return 1;
 	size_t len = strlen(str);
 	if (len > 255)
 		throw Exception(S6M_ERROR_INVALID);
@@ -204,7 +204,7 @@ static ssize_t String_Packed_Size(const char *str)
 
 static void String_Pack(ByteBuffer *bb, char *str)
 {
-	size_t len = strlen(str);
+	size_t len = str ? strlen(str) : 0;
 	if (len > 255)
 		throw Exception(S6M_ERROR_INVALID);
 	
