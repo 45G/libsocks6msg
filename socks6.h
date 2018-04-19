@@ -46,6 +46,8 @@ extern "C"
  */
 #define SOCKS6_VERSION_MINOR 202
 
+#define SOCKS6_PWAUTH_VERSION 0x01
+
 struct SOCKS6Version
 {
 	uint8_t major;
