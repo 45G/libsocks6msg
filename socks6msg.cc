@@ -107,90 +107,8 @@ using namespace S6M;
 
 
 /*
- * helpers
- */
-
-#define S6M_DIE(errcode) \
-{\
-	*err = errcode; \
-	return -1; \
-}
-
-#define S6M_PACKED_SIZE(type)  S6M_ ## type ## _Packed_Size 
-
-#define S6M_SIZE_CHECK(type, ptr) \
-{ \
-	ssize_t psize = S6M_PACKED_SIZE(type)((ptr), err); \
-	if (psize < 0) \
-		return -1; \
-	if (psize > (ssize_t)size) \
-		S6M_DIE(S6M_ERROR_BUFFER); \
-}
-
-#define S6M_PROG_BEGIN() size_t S6M_crt = 0;
-
-#define S6M_PROG(op) \
-{ \
-	ssize_t chunk = (op); \
-	if (chunk < 0) \
-		goto error; \
-	S6M_crt += chunk; \
-	size -= chunk; \
-}
-
-#define S6M_PROG_END() S6M_crt;
-
-/*
- * pregenerated stuff
- */
-
-static const SOCKS6SocketOption tfoOption = {
-	.optionHead = {
-		.kind = SOCKS6_OPTION_SOCKET,
-		.len = sizeof(SOCKS6SocketOption),
-	},
-	.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-	.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-	.code = SOCKS6_SOCKOPT_CODE_TFO,
-};
-
-static const SOCKS6SocketOption mptcpOption = {
-	.optionHead = {
-		.kind = SOCKS6_OPTION_SOCKET,
-		.len = sizeof(SOCKS6SocketOption),
-	},
-	.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-	.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-	.code = SOCKS6_SOCKOPT_CODE_TFO,
-};
-
-/*
  * raw
  */
-
-template <typename T> static ssize_t S6M_Raw_Packed_Size(const T *item, enum S6M_Error *err)
-{
-	(void)item; (void)err;
-	return sizeof(T);
-}
-
-template <typename T> static ssize_t S6M_Raw_Pack(const T *item, uint8_t *buf, size_t size, enum S6M_Error *err)
-{
-	S6M_SIZE_CHECK(Raw, item);
-	*(reinterpret_cast<T *>(buf)) = *item;
-	return sizeof(T);
-}
-
-template <typename T> static ssize_t S6M_Raw_Parse(uint8_t *buf, size_t size, T **pitem, enum S6M_Error *err)
-{
-	if (size < sizeof(T))
-		S6M_DIE(S6M_ERROR_BUFFER);
-	T *item = (T *)malloc(sizeof(T));
-	*item = *(reinterpret_cast<const T *>(buf));
-	
-	*pitem = item;
-	return sizeof(T);
-}
 
 static ssize_t String_Packed_Size(const char *str)
 {
@@ -204,7 +122,11 @@ static ssize_t String_Packed_Size(const char *str)
 
 static void String_Pack(ByteBuffer *bb, char *str)
 {
-	size_t len = str ? strlen(str) : 0;
+	size_t len;
+	if (str == NULL)
+		len = 0;
+	else
+		nen = strlen(str);
 	if (len > 255)
 		throw Exception(S6M_ERROR_INVALID);
 	
@@ -239,27 +161,26 @@ static char *String_Parse(ByteBuffer *bb)
  * SGM_Addr_*
  */
 
-int S6M_Addr_Validate(const struct S6M_Addr *addr, enum S6M_Error *err)
+static void S6M_Addr_Validate(const struct S6M_Addr *addr)
 {
 	ssize_t domPackedLen;
 	switch(addr->type)
 	{
 	case SOCKS6_ADDR_IPV4:
-		return 0;
 	case SOCKS6_ADDR_IPV6:
 		return 0;
+		
 	case SOCKS6_ADDR_DOMAIN:
-		domPackedLen = S6M_String_Packed_Size(addr->domain, err);
+		domPackedLen = String_Packed_Size(addr->domain);
 		if (domPackedLen == 1) /* empty string */
 			break;
-		return domPackedLen > 0 ? 1 : -1;
+		return;
 	}
 	
-	*err = S6M_ERROR_INVALID;
-	return -1;
+	throw Exception(S6M_ERROR_INVALID);
 }
 
-ssize_t S6M_Addr_Packed_Size(const struct S6M_Addr *addr, enum S6M_Error *err)
+ssize_t Addr_Packed_Size(const struct S6M_Addr *addr)
 {
 	switch(addr->type)
 	{
@@ -271,8 +192,7 @@ ssize_t S6M_Addr_Packed_Size(const struct S6M_Addr *addr, enum S6M_Error *err)
 		return S6M_String_Packed_Size(addr->domain, err);
 	}
 	
-	*err = S6M_ERROR_INVALID;
-	return -1;
+	throw Exception(S6M_ERROR_INVALID);
 }
 
 ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum S6M_Error *err)
@@ -289,7 +209,7 @@ ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum 
 			return -1;
 		return sizeof(addr->ipv6);
 	case SOCKS6_ADDR_DOMAIN:
-		domainPackLen = String_Pack(addr->domain, buf, size, err);
+		domainPackLen = String_Pack(addr->domain, buf, size);
 		if (domainPackLen < 0)
 			return -1;
 		if (domainPackLen == 1)
@@ -307,24 +227,35 @@ ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum 
 /*
  * S6M_Request_*
  */
-ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err) {}
-ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, enum S6M_Error *err) {}
-ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err) {}
+ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err)
+{
+	//TODO
+}
+
+ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, enum S6M_Error *err)
+{
+	//TODO
+}
+
+ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err)
+{
+	//TODO
+}
 
 void S6M_Request_Free(struct S6M_Request *req)
 {
-	free(req->addr.domain);
-	free(req->supportedMethods);
-	free(req->userPasswdAuth.username);
-	free(req->userPasswdAuth.passwd);
-	free(req);
+	delete req->addr.domain;
+	delete req->supportedMethods;
+	delete req->userPasswdAuth.username;
+	delete req->userPasswdAuth.passwd;
+	delete req;
 }
 
 /*
  * S6M_AuthReply_*
  */
 
-static int S6M_AuthReply_Validate(const struct S6M_AuthReply *authReply, S6M_Error *err)
+static void AuthReply_Validate(const struct S6M_AuthReply *authReply)
 {
 	switch (authReply->repCode)
 	{
@@ -333,8 +264,7 @@ static int S6M_AuthReply_Validate(const struct S6M_AuthReply *authReply, S6M_Err
 		return 0;
 	}
 	
-	*err = S6M_ERROR_INVALID;
-	return -1;
+	throw Exception(S6M_ERROR_INVALID);
 }
 
 ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6M_Error *err)
@@ -345,8 +275,7 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 
 ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
-	if (S6M_AuthReply_Validate(authReply, err) < 0)
-		return -1;
+	AuthReply_Validate(authReply);
 	
 	SOCKS6Version ver = { SOCKS6_VERSION_MAJOR, SOCKS6_VERSION_MINOR };
 	SOCKS6AuthReply rawAuthReply = { authReply->repCode, authReply->method };
@@ -362,14 +291,31 @@ error:
 
 ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply, enum S6M_Error *err)
 {
-	SOCKS6Version *ver = NULL;
+	try
+	{
+		ByteBuffer bb(buf, size);
+		
+		SOCKS6Version *ver = bb.get<SOCKS6Version>();
+		if (ver->major != SOCKS6_VERSION_MAJOR || ver->minor != SOCKS6_VERSION_MINOR)
+			throw Exception(S6M_ERROR_OTHERVER);
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERROR_ALLOC;
+	}
+	
+	
 	SOCKS6AuthReply *rawAuthReply = NULL;
 	S6M_AuthReply *authReply = NULL;
 	
 	S6M_PROG_BEGIN();
 	
 	S6M_PROG(S6M_Raw_Parse(buf, size, &ver, err));
-	if (ver->major != SOCKS6_VERSION_MAJOR || ver->minor != SOCKS6_VERSION_MINOR)
+	
 		goto error;
 	free(ver);
 	
@@ -377,7 +323,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	authReply = (S6M_AuthReply *)malloc(sizeof(S6M_AuthReply));
 	authReply->repCode = (SOCKS6AuthReplyCode)rawAuthReply->type;
 	authReply->method = (SOCKS6Method)rawAuthReply->method;
-	if (!S6M_AuthReply_Validate(authReply, err))
+	if (!AuthReply_Validate(authReply, err))
 		goto error;
 	free(rawAuthReply);
 	
@@ -404,9 +350,7 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 {
 	size_t size = sizeof(SOCKS6OperationReply);
 	
-	ssize_t addrSize = S6M_Addr_Packed_Size(&opReply->addr, err);
-	if (addrSize < 0)
-		return -1;
+	ssize_t addrSize = Addr_Packed_Size(&opReply->addr);
 	size += addrSize;
 	
 	size += sizeof(SOCKS6Options);
@@ -427,7 +371,7 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 	return size;
 }
 
-static int S6M_OpReply_Validate(const struct S6M_OpReply *opReply, enum S6M_Error *err)
+static void OpReply_Validate(const struct S6M_OpReply *opReply)
 {
 	switch (opReply->code)
 	{
@@ -443,14 +387,14 @@ static int S6M_OpReply_Validate(const struct S6M_OpReply *opReply, enum S6M_Erro
 		break;
 		
 	default:
-		goto error;
+		throw Exception(S6M_ERROR_INVALID);
 	}
 	
 	if (S6M_Addr_Validate(&opReply->addr, err) < 0)
-		return -1;
+		throw Exception(S6M_ERROR_INVALID);
 	
 	if (opReply->port == 0)
-		goto error;
+		throw Exception(S6M_ERROR_INVALID);
 	
 	switch (opReply->mptcpSched.clientProxy)
 	{
@@ -461,7 +405,7 @@ static int S6M_OpReply_Validate(const struct S6M_OpReply *opReply, enum S6M_Erro
 		break;
 		
 	default:
-		goto error;
+		throw Exception(S6M_ERROR_INVALID);
 	}
 	
 	switch (opReply->mptcpSched.proxyServer)
@@ -473,23 +417,16 @@ static int S6M_OpReply_Validate(const struct S6M_OpReply *opReply, enum S6M_Erro
 		break;
 		
 	default:
-		goto error;
+		throw Exception(S6M_ERROR_INVALID);
 	}
 	
 	if (opReply->idempotence.advertise && opReply->idempotence.windowSize == 0)
-		goto error;
-	
-	return 0;
-	
-error:
-	*err = S6M_ERROR_INVALID;
-	return -1;
+		throw Exception(S6M_ERROR_INVALID);
 }
 
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
-	if (S6M_OpReply_Validate(opReply, err) < 0)
-		return -1;
+	OpReply_Validate(opReply, err);
 	
 	list<SOCKS6Option *> options;
 	int optionCount = 0;
@@ -521,8 +458,28 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	SOCKS6Options opts = { .optionCount = optionCount };
 	S6M_PROG(S6M_Raw_Pack(opts, buf, size, err));
 	
+	static const SOCKS6SocketOption tfoOption = {
+		.optionHead = {
+			.kind = SOCKS6_OPTION_SOCKET,
+			.len = sizeof(SOCKS6SocketOption),
+		},
+		.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+		.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+		.code = SOCKS6_SOCKOPT_CODE_TFO,
+	};
+	
 	if (opReply->tfo)
 		S6M_PROG(S6M_Raw_Pack(&tfoOption, buf, size, err));
+	
+	static const SOCKS6SocketOption mptcpOption = {
+		.optionHead = {
+			.kind = SOCKS6_OPTION_SOCKET,
+			.len = sizeof(SOCKS6SocketOption),
+		},
+		.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+		.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+		.code = SOCKS6_SOCKOPT_CODE_TFO,
+	};
 	
 	if (opReply->mptcp)
 	{
@@ -538,12 +495,15 @@ error:
 	}
 }
 
-ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err) {}
+ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err)
+{
+	//TODO
+}
 
 void S6M_OpReply_Free(struct S6M_OpReply *opReply)
 {
-	free(opReply->addr.domain);
-	free(opReply);
+	delete opReply->addr.domain;
+	delete opReply;
 }
 
 /*
