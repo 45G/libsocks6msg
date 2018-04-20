@@ -28,80 +28,11 @@
 #include <string.h>
 #include <list>
 #include <boost/foreach.hpp>
-#include <socks6msg.h>
+#include <set>
+#include "socks6msg.h"
+#include "socks6msg_base.hh"
 
 using namespace std;
-
-namespace S6M {
-
-class Exception: exception
-{
-	enum S6M_Error error;
-	
-public:
-	Exception(enum S6M_Error error)
-		: error(error) {}
-
-	//const char *what() const;
-	
-	S6M_Error getError() const
-	{
-		return error;
-	}
-};
-
-class ByteBuffer
-{
-	uint8_t *buf;
-	size_t used;
-	size_t totalSize;
-	
-public:
-	ByteBuffer(uint8_t *buf, size_t size)
-		: buf(buf), used(0), totalSize(size) {}
-	
-	uint8_t *getBuf() const
-	{
-		return buf;
-	}
-	
-	size_t getUsed() const
-	{
-		return used;
-	}
-	
-	
-	size_t getTotalSize() const
-	{
-		return totalSize;
-	}
-	
-	template <typename T> void put(T *what, size_t count = 1)
-	{
-		size_t req = sizeof(T) * count;
-		
-		if (req + used > totalSize)
-			throw Exception(S6M_ERR_BUFFER);
-		
-		memcpy(buf + used, what, req);
-		used += req;
-	}
-	
-	template <typename T> T *get(size_t count = 1)
-	{
-		size_t req = sizeof(T) * count;
-		
-		if (req + used > totalSize)
-			throw Exception(S6M_ERR_BUFFER);
-		
-		T *ret = reinterpret_cast<T *>(buf + used);
-		used += req;
-		return ret;
-		
-	}
-};
-
-}
 
 using namespace S6M;
 
@@ -165,27 +96,6 @@ static char *String_Parse(ByteBuffer *bb, bool nonEmpty = false)
 /*
  * SGM_Addr_*
  */
-
-//TODO: get rid of this
-static void Addr_Validate(const S6M_Addr *addr)
-{
-	ssize_t domPackedLen;
-	switch(addr->type)
-	{
-	case SOCKS6_ADDR_IPV4:
-	case SOCKS6_ADDR_IPV6:
-		return;
-		
-	case SOCKS6_ADDR_DOMAIN:
-		domPackedLen = String_Packed_Size(addr->domain);
-		if (domPackedLen == 1) /* empty string */
-			throw Exception(S6M_ERR_INVALID);
-		return;
-	}
-	
-	throw Exception(S6M_ERR_BADADDR);
-}
-
 static ssize_t Addr_Packed_Size(const S6M_Addr *addr)
 {
 	switch(addr->type)
@@ -256,6 +166,283 @@ static S6M_Addr Addr_Parse(ByteBuffer *bb)
 }
 
 /*
+ * Options
+ */ 
+struct Options
+{
+	bool tfo;
+	
+	bool mptcp;
+	
+	struct
+	{
+		SOCKS6MPTCPScheduler clientProxy;
+		SOCKS6MPTCPScheduler proxyServer;
+	} mptcpSched;
+	
+	struct
+	{
+		bool request;
+		bool spend;
+		uint32_t token;
+		
+		bool advertise;
+		uint32_t base;
+		uint32_t windowSize;
+	} idempotence;
+	
+	set<SOCKS6Method> extraMethods;
+	
+	struct
+	{
+		string username;
+		string passwd;
+	} userPasswdAuth;
+	
+	Options()
+	{
+		tfo = false;
+		
+		mptcp = false;
+		
+		mptcpSched.clientProxy = (SOCKS6MPTCPScheduler)0;
+		mptcpSched.proxyServer = (SOCKS6MPTCPScheduler)0;
+		
+		idempotence.request = false;
+		idempotence.spend = false;
+		idempotence.advertise = false;
+	}
+	
+	Options(S6M_Request *req)
+	{
+		tfo = req->tfo;
+		
+		mptcp = false;
+		
+		mptcpSched.clientProxy = req->mptcpSched.clientProxy;
+		mptcpSched.proxyServer = req->mptcpSched.proxyServer;
+		
+		idempotence.request = req->idempotence.request;
+		idempotence.spend = req->idempotence.spend;
+		idempotence.token = req->idempotence.token;
+		idempotence.advertise = false;
+		
+		if (req->userPasswdAuth.username)
+		{	
+			userPasswdAuth.username = string(req->userPasswdAuth.username);
+			userPasswdAuth.passwd = string(req->userPasswdAuth.passwd);
+		}
+		
+		bool doUserPasswdAuth = userPasswdAuth.username.length() > 0;
+		
+		if (req->supportedMethods == NULL)
+			return;
+		for (int i = 0; req->supportedMethods[i] != SOCKS6_METHOD_NOAUTH; i++)
+		{
+			SOCKS6Method method = (SOCKS6Method)req->supportedMethods[i];
+			if (method == SOCKS6_METHOD_UNACCEPTABLE)
+				throw Exception(S6M_ERR_INVALID);
+			if (method == SOCKS6_METHOD_USRPASSWD && doUserPasswdAuth)
+				continue;
+			extraMethods.insert(method);
+		}
+	}
+	
+	Options(S6M_AuthReply *authReply)
+	{
+		(void)authReply;
+		
+		tfo = false;
+		
+		mptcp = false;
+		
+		mptcpSched.clientProxy = (SOCKS6MPTCPScheduler)0;
+		mptcpSched.proxyServer = (SOCKS6MPTCPScheduler)0;
+		
+		idempotence.request = false;
+		idempotence.spend = false;
+		idempotence.advertise = false;
+	}
+	
+	Options(S6M_OpReply *opReply)
+	{
+		tfo = opReply->tfo;
+		
+		mptcp = opReply->mptcp;
+		
+		mptcpSched.clientProxy = opReply->mptcpSched.clientProxy;
+		mptcpSched.proxyServer = opReply->mptcpSched.proxyServer;
+		
+		idempotence.request = false;
+		idempotence.spend = false;
+		idempotence.advertise = opReply->idempotence.advertise;
+		idempotence.base = opReply->idempotence.base;
+		idempotence.windowSize = opReply->idempotence.windowSize;
+	}
+};
+
+static void Options_Packed_Size(const Options *opts)
+{
+	//TODO
+	size += sizeof(SOCKS6Options);
+	if (opReply->tfo)
+		size += sizeof(SOCKS6SocketOption);
+	if (opReply->mptcp)
+		size += sizeof(SOCKS6SocketOption);
+	if (opReply->mptcpSched.clientProxy > 0)
+	{
+		size += sizeof(SOCKS6MPTCPSchedulerOption);
+		if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
+			size += sizeof(SOCKS6MPTCPSchedulerOption);
+	}
+	
+	if (opReply->idempotence.advertise)
+		size += sizeof(SOCKS6WindowAdvertOption);
+}
+
+static void Options_Pack(ByteBuffer *bb, const Options *opts)
+{
+	SOCKS6Options *rawOptHeader = bb->get<SOCKS6Options>();
+	rawOptHeader->optionCount = 0;
+	
+	if (opts->tfo)
+	{
+		rawOptHeader->optionCount++;
+		
+		SOCKS6SocketOption *rawTFOOption = bb->get<SOCKS6SocketOption>();
+		*rawTFOOption = {
+			.optionHead = {
+				.kind = SOCKS6_OPTION_SOCKET,
+				.len = sizeof(SOCKS6SocketOption),
+			},
+			.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+			.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+			.code = SOCKS6_SOCKOPT_CODE_TFO,
+		};
+	}
+	
+	if (opts->mptcp)
+	{
+		rawOptHeader->optionCount++;
+		
+		SOCKS6SocketOption *rawMPTCPOption = bb->get<SOCKS6SocketOption>();
+		*rawMPTCPOption = {
+			.optionHead = {
+				.kind = SOCKS6_OPTION_SOCKET,
+				.len = sizeof(SOCKS6SocketOption),
+			},
+			.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+			.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+			.code = SOCKS6_SOCKOPT_CODE_MPTCP,
+		};
+	}
+	
+	SOCKS6MPTCPSchedulerOption *mpSchedOption = NULL;
+	if (opts->mptcpSched.proxyServer != 0)
+	{
+		rawOptHeader->optionCount++;
+		
+		switch (opts->mptcpSched.proxyServer)
+		{
+		case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+		case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+		case SOCKS6_MPTCP_SCHEDULER_RR:
+			break;
+			
+		default:
+			throw Exception(S6M_ERR_INVALID);
+		}
+		
+		mpSchedOption = bb->get<SOCKS6MPTCPSchedulerOption>();
+		*mpSchedOption = {
+			.socketOptionHead = {
+				.optionHead = {
+					.kind = SOCKS6_OPTION_SOCKET,
+					.len = sizeof(SOCKS6SocketOption),
+				},
+				.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+				.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+				.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
+			},
+			.scheduler = opReply->mptcpSched.proxyServer,
+		};
+	}
+	if (opts->mptcpSched.clientProxy != 0)
+	{
+		switch (opReply->mptcpSched.clientProxy)
+		{
+		case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+		case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+		case SOCKS6_MPTCP_SCHEDULER_RR:
+			break;
+			
+		default:
+			throw Exception(S6M_ERR_INVALID);
+		}
+		
+		if (mpSchedOption != NULL && opReply->mptcpSched.proxyServer == opReply->mptcpSched.clientProxy)
+			mpSchedOption->socketOptionHead.leg = SOCKS6_SOCKOPT_LEG_BOTH;
+		else
+		{
+			rawOptHeader->optionCount++;
+			
+			mpSchedOption = bb.get<SOCKS6MPTCPSchedulerOption>();
+			*mpSchedOption = {
+				.socketOptionHead = {
+					.optionHead = {
+						.kind = SOCKS6_OPTION_SOCKET,
+						.len = sizeof(SOCKS6SocketOption),
+					},
+					.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+					.leg = SOCKS6_SOCKOPT_LEG_CLIENT_PROXY,
+					.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
+				},
+				.scheduler = opReply->mptcpSched.proxyServer,
+			};
+		}
+	}
+	
+	if (opts->idempotence.request)
+	{
+		//TODO
+	}
+	
+	if (opts->idempotence.spend)
+	{
+		//TODO
+	}
+	
+	if (opts->idempotence.advertise)
+	{
+		rawOptHeader->optionCount++;
+		
+		if (opReply->idempotence.windowSize == 0 || opReply->idempotence.windowSize >= (1UL << 31))
+			throw Exception(S6M_ERR_INVALID);
+		
+		SOCKS6WindowAdvertOption *winAdvert = bb.get<SOCKS6WindowAdvertOption>();
+		*winAdvert = {
+			.idempotenceOptionHead = {
+				.optionHead = {
+					.kind = SOCKS6_OPTION_IDEMPOTENCE,
+					.len = sizeof(SOCKS6WindowAdvertOption),
+				},
+				.type = SOCKS6_IDEMPOTENCE_WND_ADVERT,
+			},
+			.windowBase = opReply->idempotence.base,
+			.windowSize = opReply->idempotence.windowSize,
+		};
+	}
+	
+	if (!opts->extraMethods.empty())
+}
+
+static Options Options_Parse(ByteBuffer *bb)
+{
+	//TODO
+}
+
+
+/*
  * S6M_Request_*
  */
 ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err)
@@ -288,8 +475,21 @@ void S6M_Request_Free(struct S6M_Request *req)
 
 ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6M_Error *err)
 {
-	(void)authReply; (void)err;
-	return sizeof(SOCKS6Version) + sizeof(SOCKS6AuthReply);
+	try
+	{
+		Options options(authReply);
+		return sizeof(SOCKS6Version) + sizeof(SOCKS6AuthReply) + Options_Packed_Size(&options);
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERR_ALLOC;
+	}
+	
+	return -1;
 }
 
 ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, int size, enum S6M_Error *err)
@@ -313,6 +513,9 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 			.type = authReply->type,
 			.method = authReply->method
 		};
+		
+		Options options;
+		Options_Pack(&bb, &options);
 		
 		return bb.getUsed();
 	}
@@ -343,8 +546,12 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 			throw Exception(S6M_ERR_INVALID);
 		
 		S6M_AuthReply *authReply = new S6M_AuthReply();
-		authReply->type = rawAuthReply->type;
-		authReply->method = rawAuthReply->method;
+		memset(authReply, 0, sizeof(S6M_AuthReply));
+		authReply->type = (SOCKS6AuthReplyCode)rawAuthReply->type;
+		authReply->method = (SOCKS6Method)rawAuthReply->method;
+		
+		Options options = Options_Parse(&bb);
+		(void)options; //no usable options in spec
 		
 		*pauthReply = authReply;
 		return bb.getUsed();
@@ -379,20 +586,7 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 		ssize_t addrSize = Addr_Packed_Size(&opReply->addr);
 		size += addrSize;
 		
-		size += sizeof(SOCKS6Options);
-		if (opReply->tfo)
-			size += sizeof(SOCKS6SocketOption);
-		if (opReply->mptcp)
-			size += sizeof(SOCKS6SocketOption);
-		if (opReply->mptcpSched.clientProxy > 0)
-		{
-			size += sizeof(SOCKS6MPTCPSchedulerOption);
-			if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
-				size += sizeof(SOCKS6MPTCPSchedulerOption);
-		}
-		
-		if (opReply->idempotence.advertise)
-			size += sizeof(SOCKS6WindowAdvertOption);
+		//TODO
 		
 		return size;
 	}
@@ -444,126 +638,10 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 		
 		Addr_Pack(&bb, &opReply->addr);
 		
-		SOCKS6Options *rawOptHeader = bb.get<SOCKS6Options>();
-		rawOptHeader->optionCount = 0;
+		Options options(opReply);
+		Options_Pack(&bb, &options);
 		
-		if (opReply->tfo)
-		{
-			rawOptHeader->optionCount++;
-			
-			SOCKS6SocketOption *rawTFOOption = bb.get<SOCKS6SocketOption>();
-			*rawTFOOption = {
-				.optionHead = {
-					.kind = SOCKS6_OPTION_SOCKET,
-					.len = sizeof(SOCKS6SocketOption),
-				},
-				.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-				.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-				.code = SOCKS6_SOCKOPT_CODE_TFO,
-			};
-		}
-		
-		if (opReply->mptcp)
-		{
-			rawOptHeader->optionCount++;
-			
-			SOCKS6SocketOption *rawMPTCPOption = bb.get<SOCKS6SocketOption>();
-			*rawMPTCPOption = {
-				.optionHead = {
-					.kind = SOCKS6_OPTION_SOCKET,
-					.len = sizeof(SOCKS6SocketOption),
-				},
-				.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-				.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-				.code = SOCKS6_SOCKOPT_CODE_MPTCP,
-			};
-		}
-		
-		SOCKS6MPTCPSchedulerOption *mpSchedOption = NULL;
-		if (opReply->mptcpSched.proxyServer != 0)
-		{
-			rawOptHeader->optionCount++;
-			
-			switch (opReply->mptcpSched.proxyServer)
-			{
-			case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-			case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-			case SOCKS6_MPTCP_SCHEDULER_RR:
-				break;
-				
-			default:
-				throw Exception(S6M_ERR_INVALID);
-			}
-			
-			mpSchedOption = bb.get<SOCKS6MPTCPSchedulerOption>();
-			*mpSchedOption = {
-				.socketOptionHead = {
-					.optionHead = {
-						.kind = SOCKS6_OPTION_SOCKET,
-						.len = sizeof(SOCKS6SocketOption),
-					},
-					.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-					.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-					.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
-				},
-				.scheduler = opReply->mptcpSched.proxyServer,
-			};
-		}
-		if (opReply->mptcpSched.clientProxy != 0)
-		{
-			switch (opReply->mptcpSched.clientProxy)
-			{
-			case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-			case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-			case SOCKS6_MPTCP_SCHEDULER_RR:
-				break;
-				
-			default:
-				throw Exception(S6M_ERR_INVALID);
-			}
-			
-			if (mpSchedOption != NULL && opReply->mptcpSched.proxyServer == opReply->mptcpSched.clientProxy)
-				mpSchedOption->socketOptionHead.leg = SOCKS6_SOCKOPT_LEG_BOTH;
-			else
-			{
-				rawOptHeader->optionCount++;
-				
-				mpSchedOption = bb.get<SOCKS6MPTCPSchedulerOption>();
-				*mpSchedOption = {
-					.socketOptionHead = {
-						.optionHead = {
-							.kind = SOCKS6_OPTION_SOCKET,
-							.len = sizeof(SOCKS6SocketOption),
-						},
-						.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-						.leg = SOCKS6_SOCKOPT_LEG_CLIENT_PROXY,
-						.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
-					},
-					.scheduler = opReply->mptcpSched.proxyServer,
-				};
-			}
-		}
-		
-		if (opReply->idempotence.advertise)
-		{
-			rawOptHeader->optionCount++;
-			
-			if (opReply->idempotence.windowSize == 0 || opReply->idempotence.windowSize >= (1UL << 31))
-				throw Exception(S6M_ERR_INVALID);
-			
-			SOCKS6WindowAdvertOption *winAdvert = bb.get<SOCKS6WindowAdvertOption>();
-			*winAdvert = {
-				.idempotenceOptionHead = {
-					.optionHead = {
-						.kind = SOCKS6_OPTION_IDEMPOTENCE,
-						.len = sizeof(SOCKS6WindowAdvertOption),
-					},
-					.type = SOCKS6_IDEMPOTENCE_WND_ADVERT,
-				},
-				.windowBase = opReply->idempotence.base,
-				.windowSize = opReply->idempotence.windowSize,
-			};
-		}
+		return bb.getUsed();
 		
 	}
 	catch (S6M::Exception ex)
@@ -580,7 +658,46 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 
 ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err)
 {
-	//TODO
+	try
+	{
+		ByteBuffer bb(buf, size);
+		
+		SOCKS6OperationReply *rawOpReply = bb.get<SOCKS6OperationReply>();
+		
+		switch (rawOpReply->code)
+		{
+		case SOCKS6_OPERATION_REPLY_SUCCESS:
+		case SOCKS6_OPERATION_REPLY_FAILURE:
+		case SOCKS6_OPERATION_REPLY_NOT_ALLOWED:
+		case SOCKS6_OPERATION_REPLY_NET_UNREACH:
+		case SOCKS6_OPERATION_REPLY_HOST_UNREACH:
+		case SOCKS6_OPERATION_REPLY_REFUSED:
+		case SOCKS6_OPERATION_REPLY_TTL_EXPIRED:
+		case SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED:
+		case SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED:
+			break;
+			
+		default:
+			throw Exception(S6M_ERR_INVALID);
+		}
+		
+		if (rawOpReply->bindPort == 0)
+			throw Exception(S6M_ERR_INVALID);
+		
+		Options options = Options_Parse(&bb);
+		//TODO
+		
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERR_ALLOC;
+	}
+	
+	return -1;
 }
 
 void S6M_OpReply_Free(struct S6M_OpReply *opReply)
@@ -624,8 +741,8 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 		uint8_t *ver = bb.get<uint8_t>();
 		*ver = SOCKS6_PWAUTH_VERSION;
 		
-		String_Pack(&bb, pwReq->username);
-		String_Pack(&bb, pwReq->passwd);
+		String_Pack(&bb, pwReq->username, true);
+		String_Pack(&bb, pwReq->passwd, true);
 		
 		return bb.getUsed();
 	}
@@ -654,10 +771,11 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		if (*ver != SOCKS6_PWAUTH_VERSION)
 			throw Exception(S6M_ERR_INVALID);
 		
-		username = String_Parse(&bb);
-		passwd = String_Parse(&bb);
+		username = String_Parse(&bb, true);
+		passwd = String_Parse(&bb, true);
 		
-		pwReq = new S6M_PasswdReq();
+		S6M_PasswdReq *pwReq = new S6M_PasswdReq();
+		memset(pwReq, 0, sizeof(S6M_PasswdReq));
 		pwReq->username = username;
 		pwReq->passwd = passwd;
 		
@@ -740,6 +858,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 		}
 		
 		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
+		memset(pwReply, 0, sizeof(S6M_PasswdReply));
 		pwReply->fail = *fail;
 		*ppwReply = pwReply;
 		

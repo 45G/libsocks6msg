@@ -123,13 +123,6 @@ struct S6M_PasswdReply
 {
 	int fail;
 };
-
-struct S6M_Buffer
-{
-	char *buf;
-	size_t size;
-	size_t totalSize;
-};
 		
 enum S6M_Error
 {

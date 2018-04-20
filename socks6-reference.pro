@@ -9,4 +9,5 @@ SOURCES += \
 
 HEADERS += \
     socks6.h \
-    socks6msg.h
+    socks6msg.h \
+    socks6msg_base.hh
