@@ -120,7 +120,7 @@ static ssize_t String_Packed_Size(const char *str)
 	return 1 + len;
 }
 
-static void String_Pack(ByteBuffer *bb, char *str)
+static void String_Pack(ByteBuffer *bb, char *str, bool nonEmpty = false)
 {
 	size_t len;
 	if (str == NULL)
@@ -128,6 +128,8 @@ static void String_Pack(ByteBuffer *bb, char *str)
 	else
 		len = strlen(str);
 	if (len > 255)
+		throw Exception(S6M_ERR_INVALID);
+	if (nonEmpty && len == 0)
 		throw Exception(S6M_ERR_INVALID);
 	
 	uint8_t *rawLen = bb->get<uint8_t>();
@@ -137,9 +139,12 @@ static void String_Pack(ByteBuffer *bb, char *str)
 	memcpy(rawStr, str, len);
 }
 
-static char *String_Parse(ByteBuffer *bb)
+static char *String_Parse(ByteBuffer *bb, bool nonEmpty = false)
 {
 	uint8_t *len = bb->get<uint8_t>();
+	if (*len == 0 && nonEmpty)
+		throw Exception(S6M_ERR_INVALID);
+	
 	uint8_t *rawStr = bb->get<uint8_t>(*len);
 	
 	for (int i = 0; i < (int)(*len); i++)
@@ -151,8 +156,8 @@ static char *String_Parse(ByteBuffer *bb)
 	
 	char *str = new char[*len + 1];
 	
-	memcpy(str, rawStr, len);
-	str[len] = '\0';
+	memcpy(str, rawStr, *len);
+	str[*len] = '\0';
 	
 	return str;
 }
@@ -161,14 +166,15 @@ static char *String_Parse(ByteBuffer *bb)
  * SGM_Addr_*
  */
 
-static void S6M_Addr_Validate(const struct S6M_Addr *addr)
+//TODO: get rid of this
+static void Addr_Validate(const S6M_Addr *addr)
 {
 	ssize_t domPackedLen;
 	switch(addr->type)
 	{
 	case SOCKS6_ADDR_IPV4:
 	case SOCKS6_ADDR_IPV6:
-		return 0;
+		return;
 		
 	case SOCKS6_ADDR_DOMAIN:
 		domPackedLen = String_Packed_Size(addr->domain);
@@ -180,47 +186,73 @@ static void S6M_Addr_Validate(const struct S6M_Addr *addr)
 	throw Exception(S6M_ERR_BADADDR);
 }
 
-ssize_t Addr_Packed_Size(const struct S6M_Addr *addr)
+static ssize_t Addr_Packed_Size(const S6M_Addr *addr)
 {
 	switch(addr->type)
 	{
 	case SOCKS6_ADDR_IPV4:
-		return sizeof(addr->ipv4);
+		return 1 + sizeof(addr->ipv4);
 	case SOCKS6_ADDR_IPV6:
-		return sizeof(addr->ipv6);
+		return 1 + sizeof(addr->ipv6);
 	case SOCKS6_ADDR_DOMAIN:
-		return S6M_String_Packed_Size(addr->domain, err);
+		return 1 + String_Packed_Size(addr->domain);
 	}
 	
 	throw Exception(S6M_ERR_INVALID);
 }
 
-void S6M_Addr_Pack(ByteBuffer *bb, const struct S6M_Addr *addr)
+static void Addr_Pack(ByteBuffer *bb, const S6M_Addr *addr)
 {
-	ssize_t domainPackLen;
+	uint8_t rawType = (uint8_t)addr->type;
+	bb->put(&rawType);
+	
 	switch(addr->type)
 	{
 	case SOCKS6_ADDR_IPV4:
-		if (S6M_Raw_Pack(&addr->ipv4, buf, size, err) < 0)
-			return -1;
-		return sizeof(addr->ipv4);
+		bb->put(&addr->ipv4);
+		return;
+		
 	case SOCKS6_ADDR_IPV6:
-		if (S6M_Raw_Pack(&addr->ipv6, buf, size, err) < 0)
-			return -1;
-		return sizeof(addr->ipv6);
+		bb->put(&addr->ipv6);
+		return;
+		
 	case SOCKS6_ADDR_DOMAIN:
-		domainPackLen = String_Pack(addr->domain, buf, size);
-		if (domainPackLen < 0)
-			return -1;
-		if (domainPackLen == 1)
-		{
-			*err = S6M_ERR_INVALID;
-			return -1;
-		}
-		return domainPackLen;
+		String_Pack(bb, addr->domain, true);
+		return;
+		
+//	default:
+//		throw Exception(S6M_ERR_BADADDR);
 	}
 	
 	throw Exception(S6M_ERR_INVALID);
+}
+
+static S6M_Addr Addr_Parse(ByteBuffer *bb)
+{
+	uint8_t *type = bb->get<uint8_t>();
+	S6M_Addr addr;
+	addr.type = (SOCKS6AddressType)(*type);
+	
+	
+	switch(addr.type)
+	{
+	case SOCKS6_ADDR_IPV4:
+		addr.ipv4 = *(bb->get<in_addr>());
+		break;
+		
+	case SOCKS6_ADDR_IPV6:
+		addr.ipv6 = *(bb->get<in6_addr>());
+		break;
+		
+	case SOCKS6_ADDR_DOMAIN:
+		addr.domain = String_Parse(bb, true);
+		break;
+		
+	default:
+		throw Exception(S6M_ERR_BADADDR);
+	}
+	
+	return addr;
 }
 
 /*
@@ -340,27 +372,40 @@ void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
 
 ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Error *err)
 {
-	size_t size = sizeof(SOCKS6OperationReply);
-	
-	ssize_t addrSize = Addr_Packed_Size(&opReply->addr);
-	size += addrSize;
-	
-	size += sizeof(SOCKS6Options);
-	if (opReply->tfo)
-		size += sizeof(SOCKS6SocketOption);
-	if (opReply->mptcp)
-		size += sizeof(SOCKS6SocketOption);
-	if (opReply->mptcpSched.clientProxy > 0)
+	try
 	{
-		size += sizeof(SOCKS6MPTCPSchedulerOption);
-		if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
+		size_t size = sizeof(SOCKS6OperationReply);
+		
+		ssize_t addrSize = Addr_Packed_Size(&opReply->addr);
+		size += addrSize;
+		
+		size += sizeof(SOCKS6Options);
+		if (opReply->tfo)
+			size += sizeof(SOCKS6SocketOption);
+		if (opReply->mptcp)
+			size += sizeof(SOCKS6SocketOption);
+		if (opReply->mptcpSched.clientProxy > 0)
+		{
 			size += sizeof(SOCKS6MPTCPSchedulerOption);
+			if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
+				size += sizeof(SOCKS6MPTCPSchedulerOption);
+		}
+		
+		if (opReply->idempotence.advertise)
+			size += sizeof(SOCKS6WindowAdvertOption);
+		
+		return size;
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERR_ALLOC;
 	}
 	
-	if (opReply->idempotence.advertise)
-		size += sizeof(SOCKS6WindowAdvertOption);
-	
-	return size;
+	return -1;
 }
 
 static void OpReply_Validate(const struct S6M_OpReply *opReply)
@@ -382,7 +427,7 @@ static void OpReply_Validate(const struct S6M_OpReply *opReply)
 		throw Exception(S6M_ERR_INVALID);
 	}
 	
-	S6M_Addr_Validate(&opReply->addr);
+	Addr_Validate(&opReply->addr);
 	
 	if (opReply->port == 0)
 		throw Exception(S6M_ERR_INVALID);
@@ -417,6 +462,21 @@ static void OpReply_Validate(const struct S6M_OpReply *opReply)
 
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
+	try
+	{
+		
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERR_ALLOC;
+	}
+	
+	return -1;
+	
 	OpReply_Validate(opReply, err);
 	
 	list<SOCKS6Option *> options;
@@ -506,7 +566,7 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 	try
 	{
 		static const ssize_t verPackedSize = 1;
-		ssize_t userPackedSize = tring_Packed_Size(pwReq->username);
+		ssize_t userPackedSize = String_Packed_Size(pwReq->username);
 		ssize_t passwdPackedSize = String_Packed_Size(pwReq->passwd);
 		
 		return verPackedSize + userPackedSize + passwdPackedSize;
