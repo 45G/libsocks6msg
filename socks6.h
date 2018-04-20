@@ -58,8 +58,32 @@ struct SOCKS6Request
 {
 	uint8_t commandCode;
 	uint16_t port;
-	uint8_t addresType;
 	uint8_t address[0];
+} __attribute__((packed));
+
+struct SOCKS6Address
+{
+	uint8_t type;
+	uint8_t address[0];
+} __attribute__((packed));
+
+struct SOCKS6IPv4Address
+{
+	uint8_t type;
+	uint32_t ipv4Address;
+} __attribute__((packed));
+
+struct SOCKS6IPv6Address
+{
+	uint8_t type;
+	uint8_t ipv6Address[16];
+} __attribute__((packed));
+
+struct SOCKS6DomainAddress
+{
+	uint8_t type;
+	uint8_t len;
+	uint8_t domain[0];
 } __attribute__((packed));
 
 enum SOCKS6RequestCode
@@ -128,7 +152,6 @@ struct SOCKS6OperationReply
 	uint8_t code;
 	uint16_t initialDataOffset;
 	uint16_t bindPort;
-	uint8_t addressType;
 	uint8_t bindAddress[0];
 } __attribute__((packed));
 
@@ -219,23 +242,20 @@ enum SOCKS6MPTCPScheduler
 
 struct SOCKS6AuthMethodOption
 {
-	uint8_t kind;
-	uint8_t len;
+	struct SOCKS6Option optionHead;
 	uint8_t methods[0];
 } __attribute__((packed));
 
 struct SOCKS6AuthDataOption
 {
-	uint8_t kind;
-	uint8_t len;
+	struct SOCKS6Option optionHead;
 	uint8_t method;
 	uint8_t methodData[0];
 } __attribute__((packed));
 
 struct SOCKS6IdempotenceOption
 {
-	uint8_t kind;
-	uint8_t len;
+	struct SOCKS6Option optionHead;
 	uint8_t type;
 	uint8_t idempotenceData[0];
 } __attribute__((packed));
@@ -250,26 +270,26 @@ enum SOCKS6IDempotenceType
 
 struct SOCKS6WindowRequestOption
 {
-	struct SOCKS6Option optionHead;
+	struct SOCKS6IdempotenceOption idempotenceOptionHead;
 	uint32_t windowSize;
 } __attribute__((packed));
 
 struct SOCKS6WindowAdvertOption
 {
-	struct SOCKS6Option optionHead;
+	struct SOCKS6IdempotenceOption idempotenceOptionHead;
 	uint32_t windowBase;
 	uint32_t windowSize;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureOption
 {
-	struct SOCKS6Option optionHead;
+	struct SOCKS6IdempotenceOption idempotenceOptionHead;
 	uint32_t token;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureReplyOption
 {
-	struct SOCKS6Option optionHead;
+	struct SOCKS6IdempotenceOption idempotenceOptionHead;
 	uint8_t code;
 } __attribute__((packed));
 

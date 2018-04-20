@@ -81,7 +81,7 @@ struct S6M_Request
 
 struct S6M_AuthReply
 {
-	enum SOCKS6AuthReplyCode repCode;
+	enum SOCKS6AuthReplyCode type;
 	
 	enum SOCKS6Method method;
 };

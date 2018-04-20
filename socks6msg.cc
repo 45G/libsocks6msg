@@ -298,7 +298,7 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 	{
 		ByteBuffer bb(buf, size);
 		
-		if (rawAuthReply->type != SOCKS6_AUTH_REPLY_SUCCESS && rawAuthReply->type != SOCKS6_AUTH_REPLY_MORE)
+		if (authReply->type != SOCKS6_AUTH_REPLY_SUCCESS && authReply->type != SOCKS6_AUTH_REPLY_MORE)
 			throw Exception(S6M_ERR_INVALID);
 		
 		SOCKS6Version *ver = bb.get<SOCKS6Version>();
@@ -310,7 +310,7 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 		SOCKS6AuthReply *rawAuthReply = bb.get<SOCKS6AuthReply>();
 		*rawAuthReply =
 		{
-			.type = authReply->repCode,
+			.type = authReply->type,
 			.method = authReply->method
 		};
 		
@@ -343,7 +343,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 			throw Exception(S6M_ERR_INVALID);
 		
 		S6M_AuthReply *authReply = new S6M_AuthReply();
-		authReply->repCode = rawAuthReply->type;
+		authReply->type = rawAuthReply->type;
 		authReply->method = rawAuthReply->method;
 		
 		*pauthReply = authReply;
@@ -408,62 +408,162 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 	return -1;
 }
 
-static void OpReply_Validate(const struct S6M_OpReply *opReply)
-{
-	switch (opReply->code)
-	{
-	case SOCKS6_OPERATION_REPLY_SUCCESS:
-	case SOCKS6_OPERATION_REPLY_FAILURE:
-	case SOCKS6_OPERATION_REPLY_NOT_ALLOWED:
-	case SOCKS6_OPERATION_REPLY_NET_UNREACH:
-	case SOCKS6_OPERATION_REPLY_HOST_UNREACH:
-	case SOCKS6_OPERATION_REPLY_REFUSED:
-	case SOCKS6_OPERATION_REPLY_TTL_EXPIRED:
-	case SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED:
-	case SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED:
-		break;
-		
-	default:
-		throw Exception(S6M_ERR_INVALID);
-	}
-	
-	Addr_Validate(&opReply->addr);
-	
-	if (opReply->port == 0)
-		throw Exception(S6M_ERR_INVALID);
-	
-	switch (opReply->mptcpSched.clientProxy)
-	{
-	case 0:
-	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-	case SOCKS6_MPTCP_SCHEDULER_RR:
-	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		break;
-		
-	default:
-		throw Exception(S6M_ERR_INVALID);
-	}
-	
-	switch (opReply->mptcpSched.proxyServer)
-	{
-	case 0:
-	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-	case SOCKS6_MPTCP_SCHEDULER_RR:
-	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		break;
-		
-	default:
-		throw Exception(S6M_ERR_INVALID);
-	}
-	
-	if (opReply->idempotence.advertise && opReply->idempotence.windowSize == 0)
-		throw Exception(S6M_ERR_INVALID);
-}
-
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
 	try
 	{
+		ByteBuffer bb(buf, size);
+		
+		switch (opReply->code)
+		{
+		case SOCKS6_OPERATION_REPLY_SUCCESS:
+		case SOCKS6_OPERATION_REPLY_FAILURE:
+		case SOCKS6_OPERATION_REPLY_NOT_ALLOWED:
+		case SOCKS6_OPERATION_REPLY_NET_UNREACH:
+		case SOCKS6_OPERATION_REPLY_HOST_UNREACH:
+		case SOCKS6_OPERATION_REPLY_REFUSED:
+		case SOCKS6_OPERATION_REPLY_TTL_EXPIRED:
+		case SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED:
+		case SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED:
+			break;
+			
+		default:
+			throw Exception(S6M_ERR_INVALID);
+		}
+		
+		if (opReply->port == 0)
+			throw Exception(S6M_ERR_INVALID);
+		
+		SOCKS6OperationReply *rawOpReply = bb.get<SOCKS6OperationReply>();
+		*rawOpReply =
+		{
+			.code = opReply->code,
+			.initialDataOffset = htons(opReply->initDataOff),
+			.bindPort = htons(opReply->port),
+		};
+		
+		Addr_Pack(&bb, &opReply->addr);
+		
+		SOCKS6Options *rawOptHeader = bb.get<SOCKS6Options>();
+		rawOptHeader->optionCount = 0;
+		
+		if (opReply->tfo)
+		{
+			rawOptHeader->optionCount++;
+			
+			SOCKS6SocketOption *rawTFOOption = bb.get<SOCKS6SocketOption>();
+			*rawTFOOption = {
+				.optionHead = {
+					.kind = SOCKS6_OPTION_SOCKET,
+					.len = sizeof(SOCKS6SocketOption),
+				},
+				.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+				.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+				.code = SOCKS6_SOCKOPT_CODE_TFO,
+			};
+		}
+		
+		if (opReply->mptcp)
+		{
+			rawOptHeader->optionCount++;
+			
+			SOCKS6SocketOption *rawMPTCPOption = bb.get<SOCKS6SocketOption>();
+			*rawMPTCPOption = {
+				.optionHead = {
+					.kind = SOCKS6_OPTION_SOCKET,
+					.len = sizeof(SOCKS6SocketOption),
+				},
+				.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+				.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+				.code = SOCKS6_SOCKOPT_CODE_MPTCP,
+			};
+		}
+		
+		SOCKS6MPTCPSchedulerOption *mpSchedOption = NULL;
+		if (opReply->mptcpSched.proxyServer != 0)
+		{
+			rawOptHeader->optionCount++;
+			
+			switch (opReply->mptcpSched.proxyServer)
+			{
+			case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+			case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+			case SOCKS6_MPTCP_SCHEDULER_RR:
+				break;
+				
+			default:
+				throw Exception(S6M_ERR_INVALID);
+			}
+			
+			mpSchedOption = bb.get<SOCKS6MPTCPSchedulerOption>();
+			*mpSchedOption = {
+				.socketOptionHead = {
+					.optionHead = {
+						.kind = SOCKS6_OPTION_SOCKET,
+						.len = sizeof(SOCKS6SocketOption),
+					},
+					.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+					.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
+					.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
+				},
+				.scheduler = opReply->mptcpSched.proxyServer,
+			};
+		}
+		if (opReply->mptcpSched.clientProxy != 0)
+		{
+			switch (opReply->mptcpSched.clientProxy)
+			{
+			case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+			case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+			case SOCKS6_MPTCP_SCHEDULER_RR:
+				break;
+				
+			default:
+				throw Exception(S6M_ERR_INVALID);
+			}
+			
+			if (mpSchedOption != NULL && opReply->mptcpSched.proxyServer == opReply->mptcpSched.clientProxy)
+				mpSchedOption->socketOptionHead.leg = SOCKS6_SOCKOPT_LEG_BOTH;
+			else
+			{
+				rawOptHeader->optionCount++;
+				
+				mpSchedOption = bb.get<SOCKS6MPTCPSchedulerOption>();
+				*mpSchedOption = {
+					.socketOptionHead = {
+						.optionHead = {
+							.kind = SOCKS6_OPTION_SOCKET,
+							.len = sizeof(SOCKS6SocketOption),
+						},
+						.level = SOCKS6_SOCKOPT_LEVEL_TCP,
+						.leg = SOCKS6_SOCKOPT_LEG_CLIENT_PROXY,
+						.code = SOCKS6_SOCKOPT_CODE_MP_SCHED,
+					},
+					.scheduler = opReply->mptcpSched.proxyServer,
+				};
+			}
+		}
+		
+		if (opReply->idempotence.advertise)
+		{
+			rawOptHeader->optionCount++;
+			
+			if (opReply->idempotence.windowSize == 0 || opReply->idempotence.windowSize >= (1UL << 31))
+				throw Exception(S6M_ERR_INVALID);
+			
+			SOCKS6WindowAdvertOption *winAdvert = bb.get<SOCKS6WindowAdvertOption>();
+			*winAdvert = {
+				.idempotenceOptionHead = {
+					.optionHead = {
+						.kind = SOCKS6_OPTION_IDEMPOTENCE,
+						.len = sizeof(SOCKS6WindowAdvertOption),
+					},
+					.type = SOCKS6_IDEMPOTENCE_WND_ADVERT,
+				},
+				.windowBase = opReply->idempotence.base,
+				.windowSize = opReply->idempotence.windowSize,
+			};
+		}
 		
 	}
 	catch (S6M::Exception ex)
@@ -476,74 +576,6 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	}
 	
 	return -1;
-	
-	OpReply_Validate(opReply, err);
-	
-	list<SOCKS6Option *> options;
-	int optionCount = 0;
-	
-	S6M_PROG_BEGIN();
-	
-	SOCKS6OperationReply rawOpReply = {
-		.code = opReply->code,
-		.initialDataOffset = opReply->initDataOff,
-		.bindPort = opReply->port,
-		.addressType = opReply->addr.type,
-	};
-	S6M_PROG(S6M_Raw_Pack(&rawOpReply, buf, size, err));
-	
-	
-	if (opReply->tfo)
-		optionCount++;
-	if (opReply->mptcp)
-		optionCount++;
-	if (opReply->mptcpSched.clientProxy > 0)
-	{
-		optionCount++;
-		if (opReply->mptcpSched.proxyServer != 0 && opReply->mptcpSched.proxyServer != opReply->mptcpSched.clientProxy)
-			optionCount++;
-	}
-	if (opReply->idempotence.advertise)
-		optionCount++;
-	
-	SOCKS6Options opts = { .optionCount = optionCount };
-	S6M_PROG(S6M_Raw_Pack(opts, buf, size, err));
-	
-	static const SOCKS6SocketOption tfoOption = {
-		.optionHead = {
-			.kind = SOCKS6_OPTION_SOCKET,
-			.len = sizeof(SOCKS6SocketOption),
-		},
-		.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-		.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-		.code = SOCKS6_SOCKOPT_CODE_TFO,
-	};
-	
-	if (opReply->tfo)
-		S6M_PROG(S6M_Raw_Pack(&tfoOption, buf, size, err));
-	
-	static const SOCKS6SocketOption mptcpOption = {
-		.optionHead = {
-			.kind = SOCKS6_OPTION_SOCKET,
-			.len = sizeof(SOCKS6SocketOption),
-		},
-		.leg = SOCKS6_SOCKOPT_LEG_PROXY_SERVER,
-		.level = SOCKS6_SOCKOPT_LEVEL_TCP,
-		.code = SOCKS6_SOCKOPT_CODE_TFO,
-	};
-	
-	if (opReply->mptcp)
-	{
-		
-		S6M_PROG(S6M_Raw_Pack(&mptcpOption, buf, size, err));
-	}
-	
-	
-error:
-	BOOST_FOREACH(SOCKS6Option *op, options)
-	{
-		free(option);
-	}
 }
 
 ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err)
