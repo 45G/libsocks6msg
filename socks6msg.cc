@@ -81,7 +81,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw Exception(S6M_ERROR_BUFFER);
+			throw Exception(S6M_ERR_BUFFER);
 		
 		memcpy(buf + used, what, req);
 		used += req;
@@ -92,7 +92,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw Exception(S6M_ERROR_BUFFER);
+			throw Exception(S6M_ERR_BUFFER);
 		
 		T *ret = reinterpret_cast<T *>(buf + used);
 		used += req;
@@ -116,7 +116,7 @@ static ssize_t String_Packed_Size(const char *str)
 		return 1;
 	size_t len = strlen(str);
 	if (len > 255)
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	return 1 + len;
 }
 
@@ -126,9 +126,9 @@ static void String_Pack(ByteBuffer *bb, char *str)
 	if (str == NULL)
 		len = 0;
 	else
-		nen = strlen(str);
+		len = strlen(str);
 	if (len > 255)
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	
 	uint8_t *rawLen = bb->get<uint8_t>();
 	*rawLen = (uint8_t)len;
@@ -146,7 +146,7 @@ static char *String_Parse(ByteBuffer *bb)
 	{
 		//TODO: unlikely
 		if (rawStr[i] == '\0')
-			throw Exception(S6M_ERROR_INVALID);
+			throw Exception(S6M_ERR_INVALID);
 	}
 	
 	char *str = new char[*len + 1];
@@ -173,11 +173,11 @@ static void S6M_Addr_Validate(const struct S6M_Addr *addr)
 	case SOCKS6_ADDR_DOMAIN:
 		domPackedLen = String_Packed_Size(addr->domain);
 		if (domPackedLen == 1) /* empty string */
-			break;
+			throw Exception(S6M_ERR_INVALID);
 		return;
 	}
 	
-	throw Exception(S6M_ERROR_INVALID);
+	throw Exception(S6M_ERR_BADADDR);
 }
 
 ssize_t Addr_Packed_Size(const struct S6M_Addr *addr)
@@ -192,10 +192,10 @@ ssize_t Addr_Packed_Size(const struct S6M_Addr *addr)
 		return S6M_String_Packed_Size(addr->domain, err);
 	}
 	
-	throw Exception(S6M_ERROR_INVALID);
+	throw Exception(S6M_ERR_INVALID);
 }
 
-ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum S6M_Error *err)
+void S6M_Addr_Pack(ByteBuffer *bb, const struct S6M_Addr *addr)
 {
 	ssize_t domainPackLen;
 	switch(addr->type)
@@ -214,14 +214,13 @@ ssize_t S6M_Addr_Pack(const struct S6M_Addr *addr, uint8_t *buf, int size, enum 
 			return -1;
 		if (domainPackLen == 1)
 		{
-			*err = S6M_ERROR_INVALID;
+			*err = S6M_ERR_INVALID;
 			return -1;
 		}
 		return domainPackLen;
 	}
 	
-	*err = S6M_ERROR_INVALID;
-	return -1;
+	throw Exception(S6M_ERR_INVALID);
 }
 
 /*
@@ -255,18 +254,6 @@ void S6M_Request_Free(struct S6M_Request *req)
  * S6M_AuthReply_*
  */
 
-static void AuthReply_Validate(const struct S6M_AuthReply *authReply)
-{
-	switch (authReply->repCode)
-	{
-	case SOCKS6_AUTH_REPLY_SUCCESS:
-	case SOCKS6_AUTH_REPLY_MORE:
-		return 0;
-	}
-	
-	throw Exception(S6M_ERROR_INVALID);
-}
-
 ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6M_Error *err)
 {
 	(void)authReply; (void)err;
@@ -275,17 +262,37 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 
 ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
-	AuthReply_Validate(authReply);
+	try
+	{
+		ByteBuffer bb(buf, size);
+		
+		if (rawAuthReply->type != SOCKS6_AUTH_REPLY_SUCCESS && rawAuthReply->type != SOCKS6_AUTH_REPLY_MORE)
+			throw Exception(S6M_ERR_INVALID);
+		
+		SOCKS6Version *ver = bb.get<SOCKS6Version>();
+		*ver = { 
+			.major = SOCKS6_VERSION_MAJOR,
+			.minor = SOCKS6_VERSION_MINOR,
+		};
+		
+		SOCKS6AuthReply *rawAuthReply = bb.get<SOCKS6AuthReply>();
+		*rawAuthReply =
+		{
+			.type = authReply->repCode,
+			.method = authReply->method
+		};
+		
+		return bb.getUsed();
+	}
+	catch (S6M::Exception ex)
+	{
+		*err = ex.getError();
+	}
+	catch (bad_alloc)
+	{
+		*err = S6M_ERR_ALLOC;
+	}
 	
-	SOCKS6Version ver = { SOCKS6_VERSION_MAJOR, SOCKS6_VERSION_MINOR };
-	SOCKS6AuthReply rawAuthReply = { authReply->repCode, authReply->method };
-	
-	S6M_PROG_BEGIN();
-	S6M_PROG(S6M_Raw_Pack(&ver, buf, size, err));
-	S6M_PROG(S6M_Raw_Pack(&rawAuthReply, buf, size, err));
-	return S6M_PROG_END();
-	
-error:
 	return -1;
 }
 
@@ -297,7 +304,18 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		
 		SOCKS6Version *ver = bb.get<SOCKS6Version>();
 		if (ver->major != SOCKS6_VERSION_MAJOR || ver->minor != SOCKS6_VERSION_MINOR)
-			throw Exception(S6M_ERROR_OTHERVER);
+			throw Exception(S6M_ERR_OTHERVER);
+		
+		SOCKS6AuthReply *rawAuthReply = bb.get<SOCKS6AuthReply>();
+		if (rawAuthReply->type != SOCKS6_AUTH_REPLY_SUCCESS && rawAuthReply->type != SOCKS6_AUTH_REPLY_MORE)
+			throw Exception(S6M_ERR_INVALID);
+		
+		S6M_AuthReply *authReply = new S6M_AuthReply();
+		authReply->repCode = rawAuthReply->type;
+		authReply->method = rawAuthReply->method;
+		
+		*pauthReply = authReply;
+		return bb.getUsed();
 	}
 	catch (S6M::Exception ex)
 	{
@@ -305,41 +323,15 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
-	
-	SOCKS6AuthReply *rawAuthReply = NULL;
-	S6M_AuthReply *authReply = NULL;
-	
-	S6M_PROG_BEGIN();
-	
-	S6M_PROG(S6M_Raw_Parse(buf, size, &ver, err));
-	
-		goto error;
-	free(ver);
-	
-	S6M_PROG(S6M_Raw_Parse(buf, size, &rawAuthReply, err));
-	authReply = (S6M_AuthReply *)malloc(sizeof(S6M_AuthReply));
-	authReply->repCode = (SOCKS6AuthReplyCode)rawAuthReply->type;
-	authReply->method = (SOCKS6Method)rawAuthReply->method;
-	if (!AuthReply_Validate(authReply, err))
-		goto error;
-	free(rawAuthReply);
-	
-	*pauthReply = authReply;
-	return S6M_PROG_END();
-	
-error:
-	free(ver);
-	free(rawAuthReply);
-	free(authReply);
 	return -1;
 }
 
 void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
 {
-	free(authReply);
+	delete authReply;
 }
 
 /*
@@ -387,14 +379,13 @@ static void OpReply_Validate(const struct S6M_OpReply *opReply)
 		break;
 		
 	default:
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	}
 	
-	if (S6M_Addr_Validate(&opReply->addr, err) < 0)
-		throw Exception(S6M_ERROR_INVALID);
+	S6M_Addr_Validate(&opReply->addr);
 	
 	if (opReply->port == 0)
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	
 	switch (opReply->mptcpSched.clientProxy)
 	{
@@ -405,7 +396,7 @@ static void OpReply_Validate(const struct S6M_OpReply *opReply)
 		break;
 		
 	default:
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	}
 	
 	switch (opReply->mptcpSched.proxyServer)
@@ -417,11 +408,11 @@ static void OpReply_Validate(const struct S6M_OpReply *opReply)
 		break;
 		
 	default:
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 	}
 	
 	if (opReply->idempotence.advertise && opReply->idempotence.windowSize == 0)
-		throw Exception(S6M_ERROR_INVALID);
+		throw Exception(S6M_ERR_INVALID);
 }
 
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
@@ -526,7 +517,7 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
 	return -1;
@@ -552,7 +543,7 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
 	return -1;
@@ -569,7 +560,7 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		
 		uint8_t *ver = bb.get<uint8_t>();
 		if (*ver != SOCKS6_PWAUTH_VERSION)
-			throw Exception(S6M_ERROR_INVALID);
+			throw Exception(S6M_ERR_INVALID);
 		
 		username = String_Parse(&bb);
 		passwd = String_Parse(&bb);
@@ -587,7 +578,7 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
 	delete username;
@@ -619,7 +610,7 @@ ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf
 		S6M::ByteBuffer bb(buf, size);
 		
 		if (pwReply->fail != 0 && pwReply->fail != 1)
-			throw S6M::Exception(S6M_ERROR_INVALID);
+			throw S6M::Exception(S6M_ERR_INVALID);
 		
 		uint8_t ver = 0x01;
 		uint8_t fail = pwReply->fail;
@@ -635,7 +626,7 @@ ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
 	return -1;
@@ -653,7 +644,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 		if (*ver != 0x01 ||
 			(*fail != 0 && *fail != 1))
 		{
-			throw S6M::Exception(S6M_ERROR_INVALID);
+			throw S6M::Exception(S6M_ERR_INVALID);
 		}
 		
 		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
@@ -668,7 +659,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 	}
 	catch (bad_alloc)
 	{
-		*err = S6M_ERROR_ALLOC;
+		*err = S6M_ERR_ALLOC;
 	}
 	
 	return -1;

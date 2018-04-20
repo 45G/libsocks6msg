@@ -4,8 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    main.cc \
-    socks6msg.cc
+    socks6msg.cc \
+    main.c
 
 HEADERS += \
     socks6.h \

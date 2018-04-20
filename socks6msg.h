@@ -133,12 +133,14 @@ struct S6M_Buffer
 		
 enum S6M_Error
 {
-	S6M_ERROR_SUCCESS     = 0,
-	S6M_ERROR_INVALID     = -1,   /* some invalid field */
-	S6M_ERROR_ALLOC       = -2,   /* malloc fail */
-	S6M_ERROR_BUFFER      = -3,   /* reached end of buffer */
-	S6M_ERROR_OTHERVER    = -4,   /* socks version other than the one supported */
-	S6M_ERROR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
+	S6M_ERR_SUCCESS     = 0,
+	S6M_ERR_INVALID     = -1,   /* some invalid field */
+	S6M_ERR_ALLOC       = -2,   /* malloc fail */
+	S6M_ERR_BUFFER      = -3,   /* reached end of buffer */
+	S6M_ERR_OTHERVER    = -4,   /* socks version other than the one supported */
+	S6M_ERR_BADADDR     = -5,
+	S6M_ERR_BADCMD      = -6,
+	S6M_ERR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
 };
 
 ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size, enum S6M_Error *err);
