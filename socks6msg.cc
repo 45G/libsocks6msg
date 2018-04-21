@@ -37,62 +37,7 @@ using namespace std;
 using namespace S6M;
 
 
-/*
- * raw
- */
-
-static ssize_t String_Packed_Size(const char *str)
-{
-	if (!str)
-		return 1;
-	size_t len = strlen(str);
-	if (len > 255)
-		throw Exception(S6M_ERR_INVALID);
-	return 1 + len;
-}
-
-static void String_Pack(ByteBuffer *bb, char *str, bool nonEmpty = false)
-{
-	size_t len;
-	if (str == NULL)
-		len = 0;
-	else
-		len = strlen(str);
-	if (len > 255)
-		throw Exception(S6M_ERR_INVALID);
-	if (nonEmpty && len == 0)
-		throw Exception(S6M_ERR_INVALID);
-	
-	uint8_t *rawLen = bb->get<uint8_t>();
-	*rawLen = (uint8_t)len;
-	
-	uint8_t *rawStr = bb->get<uint8_t>(len);
-	memcpy(rawStr, str, len);
-}
-
-static char *String_Parse(ByteBuffer *bb, bool nonEmpty = false)
-{
-	uint8_t *len = bb->get<uint8_t>();
-	if (*len == 0 && nonEmpty)
-		throw Exception(S6M_ERR_INVALID);
-	
-	uint8_t *rawStr = bb->get<uint8_t>(*len);
-	
-	for (int i = 0; i < (int)(*len); i++)
-	{
-		//TODO: unlikely
-		if (rawStr[i] == '\0')
-			throw Exception(S6M_ERR_INVALID);
-	}
-	
-	char *str = new char[*len + 1];
-	
-	memcpy(str, rawStr, *len);
-	str[*len] = '\0';
-	
-	return str;
-}
-
+//TODO: move to base
 /*
  * SGM_Addr_*
  */
@@ -105,7 +50,7 @@ static ssize_t Addr_Packed_Size(const S6M_Addr *addr)
 	case SOCKS6_ADDR_IPV6:
 		return 1 + sizeof(addr->ipv6);
 	case SOCKS6_ADDR_DOMAIN:
-		return 1 + String_Packed_Size(addr->domain);
+		return 1 + stringPackedSize(addr->domain);
 	}
 	
 	throw Exception(S6M_ERR_INVALID);
@@ -127,7 +72,7 @@ static void Addr_Pack(ByteBuffer *bb, const S6M_Addr *addr)
 		return;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		String_Pack(bb, addr->domain, true);
+		stringPack(bb, addr->domain, true);
 		return;
 		
 //	default:
@@ -155,7 +100,7 @@ static S6M_Addr Addr_Parse(ByteBuffer *bb)
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		addr.domain = String_Parse(bb, true);
+		addr.domain = stringParse(bb, true);
 		break;
 		
 	default:
@@ -715,8 +660,8 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 	try
 	{
 		static const ssize_t verPackedSize = 1;
-		ssize_t userPackedSize = String_Packed_Size(pwReq->username);
-		ssize_t passwdPackedSize = String_Packed_Size(pwReq->passwd);
+		ssize_t userPackedSize = stringPackedSize(pwReq->username);
+		ssize_t passwdPackedSize = stringPackedSize(pwReq->passwd);
 		
 		return verPackedSize + userPackedSize + passwdPackedSize;
 	}
@@ -741,8 +686,8 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 		uint8_t *ver = bb.get<uint8_t>();
 		*ver = SOCKS6_PWAUTH_VERSION;
 		
-		String_Pack(&bb, pwReq->username, true);
-		String_Pack(&bb, pwReq->passwd, true);
+		stringPack(&bb, pwReq->username, true);
+		stringPack(&bb, pwReq->passwd, true);
 		
 		return bb.getUsed();
 	}
@@ -771,8 +716,8 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		if (*ver != SOCKS6_PWAUTH_VERSION)
 			throw Exception(S6M_ERR_INVALID);
 		
-		username = String_Parse(&bb, true);
-		passwd = String_Parse(&bb, true);
+		username = stringParse(&bb, true);
+		passwd = stringParse(&bb, true);
 		
 		S6M_PasswdReq *pwReq = new S6M_PasswdReq();
 		memset(pwReq, 0, sizeof(S6M_PasswdReq));

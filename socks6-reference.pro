@@ -5,9 +5,12 @@ CONFIG -= qt
 
 SOURCES += \
     socks6msg.cc \
-    main.c
+    main.c \
+    socks6msg_option.cc \
+    socks6msg_base.cc
 
 HEADERS += \
     socks6.h \
     socks6msg.h \
-    socks6msg_base.hh
+    socks6msg_base.hh \
+    socks6msg_option.hh

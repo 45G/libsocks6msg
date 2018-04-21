@@ -293,6 +293,14 @@ struct SOCKS6TokenExpenditureReplyOption
 	uint8_t code;
 } __attribute__((packed));
 
+enum SOCKS6TokenExpenditureCode
+{
+	SOCKS6_TOK_EXPEND_SUCCESS    = 0x00,
+	SOCKS6_TOK_EXPEND_NO_WND     = 0x01,
+	SOCKS6_TOK_EXPEND_OUT_OF_WND = 0x02,
+	SOCKS6_TOK_EXPEND_DUPLICATE  = 0x03,
+};
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
