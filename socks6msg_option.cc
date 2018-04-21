@@ -16,6 +16,24 @@ void Option::pack(uint8_t *buf) const
 	opt->len = getLen();
 }
 
+Option *Option::parse(void *buf)
+{
+	SOCKS6Option *opt = (SOCKS6Option *)buf;
+	
+	switch (opt->kind) {
+	case SOCKS6_OPTION_SOCKET:
+		return SocketOption::parse(buf);
+	case SOCKS6_OPTION_AUTH_METHOD:
+		return AuthMethodOption::parse(buf);
+	case SOCKS6_OPTION_AUTH_DATA:
+		return AuthDataOption::parse(buf);
+	case SOCKS6_OPTION_IDEMPOTENCE:
+		return IdempotenceOption::parse(buf);
+	}
+	
+	throw Exception(S6M_ERR_INVALID);
+}
+
 void SocketOption::pack(uint8_t *buf) const
 {
 	Option::pack(buf);
@@ -23,8 +41,13 @@ void SocketOption::pack(uint8_t *buf) const
 	SOCKS6SocketOption *opt = reinterpret_cast<SOCKS6SocketOption *>(buf);
 	
 	opt->leg = getLeg();
-	opt->level = getLevel();static const size_t VER_SIZE = 1;
+	opt->level = getLevel();
 	opt->code = getCode();
+}
+
+Option *SocketOption::parse(void *buf)
+{
+	//TODO
 }
 
 size_t TFOOption::getLen() const
@@ -37,6 +60,11 @@ size_t MPTCPOption::getLen() const
 	return sizeof(SOCKS6SocketOption);
 }
 
+Option *MPTCPOption::parse(void *buf)
+{
+	//TODO
+}
+
 void MPScehdOption::pack(uint8_t *buf) const
 {
 	SocketOption::pack(buf);
@@ -44,6 +72,11 @@ void MPScehdOption::pack(uint8_t *buf) const
 	SOCKS6MPTCPSchedulerOption *opt = reinterpret_cast<SOCKS6MPTCPSchedulerOption *>(buf);
 	
 	opt->scheduler = sched;
+}
+
+Option *MPScehdOption::parse(void *buf)
+{
+	//TODO
 }
 
 MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
@@ -79,6 +112,11 @@ void AuthMethodOption::pack(uint8_t *buf) const
 	}
 }
 
+Option *AuthMethodOption::parse(void *buf)
+{
+	//TODO
+}
+
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 	: Option(SOCKS6_OPTION_AUTH_METHOD), methods(methods)
 {
@@ -102,9 +140,14 @@ void RawAuthDataOption::pack(uint8_t *buf) const
 	memcpy(opt->methods, data.data(), data.size());
 }
 
+Option *RawAuthDataOption::parse(void *buf)
+{
+	//TODO
+}
+
 size_t UsernamePasswdOption::getLen() const
 {
-	S6M_PasswdReq pwReq = {
+	const S6M_PasswdReq pwReq = {
 		.username = username.c_str(),
 		.passwd = passwd.c_str(),
 	};
@@ -115,6 +158,11 @@ size_t UsernamePasswdOption::getLen() const
 		throw Exception(err);
 	
 	return sizeof(AuthDataOption) + dataSize;
+}
+
+Option *UsernamePasswdOption::parse(void *buf)
+{
+	//TODO
 }
 
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
@@ -129,9 +177,19 @@ void IdempotenceOption::pack(uint8_t *buf) const
 	opt->type = type;
 }
 
+Option *IdempotenceOption::parse(void *buf)
+{
+	//TODO
+}
+
 size_t TokenWindowRequestOption::getLen() const
 {
 	return sizeof(SOCKS6IdempotenceOption);
+}
+
+Option *TokenWindowRequestOption::parse(void *buf)
+{
+	//TODO
 }
 
 size_t TokenWindowAdvertOption::getLen() const
@@ -147,6 +205,11 @@ void TokenWindowAdvertOption::pack(uint8_t *buf) const
 	
 	opt->windowBase = htonl(winBase);
 	opt->windowSize = htonl(winSize);
+}
+
+Option *TokenWindowAdvertOption::parse(void *buf)
+{
+	//TODO
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -174,6 +237,11 @@ void TokenExpenditureRequestOption::pack(uint8_t *buf) const
 	opt->token = htonl(token);
 }
 
+Option *TokenExpenditureRequestOption::parse(void *buf)
+{
+	//TODO
+}
+
 size_t TokenExpenditureReplyOption::getLen() const
 {
 	return sizeof(SOCKS6TokenExpenditureReplyOption);
@@ -186,6 +254,11 @@ void TokenExpenditureReplyOption::pack(uint8_t *buf) const
 	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
 	
 	opt->code = code;
+}
+
+Option *TokenExpenditureReplyOption::parse(void *buf)
+{
+	//TODO
 }
 
 TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
@@ -202,6 +275,23 @@ TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureC
 	default:
 		throw Exception(S6M_ERR_INVALID);
 	}
+}
+
+Option *parseOption(ByteBuffer *bb)
+{
+	SOCKS6Option *opt = bb->get<SOCKS6Option>();
+	
+	if (opt->len < 2)
+		throw Exception(S6M_ERR_INVALID);
+	
+	bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
+	
+	return Option::parse(opt);
+}
+
+Option *AuthDataOption::parse(void *buf)
+{
+	//TODO
 }
 
 }

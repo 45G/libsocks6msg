@@ -386,7 +386,7 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 			.method = authReply->method
 		};
 		
-		OptionSet options;
+		OptionSet options(authReply);
 		Options_Pack(&bb, &options);
 		
 		return bb.getUsed();
