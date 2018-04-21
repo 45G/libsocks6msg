@@ -281,6 +281,9 @@ struct SOCKS6WindowAdvertOption
 	uint32_t windowSize;
 } __attribute__((packed));
 
+#define SOCKS6_TOKEN_WINDOW_MIN 1
+#define SOCKS6_TOKEN_WINDOW_MAX ((1UL << 31) - 1)
+
 struct SOCKS6TokenExpenditureOption
 {
 	struct SOCKS6IdempotenceOption idempotenceOptionHead;

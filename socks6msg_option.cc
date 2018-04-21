@@ -237,11 +237,7 @@ Option *TokenWindowAdvertOption::parse(void *buf)
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_ADVERT), winBase(winBase), winSize(winSize)
 {
-	//TODO: move to socks6.h
-	static const size_t MIN_WIN = 1;
-	static const size_t MAX_WIN = (1UL << 31) - 1;
-	
-	if (winSize < MIN_WIN || winSize > MAX_WIN)
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
 		throw Exception(S6M_ERR_INVALID);
 }
 
