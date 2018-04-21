@@ -25,7 +25,7 @@ public:
 	
 	void pack(ByteBuffer *bb) const
 	{
-		uint8_t buf = bb->get<uint8_t>(getLen());
+		uint8_t *buf = bb->get<uint8_t>(getLen());
 		
 		pack(buf);
 	}
@@ -142,7 +142,7 @@ public:
 	virtual void pack(uint8_t *buf) const;
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
-		: type(type) {}
+		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
 };
 
 class TokenWindowRequestOption: public IdempotenceOption

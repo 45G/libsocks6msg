@@ -110,6 +110,9 @@ struct S6M_OpReply
 		int advertise;
 		uint32_t base;
 		uint32_t windowSize;
+		
+		int reply;
+		enum SOCKS6TokenExpenditureCode replyCode;
 	} idempotence;
 };
 
