@@ -118,8 +118,8 @@ struct S6M_OpReply
 
 struct S6M_PasswdReq
 {
-	char *username;
-	char *passwd;
+	const char *username;
+	const char *passwd;
 };
 
 struct S6M_PasswdReply

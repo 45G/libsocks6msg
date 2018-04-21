@@ -79,7 +79,7 @@ public:
 
 size_t stringPackedSize(const char *str);
 
-void stringPack(ByteBuffer *bb, char *str, bool nonEmpty = false);
+void stringPack(ByteBuffer *bb, const char *str, bool nonEmpty = false);
 
 char *stringParse(ByteBuffer *bb, bool nonEmpty = false);
 

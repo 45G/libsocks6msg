@@ -1,9 +1,10 @@
-#include <socks6msg_base.hh>
+#include <string.h>
+#include "socks6msg_base.hh"
 
 namespace S6M
 {
 
-static size_t stringPackedSize(const char *str)
+size_t stringPackedSize(const char *str)
 {
 	if (!str)
 		return 1;
@@ -13,7 +14,7 @@ static size_t stringPackedSize(const char *str)
 	return 1 + len;
 }
 
-static void stringPack(ByteBuffer *bb, char *str, bool nonEmpty = false)
+void stringPack(ByteBuffer *bb, const char *str, bool nonEmpty)
 {
 	size_t len;
 	if (str == NULL)
@@ -32,7 +33,7 @@ static void stringPack(ByteBuffer *bb, char *str, bool nonEmpty = false)
 	memcpy(rawStr, str, len);
 }
 
-static char *stringParse(ByteBuffer *bb, bool nonEmpty = false)
+char *stringParse(ByteBuffer *bb, bool nonEmpty)
 {
 	uint8_t *len = bb->get<uint8_t>();
 	if (*len == 0 && nonEmpty)

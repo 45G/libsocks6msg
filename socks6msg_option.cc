@@ -65,6 +65,11 @@ Option *MPTCPOption::parse(void *buf)
 	//TODO
 }
 
+size_t MPScehdOption::getLen() const
+{
+	return sizeof(SOCKS6MPTCPSchedulerOption);
+}
+
 void MPScehdOption::pack(uint8_t *buf) const
 {
 	SocketOption::pack(buf);
@@ -153,11 +158,28 @@ size_t UsernamePasswdOption::getLen() const
 	};
 	
 	S6M_Error err;
-	ssize_t dataSize = S6M_PasswdReq_Packed_Size(&pwReq, err);
+	ssize_t dataSize = S6M_PasswdReq_Packed_Size(&pwReq, &err);
 	if (dataSize == -1)
 		throw Exception(err);
 	
 	return sizeof(AuthDataOption) + dataSize;
+}
+
+void UsernamePasswdOption::pack(uint8_t *buf) const
+{
+	AuthDataOption::pack(buf);
+	
+	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
+	
+	S6M_PasswdReq pwReq = {
+		.username = username.c_str(),
+		.passwd = passwd.c_str(),
+	};
+	
+	S6M_Error err;
+	ssize_t dataSize = S6M_PasswdReq_Pack(&pwReq, opt->methodData, getLen() - sizeof(SOCKS6AuthDataOption), &err);
+	if (dataSize == -1)
+		throw Exception(err);
 }
 
 Option *UsernamePasswdOption::parse(void *buf)
@@ -172,7 +194,7 @@ void IdempotenceOption::pack(uint8_t *buf) const
 {
 	Option::pack(buf);
 	
-	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption>(buf);
+	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
 	opt->type = type;
 }
