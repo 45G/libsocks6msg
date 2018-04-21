@@ -47,12 +47,72 @@ void SocketOption::pack(uint8_t *buf) const
 
 Option *SocketOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	
+	if (opt->optionHead.len < sizeof(SocketOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	switch (opt->leg)
+	{
+	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
+	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
+	case SOCKS6_SOCKOPT_LEG_BOTH:
+		break;
+		
+	default:
+		throw Exception(S6M_ERR_INVALID);
+	}
+	
+	switch (opt->level)
+	{
+	case SOCKS6_SOCKOPT_LEVEL_SOCKET:
+		break;
+		
+	case SOCKS6_SOCKOPT_LEVEL_IPV4:
+		break;
+		
+	case SOCKS6_SOCKOPT_LEVEL_IPV6:
+		break;
+		
+	case SOCKS6_SOCKOPT_LEVEL_TCP:
+		switch (opt->code)
+		{
+		case SOCKS6_SOCKOPT_CODE_TFO:
+			return TFOOption::parse(buf);
+			
+		case SOCKS6_SOCKOPT_CODE_MPTCP:
+			return MPTCPOption::parse(buf);
+			
+		case SOCKS6_SOCKOPT_CODE_MP_SCHED:
+			return MPScehdOption::parse(buf);
+		}
+		break;
+		
+	case SOCKS6_SOCKOPT_LEVEL_UDP:
+		break;
+	default:
+		throw Exception(S6M_ERR_INVALID);
+	}
+	
+	throw Exception(S6M_ERR_INVALID);
 }
 
 size_t TFOOption::getLen() const
 {
 	return sizeof(SOCKS6SocketOption);
+}
+
+Option *TFOOption::parse(void *buf)
+{
+	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	
+	if (opt->optionHead.len != sizeof(SOCKS6SocketOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new TFOOption();
 }
 
 size_t MPTCPOption::getLen() const
@@ -62,7 +122,15 @@ size_t MPTCPOption::getLen() const
 
 Option *MPTCPOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	
+	if (opt->optionHead.len != sizeof(SOCKS6SocketOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new MPTCPOption();
 }
 
 size_t MPScehdOption::getLen() const
@@ -81,22 +149,35 @@ void MPScehdOption::pack(uint8_t *buf) const
 
 Option *MPScehdOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
+	
+	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	/* be permissive with scheduler values */
+	if (opt->scheduler == 0)
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new MPScehdOption((SOCKS6SocketOptionLeg)opt->socketOptionHead.leg, (SOCKS6MPTCPScheduler)opt->scheduler);
 }
 
 MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
 	: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched)
 {
-	switch (sched)
-	{
-	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-	case SOCKS6_MPTCP_SCHEDULER_RR:
-	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		break;
+//	switch (sched)
+//	{
+//	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+//	case SOCKS6_MPTCP_SCHEDULER_RR:
+//	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+//		break;
 		
-	default:
+//	default:
+//		throw Exception(S6M_ERR_INVALID);
+//	}
+	
+	/* be permissive with scheduler values */
+	if (sched == 0)
 		throw Exception(S6M_ERR_INVALID);
-	}
 }
 
 size_t AuthMethodOption::getLen() const
@@ -119,7 +200,7 @@ void AuthMethodOption::pack(uint8_t *buf) const
 
 Option *AuthMethodOption::parse(void *buf)
 {
-	//TODO
+	//TODOX
 }
 
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
@@ -129,6 +210,11 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 		throw Exception(S6M_ERR_INVALID);
 	if (methods.empty())
 		throw Exception(S6M_ERR_INVALID);
+}
+
+Option *AuthDataOption::parse(void *buf)
+{
+	//TODOX
 }
 
 size_t RawAuthDataOption::getLen() const
@@ -201,7 +287,7 @@ void IdempotenceOption::pack(uint8_t *buf) const
 
 Option *IdempotenceOption::parse(void *buf)
 {
-	//TODO
+	//TODOX
 }
 
 size_t TokenWindowRequestOption::getLen() const
@@ -305,11 +391,6 @@ Option *parseOption(ByteBuffer *bb)
 	bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
 	
 	return Option::parse(opt);
-}
-
-Option *AuthDataOption::parse(void *buf)
-{
-	//TODO
 }
 
 }
