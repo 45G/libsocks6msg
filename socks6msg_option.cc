@@ -200,7 +200,23 @@ void AuthMethodOption::pack(uint8_t *buf) const
 
 Option *AuthMethodOption::parse(void *buf)
 {
-	//TODOX
+	SOCKS6AuthMethodOption *opt = (SOCKS6AuthMethodOption *)buf;
+	
+	if (opt->optionHead.len < sizeof(SOCKS6AuthMethodOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	set<SOCKS6Method> methods;
+	int methodCount = opt->optionHead.len - sizeof(SOCKS6AuthMethodOption);
+	
+	for (int i = 0; i < methodCount; i++)
+	{
+		if (opt->methods[i] == SOCKS6_METHOD_UNACCEPTABLE)
+			throw Exception(S6M_ERR_INVALID);
+		
+		methods.insert((SOCKS6Method)opt->methods[i]);
+	}
+	
+	return new AuthMethodOption(methods);
 }
 
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
