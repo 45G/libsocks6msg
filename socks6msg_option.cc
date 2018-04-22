@@ -1,4 +1,5 @@
 #include <boost/foreach.hpp>
+#include <list>
 #include "socks6msg_option.hh"
 #include "socks6msg.h"
 
@@ -33,6 +34,8 @@ Option *Option::parse(void *buf)
 	
 	throw Exception(S6M_ERR_INVALID);
 }
+
+Option::~Option() {}
 
 void SocketOption::pack(uint8_t *buf) const
 {
@@ -230,7 +233,28 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 
 Option *AuthDataOption::parse(void *buf)
 {
-	//TODOX
+	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
+	
+	if (opt->optionHead.len < sizeof(SOCKS6AuthDataOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	if (opt->method == SOCKS6_METHOD_NOAUTH || opt->method == SOCKS6_METHOD_UNACCEPTABLE)
+		throw Exception(S6M_ERR_INVALID);
+	
+	if (opt->method == SOCKS6_METHOD_USRPASSWD)
+	{
+		try
+		{
+			return UsernamePasswdOption::parse(buf);
+		}
+		catch (Exception ex)
+		{
+			if (ex.getError() != S6M_ERR_INVALID)
+				throw ex;
+		}
+	}
+	
+	return RawAuthDataOption::parse(buf);
 }
 
 size_t RawAuthDataOption::getLen() const
@@ -249,7 +273,17 @@ void RawAuthDataOption::pack(uint8_t *buf) const
 
 Option *RawAuthDataOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
+	size_t dataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
+	
+	return new RawAuthDataOption((SOCKS6Method)opt->method, opt->methodData, dataSize);
+}
+
+RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen)
+	: AuthDataOption(method)
+{
+	this->data.resize(dataLen);
+	memcpy(this->data.data(), data, dataLen);
 }
 
 size_t UsernamePasswdOption::getLen() const
@@ -286,7 +320,27 @@ void UsernamePasswdOption::pack(uint8_t *buf) const
 
 Option *UsernamePasswdOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
+	
+	S6M_Error err;
+	S6M_PasswdReq *pwReq;
+	
+	size_t expectedDataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
+	
+	ssize_t dataSize = S6M_PasswdReq_Parse((uint8_t *)(buf) + opt->optionHead.len, opt->optionHead.len - sizeof(SOCKS6AuthDataOption), &pwReq, &err);
+	if (dataSize == -1)
+		throw Exception(err);
+	
+	if ((size_t)dataSize != expectedDataSize)
+	{
+		S6M_PasswdReq_Free(pwReq);
+		throw Exception(S6M_ERR_INVALID);
+	}
+	
+	UsernamePasswdOption *ret = new UsernamePasswdOption(string(pwReq->username), string(pwReq->passwd));
+	S6M_PasswdReq_Free(pwReq);
+	
+	return ret;	
 }
 
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
@@ -303,7 +357,27 @@ void IdempotenceOption::pack(uint8_t *buf) const
 
 Option *IdempotenceOption::parse(void *buf)
 {
-	//TODOX
+	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
+	
+	if (opt->optionHead.len < sizeof (SOCKS6IdempotenceOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	switch ((SOCKS6IDempotenceType)opt->type)
+	{
+	case SOCKS6_IDEMPOTENCE_WND_REQ:
+		return TokenWindowRequestOption::parse(buf);
+	
+	case SOCKS6_IDEMPOTENCE_WND_ADVERT:
+		return TokenWindowAdvertOption::parse(buf);
+	
+	case SOCKS6_IDEMPOTENCE_TOK_EXPEND:
+		return TokenExpenditureRequestOption::parse(buf);
+	
+	case SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY:
+		return TokenExpenditureReplyOption::parse(buf);
+	}
+	
+	throw Exception(S6M_ERR_INVALID);
 }
 
 size_t TokenWindowRequestOption::getLen() const
@@ -313,7 +387,12 @@ size_t TokenWindowRequestOption::getLen() const
 
 Option *TokenWindowRequestOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
+	
+	if (opt->optionHead.len != sizeof(SOCKS6IdempotenceOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new TokenWindowRequestOption();
 }
 
 size_t TokenWindowAdvertOption::getLen() const
@@ -333,7 +412,12 @@ void TokenWindowAdvertOption::pack(uint8_t *buf) const
 
 Option *TokenWindowAdvertOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
+	
+	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new TokenWindowAdvertOption(opt->windowBase, opt->windowSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -359,7 +443,12 @@ void TokenExpenditureRequestOption::pack(uint8_t *buf) const
 
 Option *TokenExpenditureRequestOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
+	
+	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new TokenExpenditureRequestOption(opt->token);
 }
 
 size_t TokenExpenditureReplyOption::getLen() const
@@ -378,7 +467,24 @@ void TokenExpenditureReplyOption::pack(uint8_t *buf) const
 
 Option *TokenExpenditureReplyOption::parse(void *buf)
 {
-	//TODO
+	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
+	
+	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
+		throw Exception(S6M_ERR_INVALID);
+	
+	switch ((SOCKS6TokenExpenditureCode)opt->code)
+	{
+	case SOCKS6_TOK_EXPEND_SUCCESS:
+	case SOCKS6_TOK_EXPEND_NO_WND:
+	case SOCKS6_TOK_EXPEND_OUT_OF_WND:
+	case SOCKS6_TOK_EXPEND_DUPLICATE:
+		break;
+		
+	default:
+		throw Exception(S6M_ERR_INVALID);
+	}
+	
+	return new TokenExpenditureReplyOption((SOCKS6TokenExpenditureCode)opt->code);
 }
 
 TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
@@ -397,16 +503,47 @@ TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureC
 	}
 }
 
-Option *parseOption(ByteBuffer *bb)
+list<Option *> parseOptions(ByteBuffer *bb)
 {
-	SOCKS6Option *opt = bb->get<SOCKS6Option>();
+	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
+	list<Option *> opts;
 	
-	if (opt->len < 2)
-		throw Exception(S6M_ERR_INVALID);
+	try
+	{
+		for (int i = 0; i < optsHead->optionCount; i++)
+		{
+			SOCKS6Option *opt = bb->get<SOCKS6Option>();
+			
+			/* bad option length wrecks everything */
+			if (opt->len < 2)
+				throw Exception(S6M_ERR_INVALID);
+		
+			bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
+			
+			try
+			{
+				opts.push_back(Option::parse(opt));
+			}
+			catch (Exception ex)
+			{
+				/* silently ignote bad options */
+				if (ex.getError() == S6M_ERR_INVALID)
+					continue;
+				throw ex;
+			}
+		}
+	}
+	catch (exception ex)
+	{
+		BOOST_FOREACH(Option *opt, opts)
+		{
+			delete opt;
+		}
+		
+		throw ex;
+	}
 	
-	bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
-	
-	return Option::parse(opt);
+	return opts;
 }
 
 }

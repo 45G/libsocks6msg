@@ -34,6 +34,8 @@ public:
 	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}
+	
+	virtual ~Option();
 };
 
 class SocketOption: public Option
@@ -223,7 +225,7 @@ public:
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code);
 };
 
-Option *parseOption(ByteBuffer *bb);
+std::list<Option *> parseOptions(ByteBuffer *bb);
 
 }
 
