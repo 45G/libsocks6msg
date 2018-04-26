@@ -72,7 +72,7 @@ Option *RawOption::parse(void *buf)
 
 void RawOption::apply(OptionSet *optSet) const
 {
-	/* nothing */
+	//TODO
 }
 
 RawOption::RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen)
