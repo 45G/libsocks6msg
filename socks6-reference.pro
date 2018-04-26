@@ -7,10 +7,12 @@ SOURCES += \
     socks6msg.cc \
     main.c \
     socks6msg_option.cc \
-    socks6msg_base.cc
+    socks6msg_base.cc \
+    socks6msg_optionset.cc
 
 HEADERS += \
     socks6.h \
     socks6msg.h \
     socks6msg_base.hh \
-    socks6msg_option.hh
+    socks6msg_option.hh \
+    socks6msg_optionset.hh

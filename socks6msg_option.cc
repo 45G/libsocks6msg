@@ -543,47 +543,4 @@ TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureC
 	}
 }
 
-list<Option *> parseOptions(ByteBuffer *bb)
-{
-	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
-	list<Option *> opts;
-	
-	try
-	{
-		for (int i = 0; i < optsHead->optionCount; i++)
-		{
-			SOCKS6Option *opt = bb->get<SOCKS6Option>();
-			
-			/* bad option length wrecks everything */
-			if (opt->len < 2)
-				throw Exception(S6M_ERR_INVALID);
-		
-			bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
-			
-			try
-			{
-				opts.push_back(Option::parse(opt));
-			}
-			catch (Exception ex)
-			{
-				/* silently ignote bad options */
-				if (ex.getError() == S6M_ERR_INVALID)
-					continue;
-				throw ex;
-			}
-		}
-	}
-	catch (exception ex)
-	{
-		BOOST_FOREACH(Option *opt, opts)
-		{
-			delete opt;
-		}
-		
-		throw ex;
-	}
-	
-	return opts;
-}
-
 }

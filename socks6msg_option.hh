@@ -241,8 +241,6 @@ public:
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code);
 };
 
-std::list<Option *> parseOptions(ByteBuffer *bb);
-
 }
 
 #endif // SOCKS6MSG_OPTION_HH
