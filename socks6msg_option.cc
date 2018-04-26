@@ -218,6 +218,7 @@ MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sch
 //	}
 	
 	/* be permissive with scheduler values */
+	//TODO: really?
 	if (sched == 0)
 		throw Exception(S6M_ERR_INVALID);
 }
