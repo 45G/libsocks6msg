@@ -154,9 +154,6 @@ Option *TFOOption::parse(void *buf)
 {
 	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
 	
-	if (opt->optionHead.len != sizeof(SOCKS6SocketOption))
-		throw Exception(S6M_ERR_INVALID);
-	
 	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
 		throw Exception(S6M_ERR_INVALID);
 	
@@ -287,6 +284,15 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 		throw Exception(S6M_ERR_INVALID);
 }
 
+void AuthDataOption::pack(uint8_t *buf) const
+{
+	Option::pack(buf);
+	
+	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
+	
+	opt->method = method;
+}
+
 Option *AuthDataOption::parse(void *buf)
 {
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
@@ -320,7 +326,7 @@ size_t RawAuthDataOption::getLen() const
 
 void RawAuthDataOption::pack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	AuthDataOption::pack(buf);
 	
 	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
 	
@@ -376,6 +382,7 @@ void UsernamePasswdOption::pack(uint8_t *buf) const
 
 Option *UsernamePasswdOption::parse(void *buf)
 {
+	//TODO: use c++ implementation of passwd messages
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
 	S6M_Error err;

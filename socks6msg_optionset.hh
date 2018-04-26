@@ -5,6 +5,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include "socks6msg_base.hh"
 #include "socks6msg_option.hh"
@@ -164,28 +165,21 @@ public:
 			//TODO
 		}
 		
-		//TODO
+		iterator<std::vector<uint8_t> > it = extraAuthData.find(method);
+		if (it != extraAuthData.end() && *it != data)
+			throw E
 	}
 	
-	std::vector<uint8_t> getAuthData()
+	std::map<SOCKS6Method, std::vector<uint8_t> > getExtraAuthData() const
 	{
-		if (method == SOCKS6_METHOD_USRPASSWD && userPasswdAuth.attempt)
-		{
-			//TODO
-		}
-		
-		//TODO
+		return extraAuthData;
 	}
 	
-	void addOption(SOCKS6OptionKind kind, std::vector<uint8_t> data)
+	void addOption(SOCKS6OptionKind kind, std::vector<uint8_t> data);
+	
+	std::list<boost::shared_ptr<Option> > getExtraOptions() const
 	{
-		RawOption rawOption(kind, data.data(), data.size());
-		size_t rawLen = rawOption.getLen();
-		uint8_t buf[rawLen];
-		ByteBuffer bb(buf, rawLen);
-		
-		shared_ptr<Option> opt(Option::parse(bb));
-		opt->apply(this);
+		return extraOptions;
 	}
 };
 
