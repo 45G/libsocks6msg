@@ -9,6 +9,8 @@
 namespace S6M
 {
 
+class OptionSet;
+
 class Option
 {
 	SOCKS6OptionKind kind;
@@ -32,6 +34,8 @@ public:
 	
 	static Option *parse(void *buf);
 	
+	virtual void apply(OptionSet *optSet) const = 0;
+	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}
 	
@@ -48,6 +52,8 @@ public:
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen);
 };
@@ -89,6 +95,8 @@ public:
 	
 	static Option *parse(void *buf);
 	
+	virtual void apply(OptionSet *optSet) const;
+	
 	TFOOption()
 		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_TFO) {}
 };
@@ -99,6 +107,8 @@ public:
 	virtual size_t getLen() const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	MPTCPOption()
 		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MPTCP) {}

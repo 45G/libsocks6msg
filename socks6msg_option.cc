@@ -2,6 +2,7 @@
 #include <list>
 #include "socks6msg_option.hh"
 #include "socks6msg.h"
+#include "socks6msg_optionset.hh"
 
 using namespace std;
 using namespace boost;
@@ -67,6 +68,11 @@ Option *RawOption::parse(void *buf)
 	size_t dataSize = opt->len - sizeof(SOCKS6Option);
 	
 	return new RawOption((SOCKS6OptionKind)opt->kind, opt->data, dataSize);
+}
+
+void RawOption::apply(OptionSet *optSet) const
+{
+	/* nothing */
 }
 
 RawOption::RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen)
@@ -157,6 +163,11 @@ Option *TFOOption::parse(void *buf)
 	return new TFOOption();
 }
 
+void TFOOption::apply(OptionSet *optSet) const
+{
+	optSet->setTFO();
+}
+
 size_t MPTCPOption::getLen() const
 {
 	return sizeof(SOCKS6SocketOption);
@@ -173,6 +184,11 @@ Option *MPTCPOption::parse(void *buf)
 		throw Exception(S6M_ERR_INVALID);
 	
 	return new MPTCPOption();
+}
+
+void MPTCPOption::apply(OptionSet *optSet) const
+{
+	optSet->setMPTCP();
 }
 
 size_t MPScehdOption::getLen() const
@@ -457,7 +473,7 @@ Option *TokenWindowAdvertOption::parse(void *buf)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
 		throw Exception(S6M_ERR_INVALID);
 	
-	return new TokenWindowAdvertOption(opt->windowBase, opt->windowSize);
+	return new TokenWindowAdvertOption(ntohl(opt->windowBase), ntohl(opt->windowSize));
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -488,7 +504,7 @@ Option *TokenExpenditureRequestOption::parse(void *buf)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureOption))
 		throw Exception(S6M_ERR_INVALID);
 	
-	return new TokenExpenditureRequestOption(opt->token);
+	return new TokenExpenditureRequestOption(ntohl(opt->token));
 }
 
 size_t TokenExpenditureReplyOption::getLen() const
