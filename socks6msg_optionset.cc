@@ -8,10 +8,6 @@ using namespace boost;
 namespace S6M
 {
 
-
-
-
-
 list<shared_ptr<Option> > OptionSet::generateOptions()
 {
 	list<shared_ptr<Option> > opts;
@@ -162,20 +158,12 @@ void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 	idempotence.windowSize = size;
 }
 
-void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data)
-{
-	if (method == SOCKS6_METHOD_USRPASSWD)
-	{
-		
-	}
-	
-	//TODO
-}
+
 
 void OptionSet::addOption(SOCKS6OptionKind kind, vector<uint8_t> data)
 {
 	RawOption rawOption(kind, data.data(), data.size());
-	size_t rawLen = rawOption.getLen();
+	size_t rawLen = rawOption.packedSize();
 	uint8_t buf[rawLen];
 	ByteBuffer bb(buf, rawLen);
 	

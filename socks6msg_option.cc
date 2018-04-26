@@ -15,7 +15,7 @@ void Option::pack(uint8_t *buf) const
 	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
 	
 	opt->kind = getKind();
-	opt->len = getLen();
+	opt->len = packedSize();
 }
 
 Option *Option::parse(void *buf)
@@ -48,7 +48,7 @@ Option *Option::parse(void *buf)
 
 Option::~Option() {}
 
-size_t RawOption::getLen() const
+size_t RawOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + data.size();
 }
@@ -145,7 +145,7 @@ Option *SocketOption::parse(void *buf)
 	throw Exception(S6M_ERR_INVALID);
 }
 
-size_t TFOOption::getLen() const
+size_t TFOOption::packedSize() const
 {
 	return sizeof(SOCKS6SocketOption);
 }
@@ -165,7 +165,7 @@ void TFOOption::apply(OptionSet *optSet) const
 	optSet->setTFO();
 }
 
-size_t MPTCPOption::getLen() const
+size_t MPTCPOption::packedSize() const
 {
 	return sizeof(SOCKS6SocketOption);
 }
@@ -188,7 +188,7 @@ void MPTCPOption::apply(OptionSet *optSet) const
 	optSet->setMPTCP();
 }
 
-size_t MPScehdOption::getLen() const
+size_t MPScehdOption::packedSize() const
 {
 	return sizeof(SOCKS6MPTCPSchedulerOption);
 }
@@ -216,6 +216,11 @@ Option *MPScehdOption::parse(void *buf)
 	return new MPScehdOption((SOCKS6SocketOptionLeg)opt->socketOptionHead.leg, (SOCKS6MPTCPScheduler)opt->scheduler);
 }
 
+void MPScehdOption::apply(OptionSet *optSet) const
+{
+	//TODO
+}
+
 MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
 	: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched)
 {
@@ -236,7 +241,7 @@ MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sch
 		throw Exception(S6M_ERR_INVALID);
 }
 
-size_t AuthMethodOption::getLen() const
+size_t AuthMethodOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
 }
@@ -273,6 +278,11 @@ Option *AuthMethodOption::parse(void *buf)
 	}
 	
 	return new AuthMethodOption(methods);
+}
+
+void AuthMethodOption::apply(OptionSet *optSet) const
+{
+	//TODO
 }
 
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
@@ -319,7 +329,7 @@ Option *AuthDataOption::parse(void *buf)
 	return RawAuthDataOption::parse(buf);
 }
 
-size_t RawAuthDataOption::getLen() const
+size_t RawAuthDataOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + data.size() * sizeof(uint8_t);
 }
@@ -341,6 +351,11 @@ Option *RawAuthDataOption::parse(void *buf)
 	return new RawAuthDataOption((SOCKS6Method)opt->method, opt->methodData, dataSize);
 }
 
+void RawAuthDataOption::apply(OptionSet *optSet) const
+{
+	//TODO
+}
+
 RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen)
 	: AuthDataOption(method)
 {
@@ -348,7 +363,7 @@ RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t 
 	memcpy(this->data.data(), data, dataLen);
 }
 
-size_t UsernamePasswdOption::getLen() const
+size_t UsernamePasswdOption::packedSize() const
 {
 	const S6M_PasswdReq pwReq = {
 		.username = username.c_str(),
@@ -375,7 +390,7 @@ void UsernamePasswdOption::pack(uint8_t *buf) const
 	};
 	
 	S6M_Error err;
-	ssize_t dataSize = S6M_PasswdReq_Pack(&pwReq, opt->methodData, getLen() - sizeof(SOCKS6AuthDataOption), &err);
+	ssize_t dataSize = S6M_PasswdReq_Pack(&pwReq, opt->methodData, packedSize() - sizeof(SOCKS6AuthDataOption), &err);
 	if (dataSize == -1)
 		throw Exception(err);
 }
@@ -404,6 +419,11 @@ Option *UsernamePasswdOption::parse(void *buf)
 	S6M_PasswdReq_Free(pwReq);
 	
 	return ret;	
+}
+
+void UsernamePasswdOption::apply(OptionSet *optSet) const
+{
+	//TODO
 }
 
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
@@ -443,7 +463,7 @@ Option *IdempotenceOption::parse(void *buf)
 	throw Exception(S6M_ERR_INVALID);
 }
 
-size_t TokenWindowRequestOption::getLen() const
+size_t TokenWindowRequestOption::packedSize() const
 {
 	return sizeof(SOCKS6IdempotenceOption);
 }
@@ -458,7 +478,12 @@ Option *TokenWindowRequestOption::parse(void *buf)
 	return new TokenWindowRequestOption();
 }
 
-size_t TokenWindowAdvertOption::getLen() const
+void TokenWindowRequestOption::apply(OptionSet *optSet) const
+{
+	//TODO
+}
+
+size_t TokenWindowAdvertOption::packedSize() const
 {
 	return sizeof(SOCKS6WindowAdvertOption);
 }
@@ -483,6 +508,11 @@ Option *TokenWindowAdvertOption::parse(void *buf)
 	return new TokenWindowAdvertOption(ntohl(opt->windowBase), ntohl(opt->windowSize));
 }
 
+void TokenWindowAdvertOption::apply(OptionSet *optSet) const
+{
+	//TODO
+}
+
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_ADVERT), winBase(winBase), winSize(winSize)
 {
@@ -490,7 +520,7 @@ TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winS
 		throw Exception(S6M_ERR_INVALID);
 }
 
-size_t TokenExpenditureRequestOption::getLen() const
+size_t TokenExpenditureRequestOption::packedSize() const
 {
 	return sizeof(SOCKS6TokenExpenditureOption);
 }
@@ -514,7 +544,12 @@ Option *TokenExpenditureRequestOption::parse(void *buf)
 	return new TokenExpenditureRequestOption(ntohl(opt->token));
 }
 
-size_t TokenExpenditureReplyOption::getLen() const
+void TokenExpenditureRequestOption::apply(OptionSet *optSet) const
+{
+	//TODO
+}
+
+size_t TokenExpenditureReplyOption::packedSize() const
 {
 	return sizeof(SOCKS6TokenExpenditureReplyOption);
 }
@@ -548,6 +583,11 @@ Option *TokenExpenditureReplyOption::parse(void *buf)
 	}
 	
 	return new TokenExpenditureReplyOption((SOCKS6TokenExpenditureCode)opt->code);
+}
+
+void TokenExpenditureReplyOption::apply(OptionSet *optSet) const
+{
+	//TODO
 }
 
 TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)

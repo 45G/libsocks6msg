@@ -21,13 +21,13 @@ public:
 		return kind;
 	}
 	
-	virtual size_t getLen() const = 0;
+	virtual size_t packedSize() const = 0;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	void pack(ByteBuffer *bb) const
 	{
-		uint8_t *buf = bb->get<uint8_t>(getLen());
+		uint8_t *buf = bb->get<uint8_t>(packedSize());
 		
 		pack(buf);
 	}
@@ -47,7 +47,7 @@ class RawOption: public Option
 	std::vector<uint8_t> data;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
@@ -91,7 +91,7 @@ public:
 class TFOOption: public SocketOption
 {
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	static Option *parse(void *buf);
 	
@@ -104,7 +104,7 @@ public:
 class MPTCPOption: public SocketOption
 {
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	static Option *parse(void *buf);
 	
@@ -119,11 +119,13 @@ class MPScehdOption: public SocketOption
 	SOCKS6MPTCPScheduler sched;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched);
 };
@@ -133,11 +135,13 @@ class AuthMethodOption: public Option
 	std::set<SOCKS6Method> methods;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	AuthMethodOption(std::set<SOCKS6Method> methods);
 };
@@ -160,11 +164,13 @@ class RawAuthDataOption: public AuthDataOption
 	std::vector<uint8_t> data;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen);
 };
@@ -176,11 +182,13 @@ class UsernamePasswdOption: public AuthDataOption
 	std::string passwd;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	UsernamePasswdOption(std::string username, std::string passwd);
 };
@@ -201,9 +209,11 @@ public:
 class TokenWindowRequestOption: public IdempotenceOption
 {
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	TokenWindowRequestOption()
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ) {}
@@ -215,11 +225,13 @@ class TokenWindowAdvertOption: public IdempotenceOption
 	uint32_t winSize;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
 };
@@ -229,11 +241,13 @@ class TokenExpenditureRequestOption: public IdempotenceOption
 	uint32_t token;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	TokenExpenditureRequestOption(uint32_t token)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
@@ -244,11 +258,13 @@ class TokenExpenditureReplyOption: public IdempotenceOption
 	SOCKS6TokenExpenditureCode code;
 	
 public:
-	virtual size_t getLen() const;
+	virtual size_t packedSize() const;
 	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
+	
+	virtual void apply(OptionSet *optSet) const;
 	
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code);
 };
