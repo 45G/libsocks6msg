@@ -38,6 +38,20 @@ public:
 	virtual ~Option();
 };
 
+class RawOption: public Option
+{
+	std::vector<uint8_t> data;
+	
+public:
+	virtual size_t getLen() const;
+	
+	virtual void pack(uint8_t *buf) const;
+	
+	static Option *parse(void *buf);
+	
+	RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen);
+};
+
 class SocketOption: public Option
 {
 	SOCKS6SocketOptionLeg leg;
@@ -93,6 +107,7 @@ public:
 class MPScehdOption: public SocketOption
 {
 	SOCKS6MPTCPScheduler sched;
+	
 public:
 	virtual size_t getLen() const;
 	
@@ -120,6 +135,7 @@ public:
 class AuthDataOption: public Option
 {
 	SOCKS6Method method;
+	
 public:
 	static Option *parse(void *buf);
 	

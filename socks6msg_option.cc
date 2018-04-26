@@ -21,21 +21,60 @@ Option *Option::parse(void *buf)
 {
 	SOCKS6Option *opt = (SOCKS6Option *)buf;
 	
-	switch (opt->kind) {
-	case SOCKS6_OPTION_SOCKET:
-		return SocketOption::parse(buf);
-	case SOCKS6_OPTION_AUTH_METHOD:
-		return AuthMethodOption::parse(buf);
-	case SOCKS6_OPTION_AUTH_DATA:
-		return AuthDataOption::parse(buf);
-	case SOCKS6_OPTION_IDEMPOTENCE:
-		return IdempotenceOption::parse(buf);
+	try
+	{
+		switch (opt->kind) {
+		case SOCKS6_OPTION_SOCKET:
+			return SocketOption::parse(buf);
+		case SOCKS6_OPTION_AUTH_METHOD:
+			return AuthMethodOption::parse(buf);
+		case SOCKS6_OPTION_AUTH_DATA:
+			return AuthDataOption::parse(buf);
+		case SOCKS6_OPTION_IDEMPOTENCE:
+			return IdempotenceOption::parse(buf);
+		}
+		
+		throw Exception(S6M_ERR_INVALID);
 	}
-	
-	throw Exception(S6M_ERR_INVALID);
+	catch (Exception ex)
+	{
+		if (ex.getError() == S6M_ERR_INVALID)
+			return RawOption::parse(buf);
+		
+		throw ex;
+	}
 }
 
 Option::~Option() {}
+
+size_t RawOption::getLen() const
+{
+	return sizeof(SOCKS6Option) + data.size();
+}
+
+void RawOption::pack(uint8_t *buf) const
+{
+	Option::pack(buf);
+	
+	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
+	
+	memcpy(opt->data, data.data(), data.size());	
+}
+
+Option *RawOption::parse(void *buf)
+{
+	SOCKS6Option *opt = (SOCKS6Option *)buf;
+	size_t dataSize = opt->len - sizeof(SOCKS6Option);
+	
+	return new RawOption((SOCKS6OptionKind)opt->kind, opt->data, dataSize);
+}
+
+RawOption::RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen)
+	: Option(kind)
+{
+	this->data.resize(dataLen);
+	memcpy(this->data.data(), data, dataLen);
+}
 
 void SocketOption::pack(uint8_t *buf) const
 {
