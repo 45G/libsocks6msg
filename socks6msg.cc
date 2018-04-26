@@ -140,7 +140,7 @@ struct OptionSet
 		SOCKS6TokenExpenditureCode replyCode;
 	} idempotence;
 	
-	set<SOCKS6Method> extraMethods;
+	set<SOCKS6Method> knownMethods;
 	
 	struct
 	{
@@ -186,18 +186,19 @@ struct OptionSet
 			userPasswdAuth.passwd = string(req->userPasswdAuth.passwd);
 		}
 		
+		knownMethods.insert(SOCKS6_METHOD_NOAUTH);
 		bool doUserPasswdAuth = userPasswdAuth.username.length() > 0;
-		
-		if (req->supportedMethods == NULL)
-			return;
-		for (int i = 0; req->supportedMethods[i] != SOCKS6_METHOD_NOAUTH; i++)
+		if (doUserPasswdAuth)
+			knownMethods.insert(SOCKS6_METHOD_USRPASSWD);
+		if (req->supportedMethods != NULL)
 		{
-			SOCKS6Method method = (SOCKS6Method)req->supportedMethods[i];
-			if (method == SOCKS6_METHOD_UNACCEPTABLE)
-				throw Exception(S6M_ERR_INVALID);
-			if (method == SOCKS6_METHOD_USRPASSWD && doUserPasswdAuth)
-				continue;
-			extraMethods.insert(method);
+			for (int i = 0; req->supportedMethods[i] != SOCKS6_METHOD_NOAUTH; i++)
+			{
+				SOCKS6Method method = (SOCKS6Method)req->supportedMethods[i];
+				if (method == SOCKS6_METHOD_UNACCEPTABLE)
+					throw Exception(S6M_ERR_INVALID);
+				knownMethods.insert(method);
+			}
 		}
 		
 		generate();
@@ -274,6 +275,11 @@ struct OptionSet
 		if (idempotence.reply)
 			opts.push_back(new TokenExpenditureReplyOption(idempotence.replyCode));
 		
+		set<SOCKS6Method> extraMethods(knownMethods);
+		extraMethods.erase(SOCKS6_METHOD_NOAUTH);
+		bool doUserPasswdAuth = userPasswdAuth.username.length() > 0;
+		if (doUserPasswdAuth)
+			extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 		if (!extraMethods.empty())
 			opts.push_back(new AuthMethodOption(extraMethods));
 		
