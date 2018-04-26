@@ -72,10 +72,10 @@ Option *RawOption::parse(void *buf)
 
 void RawOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->addOption(kind, data, false);
 }
 
-RawOption::RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen)
+RawOption::RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen)
 	: Option(kind)
 {
 	this->data.resize(dataLen);
@@ -353,7 +353,7 @@ Option *RawAuthDataOption::parse(void *buf)
 
 void RawAuthDataOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->setAuthData(method, data, false);
 }
 
 RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen)
@@ -380,6 +380,7 @@ size_t UsernamePasswdOption::packedSize() const
 
 void UsernamePasswdOption::pack(uint8_t *buf) const
 {
+	//TODO: use c++ PasswdReq stuff
 	AuthDataOption::pack(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
@@ -423,7 +424,7 @@ Option *UsernamePasswdOption::parse(void *buf)
 
 void UsernamePasswdOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->attemptUserPasswdAuth(username, passwd);
 }
 
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
@@ -480,7 +481,7 @@ Option *TokenWindowRequestOption::parse(void *buf)
 
 void TokenWindowRequestOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->requestTokenWindow();
 }
 
 size_t TokenWindowAdvertOption::packedSize() const
@@ -505,12 +506,16 @@ Option *TokenWindowAdvertOption::parse(void *buf)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
 		throw Exception(S6M_ERR_INVALID);
 	
-	return new TokenWindowAdvertOption(ntohl(opt->windowBase), ntohl(opt->windowSize));
+	uint32_t winSize = ntohl(opt->windowSize);
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
+		throw Exception(S6M_ERR_INVALID);
+	
+	return new TokenWindowAdvertOption(ntohl(opt->windowBase), winSize);
 }
 
 void TokenWindowAdvertOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->advetiseTokenWindow(winBase, winSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -546,7 +551,7 @@ Option *TokenExpenditureRequestOption::parse(void *buf)
 
 void TokenExpenditureRequestOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->spendToken(token);
 }
 
 size_t TokenExpenditureReplyOption::packedSize() const
@@ -587,7 +592,7 @@ Option *TokenExpenditureReplyOption::parse(void *buf)
 
 void TokenExpenditureReplyOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	optSet->replyToExpenditure(code);
 }
 
 TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)

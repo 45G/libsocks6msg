@@ -16,6 +16,7 @@ namespace S6M
 class OptionSet
 {
 	bool tfo;
+	
 	bool mptcp;
 	
 	struct Scheds
@@ -31,31 +32,25 @@ class OptionSet
 	struct Idem
 	{
 		bool request;
+		
 		bool spend;
 		uint32_t token;
 		
-		bool advertise;
 		uint32_t base;
 		uint32_t windowSize;
 		
-		bool reply;
 		SOCKS6TokenExpenditureCode replyCode;
 		
 		Idem()
-			: request(false), spend(false), token(0), advertise(false), base(0), windowSize(0), reply(false), replyCode(SOCKS6_TOK_EXPEND_SUCCESS) {}
+			: request(false), spend(false), token(0), base(0), windowSize(0), reply(false), replyCode((SOCKS6TokenExpenditureCode)0) {}
 	} idempotence;
 	
 	std::set<SOCKS6Method> knownMethods;
 	
-	struct UsrPswd
+	struct
 	{
-		bool attempt;
-		
 		std::string username;
 		std::string passwd;
-		
-		UsrPswd()
-			: attempt(false) {}
 	} userPasswdAuth;
 	
 	std::map<SOCKS6Method, std::vector<uint8_t> > extraAuthData;
@@ -118,7 +113,7 @@ public:
 	
 	bool advetisedTokenWindow()
 	{
-		return idempotence.advertise;
+		return idempotence.windowSize > 0;
 	}
 	
 	uint32_t getTokenWindowBase() const
@@ -133,6 +128,25 @@ public:
 	
 	void advetiseTokenWindow(uint32_t base, uint32_t size);
 	
+	void spendToken(uint32_t token);
+	
+	bool expenditureAttempted() const
+	{
+		return idempotence.spend;
+	}
+	
+	uint32_t getToken() const
+	{
+		return idempotence.token;
+	}
+	
+	void replyToExpenditure(SOCKS6TokenExpenditureCode code);
+	
+	SOCKS6TokenExpenditureCode getExpenditureReplyCode() const
+	{
+		return idempotence.replyCode;
+	}
+	
 	std::set<SOCKS6Method> getKnownMethods() const
 	{
 		return knownMethods;
@@ -143,10 +157,7 @@ public:
 		knownMethods.insert(method);
 	}
 	
-	bool attemptedUserPasswdAuth() const
-	{
-		return userPasswdAuth.attempt;
-	}
+	void attemptUserPasswdAuth(const std::string &user, const std::string &passwd);
 	
 	std::string getUsername() const
 	{
@@ -158,7 +169,7 @@ public:
 		return userPasswdAuth.passwd;
 	}
 	
-	void setAuthData(SOCKS6Method method, std::vector<uint8_t> data)
+	void setAuthData(SOCKS6Method method, const std::vector<uint8_t> &data, bool parse = true)
 	{
 		if (method == SOCKS6_METHOD_USRPASSWD)
 		{
@@ -175,7 +186,7 @@ public:
 		return extraAuthData;
 	}
 	
-	void addOption(SOCKS6OptionKind kind, std::vector<uint8_t> data);
+	void addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse = true);
 	
 	std::list<boost::shared_ptr<Option> > getExtraOptions() const
 	{

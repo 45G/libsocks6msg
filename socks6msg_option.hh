@@ -55,7 +55,7 @@ public:
 	
 	virtual void apply(OptionSet *optSet) const;
 	
-	RawOption(SOCKS6OptionKind kind, uint8_t *data, size_t dataLen);
+	RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen);
 };
 
 class SocketOption: public Option

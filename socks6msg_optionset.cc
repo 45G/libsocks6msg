@@ -150,7 +150,9 @@ void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
 
 void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 {
-	if (idempotence.advertise && (idempotence.base != base || idempotence.windowSize != size))
+	if (size == 0)
+		throw Exception(S6M_ERR_INVALID);
+	if (idempotence.windowSize > 0 && (idempotence.base != base || idempotence.windowSize != size))
 		throw Exception(S6M_ERR_INVALID);
 	
 	idempotence.advertise = true;
@@ -158,11 +160,45 @@ void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 	idempotence.windowSize = size;
 }
 
+void OptionSet::expendToken(uint32_t token)
+{
+	if (idempotence.spend && idempotence.token != token)
+		throw Exception(S6M_ERR_INVALID);
+	
+	idempotence.spend = true;
+	idempotence.token = token;
+}
 
+void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
+{
+	if (idempotence != 0 && idempotence.replyCode != code)
+		throw Exception(S6M_ERR_INVALID);
+	
+	idempotence.replyCode = code;
+}
 
-void OptionSet::addOption(SOCKS6OptionKind kind, vector<uint8_t> data)
+void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
+{
+	if (user.size() == 0 || passwd.size() == 0)
+		throw Exception(S6M_ERR_INVALID);
+	
+	if (userPasswdAuth.username.size() != 0 && (user != userPasswdAuth.username || passwd != userPasswdAuth.passwd))
+		throw Exception(S6M_ERR_INVALID);
+	
+	userPasswdAuth.username = user;
+	userPasswdAuth.passwd = passwd;
+}
+
+void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse)
 {
 	RawOption rawOption(kind, data.data(), data.size());
+	
+	if (!parse)
+	{
+		rawOption.apply(this);
+		return;
+	}
+	
 	size_t rawLen = rawOption.packedSize();
 	uint8_t buf[rawLen];
 	ByteBuffer bb(buf, rawLen);
