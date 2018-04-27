@@ -1,14 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <list>
-#include <boost/foreach.hpp>
 #include <set>
+#include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
 #include "socks6msg.h"
 #include "socks6msg_base.hh"
 #include "socks6msg_option.hh"
 
 using namespace std;
-
+using namespace boost;
 using namespace S6M;
 
 
@@ -83,214 +84,6 @@ static S6M_Addr Addr_Parse(ByteBuffer *bb)
 	}
 	
 	return addr;
-}
-
-/*
- * Options
- */ 
-struct OptionSet
-{
-	bool tfo;
-	
-	bool mptcp;
-	
-	struct
-	{
-		SOCKS6MPTCPScheduler clientProxy;
-		SOCKS6MPTCPScheduler proxyServer;
-	} mptcpSched;
-	
-	struct
-	{
-		bool request;
-		bool spend;
-		uint32_t token;
-		
-		bool advertise;
-		uint32_t base;
-		uint32_t windowSize;
-		
-		bool reply;
-		SOCKS6TokenExpenditureCode replyCode;
-	} idempotence;
-	
-	set<SOCKS6Method> knownMethods;
-	
-	struct
-	{
-		string username;
-		string passwd;
-	} userPasswdAuth;
-	
-	list<Option *> opts;
-	
-//	Options()
-//	{
-//		tfo = false;
-		
-//		mptcp = false;
-		
-//		mptcpSched.clientProxy = (SOCKS6MPTCPScheduler)0;
-//		mptcpSched.proxyServer = (SOCKS6MPTCPScheduler)0;
-		
-//		idempotence.request = false;
-//		idempotence.spend = false;
-//		idempotence.advertise = false;
-//		idempotence.reply = false;
-//	}
-	
-	OptionSet(const S6M_Request *req)
-	{
-		tfo = req->tfo;
-		
-		mptcp = false;
-		
-		mptcpSched.clientProxy = req->mptcpSched.clientProxy;
-		mptcpSched.proxyServer = req->mptcpSched.proxyServer;
-		
-		idempotence.request = req->idempotence.request;
-		idempotence.spend = req->idempotence.spend;
-		idempotence.token = req->idempotence.token;
-		idempotence.advertise = false;
-		idempotence.reply = false;
-		
-		if (req->userPasswdAuth.username)
-		{	
-			userPasswdAuth.username = string(req->userPasswdAuth.username);
-			userPasswdAuth.passwd = string(req->userPasswdAuth.passwd);
-		}
-		
-		knownMethods.insert(SOCKS6_METHOD_NOAUTH);
-		bool doUserPasswdAuth = userPasswdAuth.username.length() > 0;
-		if (doUserPasswdAuth)
-			knownMethods.insert(SOCKS6_METHOD_USRPASSWD);
-		if (req->supportedMethods != NULL)
-		{
-			for (int i = 0; req->supportedMethods[i] != SOCKS6_METHOD_NOAUTH; i++)
-			{
-				SOCKS6Method method = (SOCKS6Method)req->supportedMethods[i];
-				if (method == SOCKS6_METHOD_UNACCEPTABLE)
-					throw Exception(S6M_ERR_INVALID);
-				knownMethods.insert(method);
-			}
-		}
-		
-		generate();
-	}
-	
-	OptionSet(const S6M_AuthReply *authReply)
-	{
-		(void)authReply;
-		
-		tfo = false;
-		
-		mptcp = false;
-		
-		mptcpSched.clientProxy = (SOCKS6MPTCPScheduler)0;
-		mptcpSched.proxyServer = (SOCKS6MPTCPScheduler)0;
-		
-		idempotence.request = false;
-		idempotence.spend = false;
-		idempotence.advertise = false;
-		idempotence.reply = false;
-		
-		generate();
-	}
-	
-	OptionSet(const S6M_OpReply *opReply)
-	{
-		tfo = opReply->tfo;
-		
-		mptcp = opReply->mptcp;
-		
-		mptcpSched.clientProxy = opReply->mptcpSched.clientProxy;
-		mptcpSched.proxyServer = opReply->mptcpSched.proxyServer;
-		
-		idempotence.request = false;
-		idempotence.spend = false;
-		idempotence.advertise = opReply->idempotence.advertise;
-		idempotence.base = opReply->idempotence.base;
-		idempotence.windowSize = opReply->idempotence.windowSize;
-		idempotence.reply = opReply->idempotence.reply;
-		idempotence.replyCode = opReply->idempotence.replyCode;
-		
-		generate();
-	}
-	
-	void generate()
-	{
-		if (tfo)
-			opts.push_back(new TFOOption());
-		if (mptcp)
-			opts.push_back(new MPTCPOption());
-		
-		if (mptcpSched.clientProxy > 0)
-		{
-			if (mptcpSched.proxyServer == mptcpSched.clientProxy)
-			{
-				opts.push_back(new MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy));
-				goto both_sched_done;
-			}
-			else
-			{
-				opts.push_back(new MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy));
-			}
-		}
-		if (mptcpSched.proxyServer > 0)
-			opts.push_back(new MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer));
-		
-	both_sched_done:
-		if (idempotence.request)
-			opts.push_back(new TokenWindowRequestOption());
-		if (idempotence.spend)
-			opts.push_back(new TokenExpenditureRequestOption(idempotence.token));
-		if (idempotence.advertise)
-			opts.push_back(new TokenWindowAdvertOption(idempotence.base, idempotence.windowSize));
-		if (idempotence.reply)
-			opts.push_back(new TokenExpenditureReplyOption(idempotence.replyCode));
-		
-		set<SOCKS6Method> extraMethods(knownMethods);
-		extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-		bool doUserPasswdAuth = userPasswdAuth.username.length() > 0;
-		if (doUserPasswdAuth)
-			extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
-		if (!extraMethods.empty())
-			opts.push_back(new AuthMethodOption(extraMethods));
-		
-		if (!userPasswdAuth.username.empty())
-			opts.push_back(new UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd));
-	}
-};
-
-static size_t Options_Packed_Size(const OptionSet *opts)
-{
-	size_t size = 0;
-	
-	size += sizeof(SOCKS6Options);
-	
-	BOOST_FOREACH(Option *opt, opts->opts)
-	{
-		size += opt->getLen();
-	}
-	
-	return size;
-}
-
-static void Options_Pack(ByteBuffer *bb, const OptionSet *opts)
-{
-	SOCKS6Options *rawOptHeader = bb->get<SOCKS6Options>();
-	rawOptHeader->optionCount = 0;
-	
-	BOOST_FOREACH(Option *opt, opts->opts)
-	{
-		rawOptHeader->optionCount++;
-		opt->pack(bb);
-	}
-}
-
-static OptionSet Options_Parse(ByteBuffer *bb)
-{
-	//TODO
 }
 
 
@@ -402,7 +195,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		authReply->type = (SOCKS6AuthReplyCode)rawAuthReply->type;
 		authReply->method = (SOCKS6Method)rawAuthReply->method;
 		
-		OptionSet options = Options_Parse(&bb);
+		OptionSet options OptionSet::parse(&bb);
 		(void)options; //no usable options in spec
 		
 		*pauthReply = authReply;
@@ -537,7 +330,7 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enu
 		if (rawOpReply->bindPort == 0)
 			throw Exception(S6M_ERR_INVALID);
 		
-		OptionSet options = Options_Parse(&bb);
+		OptionSet options = OptionSet::parse(&bb);
 		//TODO
 		
 	}

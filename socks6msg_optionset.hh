@@ -68,6 +68,8 @@ public:
 	
 	void pack(ByteBuffer *bb);
 	
+	size_t packedSize();
+	
 	bool hasTFO() const
 	{
 		return tfo;
@@ -98,6 +100,8 @@ public:
 	{
 		return mptcpSched.proxyServer;
 	}
+	
+	void setBothScheds(SOCKS6MPTCPScheduler sched);
 	
 	void setProxyServerSched(SOCKS6MPTCPScheduler sched);
 	
@@ -169,17 +173,7 @@ public:
 		return userPasswdAuth.passwd;
 	}
 	
-	void setAuthData(SOCKS6Method method, const std::vector<uint8_t> &data, bool parse = true)
-	{
-		if (method == SOCKS6_METHOD_USRPASSWD)
-		{
-			//TODO
-		}
-		
-		iterator<std::vector<uint8_t> > it = extraAuthData.find(method);
-		if (it != extraAuthData.end() && *it != data)
-			throw E
-	}
+	void setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse = true);
 	
 	std::map<SOCKS6Method, std::vector<uint8_t> > getExtraAuthData() const
 	{

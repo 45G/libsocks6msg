@@ -132,12 +132,40 @@ void OptionSet::pack(ByteBuffer *bb)
 	}
 }
 
+size_t OptionSet::packedSize()
+{
+	list<shared_ptr<Option> > opts = generateOptions();
+	if (opts.size() > 255)
+		throw Exception(S6M_ERR_INVALID);
+	
+	size_t size = sizeof(SOCKS6Options);
+	
+	BOOST_FOREACH(Option *opt, opts)
+	{
+		size += opt->packedSize();
+	}
+	
+	return size;
+}
+
 void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 {
 	if (mptcpSched.clientProxy != (SOCKS6MPTCPScheduler)0 && mptcpSched.clientProxy != sched)
 		throw Exception(S6M_ERR_INVALID);
 	
 	mptcpSched.clientProxy = sched;
+}
+
+void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
+{
+	bool canSetCP = mptcpSched.clientProxy == (SOCKS6MPTCPScheduler)0 || mptcpSched.clientProxy == sched;
+	bool canSetPS = mptcpSched.proxyServer == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyServer == sched;
+	
+	if (!(canSetCP && canSetPS))
+		throw Exception(S6M_ERR_INVALID);
+	
+	mptcpSched.clientProxy = sched;
+	mptcpSched.proxyServer = sched;
 }
 
 void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
@@ -187,6 +215,37 @@ void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 	
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
+}
+
+void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse)
+{
+	if (!parse)
+		goto as_is;
+	
+	try
+	{
+		if (method == SOCKS6_METHOD_USRPASSWD)
+		{
+			ByteBuffer bb(data.data(), data.size());
+			UserPasswordRequest *req = UserPasswordRequest::parse(&bb);
+			
+			if (bb.getUsed() != data.size())
+				throw Exception(S6M_ERR_INVALID);
+			
+			return;
+		}
+	}
+	catch (Exception ex)
+	{
+		if (ex.getError() != S6M_ERR_INVALID && ex.getError() != S6M_ERR_OTHERVER && ex.getError() != S6M_ERR_BUFFER)
+			throw ex;
+	}
+	
+as_is:
+	iterator<std::vector<uint8_t> > it = extraAuthData.find(method);
+	if (it != extraAuthData.end() && *it != data)
+		throw Exception(S6M_ERR_INVALID);
+	extraAuthData[method] = data;
 }
 
 void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse)

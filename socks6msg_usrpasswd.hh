@@ -10,7 +10,7 @@ namespace S6M
 class UserPasswordBase
 {
 protected:
-	const uint8_t VERSION = 0x01;
+	static const uint8_t VERSION = 0x01;
 };
 
 class UserPasswordRequest: public UserPasswordBase
@@ -28,7 +28,7 @@ public:
 		return 1 + stringPackedSize(username.c_str()) + stringPackedSize(password.c_str());
 	}
 	
-	UserPasswordRequest *parse(ByteBuffer *bb);
+	static UserPasswordRequest *parse(ByteBuffer *bb);
 	
 	std::string getUsername() const;
 	

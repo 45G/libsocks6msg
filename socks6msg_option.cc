@@ -218,7 +218,18 @@ Option *MPScehdOption::parse(void *buf)
 
 void MPScehdOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	switch (leg)
+	{
+	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
+		optSet->setClientProxySched(sched);
+		break;
+	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
+		optSet->setProxyServerSched(sched);
+		break;
+	case SOCKS6_SOCKOPT_LEG_BOTH:
+		optSet->setBothScheds(sched);
+		break;
+	}
 }
 
 MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
@@ -282,7 +293,10 @@ Option *AuthMethodOption::parse(void *buf)
 
 void AuthMethodOption::apply(OptionSet *optSet) const
 {
-	//TODO
+	BOOST_FOREACH(SOCKS6Method method, methods)
+	{
+		optSet->advertiseMethod(method);
+	}
 }
 
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
