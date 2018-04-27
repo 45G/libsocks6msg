@@ -18,7 +18,6 @@ class Address
 	in_addr ipv4;
 	in6_addr ipv6;
 	String domain;
-	std::vector<uint8_t> data;
 	
 public:
 	static Address *parse(ByteBuffer *bb);
@@ -36,8 +35,6 @@ public:
 	Address(std::string domain)
 		: domain(domain) {}
 	
-	Address(SOCKS6AddressType type, std::vector<uint8_t> data);
-	
 	SOCKS6AddressType getType() const
 	{
 		return type;
@@ -46,7 +43,6 @@ public:
 	in_addr getIPv4() const;
 	in6_addr getIPv6() const;
 	std::string getDomain() const;
-	std::vector getData() const;
 };
 
 }

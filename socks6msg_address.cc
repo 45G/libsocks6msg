@@ -24,10 +24,6 @@ Address *Address::parse(ByteBuffer *bb)
 	case SOCKS6_ADDR_DOMAIN:
 		size += domain.packedSize();
 		break;
-		
-	default:
-		size += data.size();
-		break;
 	}
 	
 }
@@ -48,10 +44,6 @@ size_t Address::packedSize()
 		
 	case SOCKS6_ADDR_DOMAIN:
 		size += domain.packedSize();
-		break;
-		
-	default:
-		size += data.size();
 		break;
 	}
 	
@@ -80,37 +72,6 @@ void Address::pack(ByteBuffer *bb)
 	case SOCKS6_ADDR_DOMAIN:
 		domain.pack(bb);
 		break;
-		
-	default:
-		rawData = bb->get<uint8_t>(data.size());
-		memcpy(rawData, data.data(), data.size());
-		break;
-	}
-}
-
-Address::Address(SOCKS6AddressType type, vector<uint8_t> data)
-	: type(type)
-{
-	switch (type)
-	{
-	case SOCKS6_ADDR_IPV4:
-		if (data.size() != sizeof(in_addr))
-			throw Exception(S6M_ERR_INVALID);
-		memcpy(&ipv4, data.data(), data.size());
-		break;
-		
-	case SOCKS6_ADDR_IPV6:
-		if (data.size() != sizeof(in6_addr))
-			throw Exception(S6M_ERR_INVALID);
-		memcpy(&ipv6, data.data(), data.size());
-		break;
-		
-	case SOCKS6_ADDR_DOMAIN:
-		domain = String(data);
-		break;
-		
-	default:
-		this->data = data;
 	}
 }
 
@@ -136,14 +97,6 @@ string Address::getDomain() const
 		throw Exception(S6M_ERR_INVALID);
 	
 	return domain;
-}
-
-vector Address::getData() const
-{
-	if (type == SOCKS6_ADDR_IPV4 || type == SOCKS6_ADDR_IPV6 || type == SOCKS6_ADDR_DOMAIN)
-		throw Exception(S6M_ERR_INVALID);
-	
-	return data;
 }
 
 }
