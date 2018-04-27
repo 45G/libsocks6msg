@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "socks6msg_base.hh"
+#include "socks6msg_string.hh"
 
 namespace S6M
 {
@@ -16,7 +17,7 @@ class Address
 	
 	in_addr ipv4;
 	in6_addr ipv6;
-	std::string domain;
+	String domain;
 	std::vector<uint8_t> data;
 	
 public:
@@ -32,7 +33,8 @@ public:
 	Address(in6_addr ipv6)
 		: type(SOCKS6_ADDR_IPV6), ipv6(ipv6) {}
 	
-	Address(std::string domain);
+	Address(std::string domain)
+		: domain(domain) {}
 	
 	Address(SOCKS6AddressType type, std::vector<uint8_t> data);
 	

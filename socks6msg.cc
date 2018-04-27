@@ -76,7 +76,8 @@ static S6M_Addr Addr_Parse(ByteBuffer *bb)
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		addr.domain = stringParse(bb, true);
+		//TODO: memleak
+		addr.domain = String::parse(bb)->getStr();;
 		break;
 		
 	default:

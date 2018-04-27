@@ -7,7 +7,6 @@ SOURCES += \
     socks6msg.cc \
     main.c \
     socks6msg_option.cc \
-    socks6msg_base.cc \
     socks6msg_optionset.cc \
     socks6msg_usrpasswd.cc \
     socks6msg_address.cc \

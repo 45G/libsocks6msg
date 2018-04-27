@@ -3,6 +3,7 @@
 
 #include <string>
 #include "socks6msg_base.hh"
+#include "socks6msg_string.hh"
 
 namespace S6M
 {
@@ -15,24 +16,34 @@ protected:
 
 class UserPasswordRequest: public UserPasswordBase
 {
-	std::string username;
-	std::string password;
+	String username;
+	String password;
 	
 public:
-	UserPasswordRequest(const std::string &username, const std::string &password);
+	UserPasswordRequest(const std::string &username, const std::string &password)
+		: username(username), password(password) {}
+	
+	UserPasswordRequest(const String &username, const String &password)
+		: username(username), password(password) {}
 	
 	void pack(ByteBuffer *bb);
 	
 	size_t packedSize()
 	{
-		return 1 + stringPackedSize(username.c_str()) + stringPackedSize(password.c_str());
+		return 1 + username.packedSize() + password.packedSize();
 	}
 	
 	static UserPasswordRequest *parse(ByteBuffer *bb);
 	
-	std::string getUsername() const;
+	std::string getUsername() const
+	{
+		return username.getStr();
+	}
 	
-	std::string getPassword() const;
+	std::string getPassword() const
+	{
+		return password.getStr();
+	}
 };
 
 class UserPasswordReply: public UserPasswordBase
