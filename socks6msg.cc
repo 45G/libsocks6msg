@@ -35,7 +35,7 @@ static void Addr_Pack(ByteBuffer *bb, const S6M_Addr *addr)
 {
 	uint8_t rawType = (uint8_t)addr->type;
 	bb->put(&rawType);
-	
+	shared_ptr<char> cusr = shared_ptr<char>(stringParse(bb));
 	switch(addr->type)
 	{
 	case SOCKS6_ADDR_IPV4:

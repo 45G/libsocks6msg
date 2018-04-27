@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include "socks6msg_base.hh"
+#include "socks6msg_usrpasswd.hh"
 
 namespace S6M
 {
@@ -175,11 +176,9 @@ public:
 	RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen);
 };
 
-//TODO: sanity checks in constructor
 class UsernamePasswdOption: public AuthDataOption
 {
-	std::string username;
-	std::string passwd;
+	UserPasswordRequest req;
 	
 public:
 	virtual size_t packedSize() const;

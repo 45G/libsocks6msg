@@ -365,70 +365,41 @@ RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t 
 
 size_t UsernamePasswdOption::packedSize() const
 {
-	const S6M_PasswdReq pwReq = {
-		.username = username.c_str(),
-		.passwd = passwd.c_str(),
-	};
-	
-	S6M_Error err;
-	ssize_t dataSize = S6M_PasswdReq_Packed_Size(&pwReq, &err);
-	if (dataSize == -1)
-		throw Exception(err);
-	
-	return sizeof(AuthDataOption) + dataSize;
+	return sizeof(AuthDataOption) + req.packedSize();
 }
 
 void UsernamePasswdOption::pack(uint8_t *buf) const
 {
-	//TODO: use c++ PasswdReq stuff
 	AuthDataOption::pack(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
 	
-	S6M_PasswdReq pwReq = {
-		.username = username.c_str(),
-		.passwd = passwd.c_str(),
-	};
+	ByteBuffer bb(opt->methodData, opt->optionHead.len - sizeof(SOCKS6AuthDataOption));
 	
-	S6M_Error err;
-	ssize_t dataSize = S6M_PasswdReq_Pack(&pwReq, opt->methodData, packedSize() - sizeof(SOCKS6AuthDataOption), &err);
-	if (dataSize == -1)
-		throw Exception(err);
+	req.pack(&bb);
 }
 
 Option *UsernamePasswdOption::parse(void *buf)
 {
-	//TODO: use c++ implementation of passwd messages
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
-	S6M_Error err;
-	S6M_PasswdReq *pwReq;
-	
 	size_t expectedDataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
+	ByteBuffer bb(buf, expectedDataSize);
+	shared_ptr<UserPasswordRequest> req = shared_ptr<UserPasswordRequest>(UserPasswordRequest.parse(&bb));
 	
-	ssize_t dataSize = S6M_PasswdReq_Parse((uint8_t *)(buf) + opt->optionHead.len, opt->optionHead.len - sizeof(SOCKS6AuthDataOption), &pwReq, &err);
-	if (dataSize == -1)
-		throw Exception(err);
-	
-	if ((size_t)dataSize != expectedDataSize)
-	{
-		S6M_PasswdReq_Free(pwReq);
+	if (bb.getUsed() != expectedDataSize)
 		throw Exception(S6M_ERR_INVALID);
-	}
 	
-	UsernamePasswdOption *ret = new UsernamePasswdOption(string(pwReq->username), string(pwReq->passwd));
-	S6M_PasswdReq_Free(pwReq);
-	
-	return ret;	
+	return new UsernamePasswdOption(req->getUsername(), req->getPassword());	
 }
 
 void UsernamePasswdOption::apply(OptionSet *optSet) const
 {
-	optSet->attemptUserPasswdAuth(username, passwd);
+	optSet->attemptUserPasswdAuth(req.getUsername(), req.getPassword());
 }
 
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
-	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), username(username), passwd(passwd) {}
+	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
 void IdempotenceOption::pack(uint8_t *buf) const
 {

@@ -1,8 +1,8 @@
 #ifndef SOCKS6MSG_BASE_HH
 #define SOCKS6MSG_BASE_HH
 
-#include <exception>
 #include <stdint.h>
+#include <exception>
 #include "socks6msg.h"
 
 namespace S6M
