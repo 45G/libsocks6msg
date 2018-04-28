@@ -42,7 +42,7 @@ class OptionSet
 		SOCKS6TokenExpenditureCode replyCode;
 		
 		Idem()
-			: request(false), spend(false), token(0), base(0), windowSize(0), reply(false), replyCode((SOCKS6TokenExpenditureCode)0) {}
+			: request(false), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
 	} idempotence;
 	
 	std::set<SOCKS6Method> knownMethods;
@@ -180,7 +180,7 @@ public:
 		return extraAuthData;
 	}
 	
-	void addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse = true);
+	void addOption(SOCKS6OptionKind kind, const std::vector<uint8_t> &data, bool parse = true);
 	
 	std::list<boost::shared_ptr<Option> > getExtraOptions() const
 	{

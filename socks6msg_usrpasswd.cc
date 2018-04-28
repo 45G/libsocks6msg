@@ -7,7 +7,7 @@ using namespace boost;
 namespace S6M
 {
 
-void UserPasswordRequest::pack(ByteBuffer *bb)
+void UserPasswordRequest::pack(ByteBuffer *bb) const
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	*ver = VERSION;
@@ -22,10 +22,10 @@ UserPasswordRequest *UserPasswordRequest::parse(ByteBuffer *bb)
 	if (*ver != VERSION)
 		throw Exception(S6M_ERR_OTHERVER);
 	
-	shared_ptr<String> user = shared_ptr<String>(String::parse(bb));
-	shared_ptr<String> pass = shared_ptr<String>(String::parse(bb));
+	String user(bb);
+	String pass(bb);
 	
-	return new UserPasswordRequest(*user, *pass);
+	return new UserPasswordRequest(user, pass);
 }
 
 void UserPasswordReply::pack(ByteBuffer *bb)

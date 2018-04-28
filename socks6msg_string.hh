@@ -17,12 +17,12 @@ public:
 	
 	String(ByteBuffer *bb, bool nonEmpty = true);
 	
-	size_t packedSize()
+	size_t packedSize() const
 	{
 		return 1 + str.length();
 	}
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
 	
 	std::string getStr() const
 	{

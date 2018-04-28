@@ -36,7 +36,7 @@ String::String(ByteBuffer *bb, bool nonEmpty)
 		throw Exception(S6M_ERR_INVALID);
 }
 
-void String::pack(ByteBuffer *bb)
+void String::pack(ByteBuffer *bb) const
 {
 	uint8_t *len = bb->get<uint8_t>();
 	uint8_t *rawStr = bb->get<uint8_t>(str.length());

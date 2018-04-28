@@ -26,9 +26,9 @@ public:
 	UserPasswordRequest(const String &username, const String &password)
 		: username(username), password(password) {}
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
 	
-	size_t packedSize()
+	size_t packedSize() const
 	{
 		return 1 + username.packedSize() + password.packedSize();
 	}

@@ -152,6 +152,11 @@ class AuthDataOption: public Option
 	SOCKS6Method method;
 	
 public:
+	SOCKS6Method getMethod() const
+	{
+		return method;
+	}
+	
 	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);

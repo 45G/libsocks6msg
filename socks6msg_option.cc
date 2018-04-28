@@ -72,7 +72,7 @@ Option *RawOption::parse(void *buf)
 
 void RawOption::apply(OptionSet *optSet) const
 {
-	optSet->addOption(kind, data, false);
+	optSet->addOption(getKind(), data, false);
 }
 
 RawOption::RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen)
@@ -218,7 +218,7 @@ Option *MPScehdOption::parse(void *buf)
 
 void MPScehdOption::apply(OptionSet *optSet) const
 {
-	switch (leg)
+	switch (getLeg())
 	{
 	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
 		optSet->setClientProxySched(sched);
@@ -367,7 +367,7 @@ Option *RawAuthDataOption::parse(void *buf)
 
 void RawAuthDataOption::apply(OptionSet *optSet) const
 {
-	optSet->setAuthData(method, data, false);
+	optSet->setAuthData(getMethod(), data, false);
 }
 
 RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen)
@@ -398,8 +398,8 @@ Option *UsernamePasswdOption::parse(void *buf)
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
 	size_t expectedDataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
-	ByteBuffer bb(buf, expectedDataSize);
-	shared_ptr<UserPasswordRequest> req = shared_ptr<UserPasswordRequest>(UserPasswordRequest.parse(&bb));
+	ByteBuffer bb((uint8_t *)buf, expectedDataSize);
+	shared_ptr<UserPasswordRequest> req = shared_ptr<UserPasswordRequest>(UserPasswordRequest::parse(&bb));
 	
 	if (bb.getUsed() != expectedDataSize)
 		throw Exception(S6M_ERR_INVALID);
