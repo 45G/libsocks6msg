@@ -10,7 +10,8 @@ SOURCES += \
     socks6msg_optionset.cc \
     socks6msg_usrpasswd.cc \
     socks6msg_address.cc \
-    socks6msg_string.cc
+    socks6msg_string.cc \
+    socks6msg_request.cc
 
 HEADERS += \
     socks6.h \
@@ -20,4 +21,5 @@ HEADERS += \
     socks6msg_optionset.hh \
     socks6msg_usrpasswd.hh \
     socks6msg_address.hh \
-    socks6msg_string.hh
+    socks6msg_string.hh \
+    socks6msg_request.hh

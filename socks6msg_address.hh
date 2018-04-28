@@ -20,8 +20,6 @@ class Address
 	String domain;
 	
 public:
-	static Address *parse(ByteBuffer *bb);
-	
 	size_t packedSize();
 	
 	void pack(ByteBuffer *bb);
@@ -34,6 +32,8 @@ public:
 	
 	Address(std::string domain)
 		: domain(domain) {}
+	
+	Address(ByteBuffer *bb);
 	
 	SOCKS6AddressType getType() const
 	{

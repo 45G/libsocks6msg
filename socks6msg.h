@@ -12,6 +12,7 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+#if 0
 struct S6M_Addr
 {
 	enum SOCKS6AddressType type;
@@ -100,6 +101,8 @@ struct S6M_PasswdReply
 {
 	int fail;
 };
+
+#endif
 		
 enum S6M_Error
 {
@@ -108,11 +111,12 @@ enum S6M_Error
 	S6M_ERR_ALLOC       = -2,   /* malloc fail */
 	S6M_ERR_BUFFER      = -3,   /* reached end of buffer */
 	S6M_ERR_OTHERVER    = -4,   /* socks version other than the one supported */
-	S6M_ERR_BADADDR     = -5,
+	S6M_ERR_BADADDR     = -5,   /* unknown address */
 	S6M_ERR_BADCMD      = -6,
 	S6M_ERR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
 };
 
+#if 0
 ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size, enum S6M_Error *err);
 ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, int size, enum S6M_Error *err);
 ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   uint8_t *buf, int size, enum S6M_Error *err);
@@ -136,6 +140,7 @@ void S6M_AuthReply_Free  (struct S6M_AuthReply   *authReply);
 void S6M_OpReply_Free    (struct S6M_OpReply     *opReply);
 void S6M_PasswdReq_Free  (struct S6M_PasswdReq   *pwReq);
 void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply);
+#endif
 
 #ifdef __cplusplus
 }

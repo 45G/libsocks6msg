@@ -2,6 +2,7 @@
 
 int main()
 {
+#if 0
 	struct S6M_Request req = {
 		.reqCode = SOCKS6_REQUEST_CONNECT,
 		.addr = {
@@ -15,5 +16,6 @@ int main()
 	enum S6M_Error err;
 	
 	ssize_t size = S6M_Request_Pack(&req, buf, 1000, &err);
+#endif
 	return 0;
 }

@@ -105,7 +105,10 @@ OptionSet *OptionSet::parse(ByteBuffer *bb)
 		{
 			/* silently ignote bad options */
 			if (ex.getError() == S6M_ERR_INVALID)
+			{
+				extraOptions.push_back(opt);
 				continue;
+			}
 			
 			delete optSet;
 			throw ex;

@@ -15,15 +15,12 @@ class String
 public:
 	String(const std::string &str, bool nonEmpty = true);
 	
-	String(const std::vector &data, bool nonEmpty = true)
-		: String(std::string(data.data(), data.size()), nonEmpty) {}
+	String(ByteBuffer *bb, bool nonEmpty = true);
 	
 	size_t packedSize()
 	{
 		return 1 + str.length();
 	}
-	
-	String *parse(ByteBuffer *bb, bool nonEmpty = true);
 	
 	void pack(ByteBuffer *bb);
 	

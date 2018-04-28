@@ -18,7 +18,7 @@ String::String(const string &str, bool nonEmpty)
 		throw Exception(S6M_ERR_INVALID);
 }
 
-String *String::parse(ByteBuffer *bb, bool nonEmpty)
+String::String(ByteBuffer *bb, bool nonEmpty)
 {
 	uint8_t *len = bb->get<uint8_t>();
 	
@@ -30,7 +30,10 @@ String *String::parse(ByteBuffer *bb, bool nonEmpty)
 	
 	uint8_t *rawStr = bb->get<uint8_t>(len);
 	
-	return String(string(rawStr, *len), nonEmpty);
+	str = string(rawStr, *len);
+	
+	if (str.find_first_of('\0') != string::npos)
+		throw Exception(S6M_ERR_INVALID);
 }
 
 void String::pack(ByteBuffer *bb)

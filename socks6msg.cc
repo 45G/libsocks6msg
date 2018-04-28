@@ -1,3 +1,4 @@
+#if 0
 #include <stdlib.h>
 #include <string.h>
 #include <list>
@@ -11,81 +12,6 @@
 using namespace std;
 using namespace boost;
 using namespace S6M;
-
-
-//TODO: move to base
-/*
- * SGM_Addr_*
- */
-static ssize_t Addr_Packed_Size(const S6M_Addr *addr)
-{
-	switch(addr->type)
-	{
-	case SOCKS6_ADDR_IPV4:
-		return 1 + sizeof(addr->ipv4);
-	case SOCKS6_ADDR_IPV6:
-		return 1 + sizeof(addr->ipv6);
-	case SOCKS6_ADDR_DOMAIN:
-		return 1 + stringPackedSize(addr->domain);
-	}
-	
-	throw Exception(S6M_ERR_INVALID);
-}
-
-static void Addr_Pack(ByteBuffer *bb, const S6M_Addr *addr)
-{
-	uint8_t rawType = (uint8_t)addr->type;
-	bb->put(&rawType);
-	shared_ptr<char> cusr = shared_ptr<char>(stringParse(bb));
-	switch(addr->type)
-	{
-	case SOCKS6_ADDR_IPV4:
-		bb->put(&addr->ipv4);
-		return;
-		
-	case SOCKS6_ADDR_IPV6:
-		bb->put(&addr->ipv6);
-		return;
-		
-	case SOCKS6_ADDR_DOMAIN:
-		stringPack(bb, addr->domain, true);
-		return;
-		
-//	default:
-//		throw Exception(S6M_ERR_BADADDR);
-	}
-	
-	throw Exception(S6M_ERR_INVALID);
-}
-
-static S6M_Addr Addr_Parse(ByteBuffer *bb)
-{
-	uint8_t *type = bb->get<uint8_t>();
-	S6M_Addr addr;
-	addr.type = (SOCKS6AddressType)(*type);
-	
-	
-	switch(addr.type)
-	{
-	case SOCKS6_ADDR_IPV4:
-		addr.ipv4 = *(bb->get<in_addr>());
-		break;
-		
-	case SOCKS6_ADDR_IPV6:
-		addr.ipv6 = *(bb->get<in6_addr>());
-		break;
-		
-	case SOCKS6_ADDR_DOMAIN:
-		//TODO: memleak
-		addr.domain = String::parse(bb)->getStr();;
-		break;
-		
-	default:
-		throw Exception(S6M_ERR_BADADDR);
-	}
-	
-	return addr;
-}
 
 
 /*
@@ -527,3 +453,4 @@ void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply)
 {
 	delete pwReply;
 }
+#endif
