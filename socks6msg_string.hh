@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 
 namespace S6M
 {
@@ -13,6 +13,9 @@ class String
 	std::string str;
 	
 public:
+	//TODO: get rid of this constructor
+	String() {}
+	
 	String(const std::string &str, bool nonEmpty = true);
 	
 	String(ByteBuffer *bb, bool nonEmpty = true);

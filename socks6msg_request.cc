@@ -1,4 +1,5 @@
 #include "socks6msg_request.hh"
+#include "socks6msg_version.hh"
 
 namespace S6M
 {
@@ -19,22 +20,37 @@ Request::Request(SOCKS6RequestCode commandCode, Address addr, uint16_t port, con
 	}
 }
 
-Request *Request::parse(ByteBuffer *bb)
+Request::Request(ByteBuffer *bb)
 {
+	Version ver(bb); (void)ver;
+	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	rawRequest->commandCode = commandCode;
-	rawRequest->port = htons(port);
+	commandCode = (SOCKS6RequestCode)rawRequest->commandCode;
+	port = ntohs(rawRequest->port);
 	
-	Address *addr = Address::parse(bb);
+	switch (commandCode)
+	{
+	case SOCKS6_REQUEST_NOOP:
+	case SOCKS6_REQUEST_CONNECT:
+	case SOCKS6_REQUEST_BIND:
+	case SOCKS6_REQUEST_UDP_ASSOC:
+		break;
+		
+	default:
+		throw Exception(S6M_ERR_INVALID);
+	}
 	
-	OptionSet *optionSet = OptionSet::parse(bb);
+	addr = Address(bb);
+	optionSet = OptionSet(bb);
 	
 	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
-	rawInitialData->initialDataLen = htons(initialDataLen);
+	initialDataLen = ntohs(rawInitialData->initialDataLen);
 }
 
 void Request::pack(ByteBuffer *bb)
 {
+	Version::pack(bb);
+	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	rawRequest->commandCode = commandCode;
 	rawRequest->port = htons(port);
@@ -49,7 +65,7 @@ void Request::pack(ByteBuffer *bb)
 
 size_t Request::packedSize()
 {
-	return sizeof (SOCKS6Request) + addr.packedSize() + optionSet.packedSize() + sizeof(SOCKS6InitialData);
+	return Version::packedSize() + sizeof (SOCKS6Request) + addr.packedSize() + optionSet.packedSize() + sizeof(SOCKS6InitialData);
 }
 
 }

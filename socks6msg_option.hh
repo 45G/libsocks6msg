@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 #include <string>
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 #include "socks6msg_usrpasswd.hh"
 
 namespace S6M

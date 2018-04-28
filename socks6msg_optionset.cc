@@ -60,12 +60,7 @@ both_sched_done:
 	return opts;
 }
 
-OptionSet::OptionSet()
-	: tfo(false), mptcp(false) {}
-
-OptionSet::~OptionSet() {}
-
-OptionSet *OptionSet::parse(ByteBuffer *bb)
+OptionSet::OptionSet(ByteBuffer *bb)
 {
 	list<shared_ptr<Option> > opts;
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
@@ -92,30 +87,25 @@ OptionSet *OptionSet::parse(ByteBuffer *bb)
 			throw ex;
 		}
 	}
-	
-	OptionSet *optSet = new OptionSet();
-	
+		
 	BOOST_FOREACH(shared_ptr<Option> opt, opts)
 	{
 		try
 		{
-			opt->apply(optSet);
+			opt->apply(this);
 		}
 		catch (Exception ex)
 		{
 			/* silently ignote bad options */
 			if (ex.getError() == S6M_ERR_INVALID)
 			{
-				optSet->extraOptions.push_back(opt);
+				extraOptions.push_back(opt);
 				continue;
 			}
 			
-			delete optSet;
 			throw ex;
 		}
 	}
-	
-	return optSet;
 }
 
 void OptionSet::pack(ByteBuffer *bb)

@@ -7,7 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 #include "socks6msg_option.hh"
 
 namespace S6M
@@ -60,11 +60,10 @@ class OptionSet
 	std::list<boost::shared_ptr<Option> > generateOptions();
 	
 public:
-	OptionSet();
+	OptionSet()
+		: tfo(false), mptcp(false) {}
 	
-	~OptionSet();
-	
-	static OptionSet *parse(ByteBuffer *bb);
+	OptionSet (ByteBuffer *bb);
 	
 	void pack(ByteBuffer *bb);
 	

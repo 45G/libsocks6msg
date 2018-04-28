@@ -1,7 +1,7 @@
 #ifndef SOCKS6MSG_REQUEST_HH
 #define SOCKS6MSG_REQUEST_HH
 
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 #include "socks6msg_address.hh"
 #include "socks6msg_optionset.hh"
 
@@ -22,11 +22,36 @@ class Request
 public:
 	Request(SOCKS6RequestCode commandCode, Address addr, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen);
 	
-	Request *parse(ByteBuffer *bb);
+	Request(ByteBuffer *bb);
 	
 	void pack(ByteBuffer *bb);
 	
 	size_t packedSize();
+	
+	SOCKS6RequestCode getCommandCode() const
+	{
+		return commandCode;
+	}
+	
+	Address getAddr() const
+	{
+		return addr;
+	}
+	
+	uint16_t getPort() const
+	{
+		return port;
+	}
+	
+	OptionSet getOptionSet() const
+	{
+		return optionSet;
+	}
+	
+	uint16_t getInitialDataLen() const
+	{
+		return initialDataLen;
+	}
 };
 
 }

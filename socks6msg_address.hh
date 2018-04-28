@@ -5,7 +5,7 @@
 #include <netinet/ip6.h>
 #include <string>
 #include <vector>
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 #include "socks6msg_string.hh"
 
 namespace S6M
@@ -23,6 +23,9 @@ public:
 	size_t packedSize();
 	
 	void pack(ByteBuffer *bb);
+	
+	Address()
+		: type((SOCKS6AddressType)0) {}
 	
 	Address(in_addr ipv4)
 		: type(SOCKS6_ADDR_IPV4), ipv4(ipv4) {}

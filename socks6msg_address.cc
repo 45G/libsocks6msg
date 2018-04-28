@@ -24,6 +24,7 @@ size_t Address::packedSize()
 		size += domain.packedSize();
 		break;
 	}
+	}
 	
 	return size;
 }
@@ -76,7 +77,7 @@ string Address::getDomain() const
 	if (type != SOCKS6_ADDR_DOMAIN)
 		throw Exception(S6M_ERR_INVALID);
 	
-	return domain;
+	return domain.getStr();
 }
 
 Address::Address(ByteBuffer *bb)

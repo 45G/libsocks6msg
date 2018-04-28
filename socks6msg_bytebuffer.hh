@@ -1,28 +1,13 @@
-#ifndef SOCKS6MSG_BASE_HH
-#define SOCKS6MSG_BASE_HH
+#ifndef SOCKS6MSG_BYTEBUFFER_HH
+#define SOCKS6MSG_BYTEBUFFER_HH
 
 #include <stdint.h>
 #include <exception>
 #include "socks6msg.h"
+#include "socks6msg_exception.hh"
 
 namespace S6M
 {
-
-class Exception: std::exception
-{
-	enum S6M_Error error;
-	
-public:
-	Exception(enum S6M_Error error)
-		: error(error) {}
-
-	//const char *what() const;
-	
-	S6M_Error getError() const
-	{
-		return error;
-	}
-};
 
 class ByteBuffer
 {
@@ -79,4 +64,4 @@ public:
 
 }
 
-#endif // SOCKS6MSG_BASE_HH
+#endif // SOCKS6MSG_BYTEBUFFER_HH

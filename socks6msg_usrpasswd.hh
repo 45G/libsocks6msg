@@ -2,7 +2,7 @@
 #define SOCKS6MSG_USRPASSWD_HH
 
 #include <string>
-#include "socks6msg_base.hh"
+#include "socks6msg_bytebuffer.hh"
 #include "socks6msg_string.hh"
 
 namespace S6M
