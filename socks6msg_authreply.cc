@@ -10,7 +10,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = (SOCKS6AuthReplyCode)rawAuthReply->type;
-	method  =(SOCKS6Method)rawAuthReply->method;
+	method  = (SOCKS6Method)rawAuthReply->method;
 	
 	switch (replyCode)
 	{
