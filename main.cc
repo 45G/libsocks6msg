@@ -1,4 +1,5 @@
 #include <iostream>
+#include "socks6msg.h"
 #include "socks6msg.hh"
 
 using namespace std;

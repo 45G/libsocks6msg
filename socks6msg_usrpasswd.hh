@@ -26,14 +26,14 @@ public:
 	UserPasswordRequest(const String &username, const String &password)
 		: username(username), password(password) {}
 	
+	UserPasswordRequest(ByteBuffer *bb);
+	
 	void pack(ByteBuffer *bb) const;
 	
 	size_t packedSize() const
 	{
 		return 1 + username.packedSize() + password.packedSize();
 	}
-	
-	static UserPasswordRequest *parse(ByteBuffer *bb);
 	
 	std::string getUsername() const
 	{
@@ -54,14 +54,14 @@ public:
 	UserPasswordReply(bool success)
 		: success(success) {}
 	
+	UserPasswordReply(ByteBuffer *bb);
+	
 	void pack(ByteBuffer *bb);
 	
 	size_t packedSize()
 	{
 		return 2;
 	}
-	
-	UserPasswordReply *parse(ByteBuffer *bb);
 	
 	bool isSuccessful()
 	{

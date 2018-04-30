@@ -392,12 +392,12 @@ Option *UsernamePasswdOption::parse(void *buf)
 	
 	size_t expectedDataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
 	ByteBuffer bb((uint8_t *)buf, expectedDataSize);
-	shared_ptr<UserPasswordRequest> req = shared_ptr<UserPasswordRequest>(UserPasswordRequest::parse(&bb));
+	UserPasswordRequest req(&bb);
 	
 	if (bb.getUsed() != expectedDataSize)
 		throw InvalidFieldException();
 	
-	return new UsernamePasswdOption(req->getUsername(), req->getPassword());	
+	return new UsernamePasswdOption(req.getUsername(), req.getPassword());	
 }
 
 void UsernamePasswdOption::apply(OptionSet *optSet) const

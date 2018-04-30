@@ -7,6 +7,16 @@ using namespace boost;
 namespace S6M
 {
 
+UserPasswordRequest::UserPasswordRequest(ByteBuffer *bb)
+{
+	uint8_t *ver = bb->get<uint8_t>();
+	if (*ver != VERSION)
+		throw BadVersionException();
+	
+	username = String(bb);
+	password = String(bb);
+}
+
 void UserPasswordRequest::pack(ByteBuffer *bb) const
 {
 	uint8_t *ver = bb->get<uint8_t>();
@@ -16,16 +26,15 @@ void UserPasswordRequest::pack(ByteBuffer *bb) const
 	password.pack(bb);
 }
 
-UserPasswordRequest *UserPasswordRequest::parse(ByteBuffer *bb)
+UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	if (*ver != VERSION)
 		throw BadVersionException();
 	
-	String user(bb);
-	String pass(bb);
+	uint8_t *status = bb->get<uint8_t>();
 	
-	return new UserPasswordRequest(user, pass);
+	success = *status == 0x00;
 }
 
 void UserPasswordReply::pack(ByteBuffer *bb)
@@ -35,17 +44,6 @@ void UserPasswordReply::pack(ByteBuffer *bb)
 	
 	*ver = VERSION;
 	*status = success ? 0x00 : 0x01;
-}
-
-UserPasswordReply *UserPasswordReply::parse(ByteBuffer *bb)
-{
-	uint8_t *ver = bb->get<uint8_t>();
-	if (*ver != VERSION)
-		throw BadVersionException();
-	
-	uint8_t *status = bb->get<uint8_t>();
-	
-	return new UserPasswordReply(*status == 0x00);
 }
 
 }

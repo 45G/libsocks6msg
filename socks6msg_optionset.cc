@@ -206,14 +206,12 @@ void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool
 		if (method == SOCKS6_METHOD_USRPASSWD)
 		{
 			ByteBuffer bb(data.data(), data.size());
-			UserPasswordRequest *req = UserPasswordRequest::parse(&bb);
+			UserPasswordRequest req(&bb);
 			
 			if (bb.getUsed() != data.size())
 				throw InvalidFieldException();
 			
-			attemptUserPasswdAuth(req->getUsername(), req->getPassword());
-			
-			delete req;
+			attemptUserPasswdAuth(req.getUsername(), req.getPassword());
 			
 			return;
 		}

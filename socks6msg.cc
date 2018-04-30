@@ -6,13 +6,54 @@
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>
 #include "socks6msg.h"
-#include "socks6msg_base.hh"
-#include "socks6msg_option.hh"
+#include "socks6msg.hh"
 
 using namespace std;
 using namespace boost;
 using namespace S6M;
 
+#define S6M_CATCH(err) \
+	catch (InvalidFieldException) \
+	{ \
+		*(err) = S6M_ERR_INVALID; \
+	} \
+	catch (EndOfBufferException) \
+	{ \
+		*(err) = S6M_ERR_BUFFER; \
+	} \
+	catch (BadVersionException) \
+	{ \
+		*(err) = S6M_ERR_OTHERVER; \
+	} \
+	catch (bad_alloc) \
+	{ \
+		*(err) = S6M_ERR_ALLOC; \
+	}
+
+/*
+ * S6m_Addr
+ */
+
+static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
+{
+	delete addr->domain;
+}
+
+/*
+ * S6m_OptionSet
+ */
+
+static ssize_t S6M_OptionSet_Packed_Size(S6M_OptionSet *optionSet)
+{
+	//TODO
+}
+
+static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
+{
+	delete optionSet->knownMethods;
+	delete optionSet->userPasswdAuth.username;
+	delete optionSet->userPasswdAuth.passwd;
+}
 
 /*
  * S6M_Request_*
@@ -34,10 +75,8 @@ ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6
 
 void S6M_Request_Free(struct S6M_Request *req)
 {
-	delete req->addr.domain;
-	delete req->supportedMethods;
-	delete req->userPasswdAuth.username;
-	delete req->userPasswdAuth.passwd;
+	S6M_Addr_Cleanup(&req->addr);
+	S6M_OptionSet_Cleanup(&req->optionSet);
 	delete req;
 }
 
@@ -52,6 +91,8 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 		OptionSet options(authReply);
 		return sizeof(SOCKS6Version) + sizeof(SOCKS6AuthReply) + Options_Packed_Size(&options);
 	}
+	
+
 	catch (S6M::Exception ex)
 	{
 		*err = ex.getError();
@@ -383,7 +424,7 @@ void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
 ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply, enum S6M_Error *err)
 {
 	(void) pwReply; (void)err;
-	return 2;
+	return UserPasswordReply::packedSize();
 }
 
 ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf, int size, enum S6M_Error *err)
@@ -421,30 +462,16 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 	{
 		S6M::ByteBuffer bb(buf, size);
 		
-		uint8_t *ver = bb.get<uint8_t>();
-		uint8_t *fail = bb.get<uint8_t>();
-		
-		if (*ver != 0x01 ||
-			(*fail != 0 && *fail != 1))
-		{
-			throw S6M::Exception(S6M_ERR_INVALID);
-		}
+		UserPasswordReply rep(&bb);
 		
 		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
-		memset(pwReply, 0, sizeof(S6M_PasswdReply));
-		pwReply->fail = *fail;
+		pwReply->success = rep.isSuccessful();
+		
 		*ppwReply = pwReply;
 		
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }

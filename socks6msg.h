@@ -4,21 +4,55 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <stdint.h>
-#include <socks6.h>
 #include <unistd.h>
+#include "socks6.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
 
-#if 0
 struct S6M_Addr
 {
 	enum SOCKS6AddressType type;
 	struct in_addr ipv4;
 	struct in6_addr ipv6;
 	char *domain;
+};
+
+struct S6M_OptionSet
+{
+	int tfo;
+	
+	int mptcp;
+	
+	struct
+	{
+		SOCKS6MPTCPScheduler clientProxy;
+		SOCKS6MPTCPScheduler proxyServer;
+		
+	} mptcpSched;
+	
+	struct
+	{
+		int request;
+		
+		int spend;
+		uint32_t token;
+		
+		uint32_t base;
+		uint32_t windowSize;
+		
+		SOCKS6TokenExpenditureCode replyCode;
+	} idempotence;
+	
+	SOCKS6Method *knownMethods;
+	
+	struct
+	{
+		char *username;
+		char *passwd;
+	} userPasswdAuth;
 };
 
 struct S6M_Request
@@ -30,28 +64,7 @@ struct S6M_Request
 	
 	uint16_t initialDataLen;
 	
-	int tfo;
-	
-	struct
-	{
-		enum SOCKS6MPTCPScheduler clientProxy;
-		enum SOCKS6MPTCPScheduler proxyServer;
-	} mptcpSched;
-	
-	struct
-	{
-		int request;
-		int spend;
-		uint32_t token;
-	} idempotence;
-	
-	uint8_t *supportedMethods;
-	
-	struct
-	{
-		char *username;
-		char *passwd;
-	} userPasswdAuth;
+	struct S6M_OptionSet optionSet;
 };
 
 struct S6M_AuthReply
@@ -59,6 +72,8 @@ struct S6M_AuthReply
 	enum SOCKS6AuthReplyCode type;
 	
 	enum SOCKS6Method method;
+	
+	struct S6M_OptionSet optionSet;
 };
 
 struct S6M_OpReply
@@ -70,25 +85,7 @@ struct S6M_OpReply
 	
 	uint16_t initDataOff;
 	
-	int tfo;
-	
-	int mptcp;
-	
-	struct
-	{
-		enum SOCKS6MPTCPScheduler clientProxy;
-		enum SOCKS6MPTCPScheduler proxyServer;
-	} mptcpSched;
-	
-	struct
-	{
-		int advertise;
-		uint32_t base;
-		uint32_t windowSize;
-		
-		int reply;
-		enum SOCKS6TokenExpenditureCode replyCode;
-	} idempotence;
+	struct S6M_OptionSet optionSet;
 };
 
 struct S6M_PasswdReq
@@ -99,10 +96,8 @@ struct S6M_PasswdReq
 
 struct S6M_PasswdReply
 {
-	int fail;
+	int success;
 };
-
-#endif
 		
 enum S6M_Error
 {
@@ -113,7 +108,6 @@ enum S6M_Error
 	S6M_ERR_OTHERVER    = -4,   /* socks version other than the one supported */
 };
 
-#if 0
 ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size, enum S6M_Error *err);
 ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, int size, enum S6M_Error *err);
 ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   uint8_t *buf, int size, enum S6M_Error *err);
@@ -137,7 +131,6 @@ void S6M_AuthReply_Free  (struct S6M_AuthReply   *authReply);
 void S6M_OpReply_Free    (struct S6M_OpReply     *opReply);
 void S6M_PasswdReq_Free  (struct S6M_PasswdReq   *pwReq);
 void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply);
-#endif
 
 #ifdef __cplusplus
 }
