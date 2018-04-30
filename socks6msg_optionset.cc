@@ -178,6 +178,9 @@ void OptionSet::spendToken(uint32_t token)
 
 void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 {
+	if (code == 0)
+		throw InvalidFieldException();
+	
 	if (idempotence.replyCode != 0 && idempotence.replyCode != code)
 		throw InvalidFieldException();
 	

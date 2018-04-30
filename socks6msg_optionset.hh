@@ -114,7 +114,7 @@ public:
 		idempotence.request = true;
 	}
 	
-	bool advetisedTokenWindow()
+	bool advetisedTokenWindow() const
 	{
 		return idempotence.windowSize > 0;
 	}
@@ -150,9 +150,9 @@ public:
 		return idempotence.replyCode;
 	}
 	
-	std::set<SOCKS6Method> getKnownMethods() const
+	const std::set<SOCKS6Method> *getKnownMethods() const
 	{
-		return knownMethods;
+		return &knownMethods;
 	}
 	
 	void advertiseMethod(SOCKS6Method method)

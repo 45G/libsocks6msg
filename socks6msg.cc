@@ -33,19 +33,78 @@ using namespace S6M;
  * S6m_Addr
  */
 
-static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
+static void S6M_Addr_Fill(struct S6M_Addr *cAddr, const Address *cppAddr)
 {
-	delete addr->domain;
+	cAddr->type = cppAddr->getType();
+	
+	switch (cppAddr->getType())
+	{
+	case SOCKS6_ADDR_IPV4:
+		cAddr->ipv4 = cppAddr->getIPv4();
+		break;
+		
+	case SOCKS6_ADDR_IPV6:
+		cAddr->ipv6 = cppAddr->getIPv6();
+		break;
+		
+	case SOCKS6_ADDR_DOMAIN:
+		cAddr->domain = strdup(cppAddr->getDomain().c_str());
+		if (cAddr->domain == NULL)
+			throw bad_alloc();
+		break;
+	}
 }
 
-#if 0
+static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
+{
+	free(addr->domain);
+}
+
+
 /*
  * S6m_OptionSet
  */
 
-static ssize_t S6M_OptionSet_Packed_Size(S6M_OptionSet *optionSet)
+static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 {
-	//TODO
+	cSet->tfo = cppSet->hasTFO();
+	cSet->mptcp = cppSet->hasMPTCP();
+	
+	cSet->mptcpSched.clientProxy = cppSet->getClientProxySched();
+	cSet->mptcpSched.proxyServer = cppSet->getProxyServerSched();
+	
+	cSet->idempotence.request = cppSet->requestedTokenWindow();
+	cSet->idempotence.spend = cppSet->expenditureAttempted();
+	if (cSet->idempotence.spend)
+		cSet->idempotence.token = cppSet->getToken();
+	if (cppSet->advetisedTokenWindow())
+	{
+		cSet->idempotence.windowBase = cppSet->getTokenWindowBase();
+		cSet->idempotence.windowSize = cppSet->getTokenWindowSize();
+	}
+	cSet->idempotence.replyCode = cppSet->getExpenditureReplyCode();
+	
+	int i = 0;
+	cSet->knownMethods = new SOCKS6Method[cppSet->getKnownMethods()->size()];
+	BOOST_FOREACH(SOCKS6Method method, *(cppSet->getKnownMethods()))
+	{
+		if (method == SOCKS6_METHOD_NOAUTH)
+			continue;
+		
+		cSet->knownMethods[i] = method;
+		i++;
+	}
+	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
+	
+	if (cppSet->getUsername().length() > 0)
+	{
+		cSet->userPasswdAuth.username = strdup(cppSet->getUsername().c_str());
+		if (cSet->userPasswdAuth.username == NULL)
+			throw bad_alloc();
+		cSet->userPasswdAuth.username = strdup(cppSet->getPassword().c_str());
+		if (cSet->userPasswdAuth.passwd == NULL)
+			throw bad_alloc();
+	}
 }
 
 static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
@@ -55,6 +114,7 @@ static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
 	delete optionSet->userPasswdAuth.passwd;
 }
 
+#if 0
 /*
  * S6M_Request_*
  */
@@ -91,16 +151,7 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 		OptionSet options(authReply);
 		return sizeof(SOCKS6Version) + sizeof(SOCKS6AuthReply) + Options_Packed_Size(&options);
 	}
-	
-
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -125,21 +176,14 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 		{
 			.type = authReply->type,
 			.method = authReply->method
-		};Exception(S6M_ERR_OTHERVER)
+		};
 		
 		OptionSet options(authReply);
 		Options_Pack(&bb, &options);
 		
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -169,14 +213,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		*pauthReply = authReply;
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -204,17 +241,11 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 		
 		return size;
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }
+#endif
 
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
@@ -222,102 +253,53 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	{
 		ByteBuffer bb(buf, size);
 		
-		switch (opReply->code)
-		{
-		case SOCKS6_OPERATION_REPLY_SUCCESS:
-		case SOCKS6_OPERATION_REPLY_FAILURE:
-		case SOCKS6_OPERATION_REPLY_NOT_ALLOWED:
-		case SOCKS6_OPERATION_REPLY_NET_UNREACH:
-		case SOCKS6_OPERATION_REPLY_HOST_UNREACH:
-		case SOCKS6_OPERATION_REPLY_REFUSED:
-		case SOCKS6_OPERATION_REPLY_TTL_EXPIRED:
-		case SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED:
-		case SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED:
-			break;
-			
-		default:
-			throw Exception(S6M_ERR_INVALID);
-		}
-		
-		if (opReply->port == 0)
-			throw Exception(S6M_ERR_INVALID);
-		
-		SOCKS6OperationReply *rawOpReply = bb.get<SOCKS6OperationReply>();
-		*rawOpReply =
-		{
-			.code = opReply->code,
-			.initialDataOffset = htons(opReply->initDataOff),
-			.bindPort = htons(opReply->port),
-		};
-		
-		Addr_Pack(&bb, &opReply->addr);
-		
-		OptionSet options(opReply);
-		Options_Pack(&bb, &options);
+		Address addr; //TODO
+		OptionSet optSet; //TODO
+		OperationReply rep(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
+		rep.pack(&bb);
 		
 		return bb.getUsed();
 		
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
 	return -1;
 }
 
+
 ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err)
 {
+	S6M_OpReply *opReply = NULL;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
+		OperationReply rep(&bb);
 		
-		SOCKS6OperationReply *rawOpReply = bb.get<SOCKS6OperationReply>();
+		S6M_OpReply *opReply = new S6M_OpReply();
+		memset(opReply, 0, sizeof(S6M_OpReply));
 		
-		switch (rawOpReply->code)
-		{
-		case SOCKS6_OPERATION_REPLY_SUCCESS:
-		case SOCKS6_OPERATION_REPLY_FAILURE:
-		case SOCKS6_OPERATION_REPLY_NOT_ALLOWED:
-		case SOCKS6_OPERATION_REPLY_NET_UNREACH:
-		case SOCKS6_OPERATION_REPLY_HOST_UNREACH:
-		case SOCKS6_OPERATION_REPLY_REFUSED:
-		case SOCKS6_OPERATION_REPLY_TTL_EXPIRED:
-		case SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED:
-		case SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED:
-			break;
-			
-		default:
-			throw Exception(S6M_ERR_INVALID);
-		}
+		opReply->code = rep.getCode();
+		S6M_Addr_Fill(&opReply->addr, rep.getAddr());
+		opReply->port = rep.getPort();
+		opReply->initDataOff = rep.getInitDataOff();
+		S6M_OptionSet_Fill(&opReply->optionSet, rep.getOptionSet());
 		
-		if (rawOpReply->bindPort == 0)
-			throw Exception(S6M_ERR_INVALID);
-		
-		OptionSet options = OptionSet::parse(&bb);
-		//TODO
-		
+		*popReply = opReply;
+		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err);
 	
+	if (opReply != NULL)
+		S6M_OpReply_Free(opReply);
 	return -1;
 }
-#endif
+
 
 void S6M_OpReply_Free(struct S6M_OpReply *opReply)
 {
 	S6M_Addr_Cleanup(&opReply->addr);
+	S6M_OptionSet_Cleanup(&opReply->optionSet);
 	delete opReply;
 }
 
@@ -333,7 +315,7 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 		
 		return req.packedSize();
 	}
-	S6M_CATCH(err)
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -349,7 +331,7 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 		
 		return bb.getUsed();
 	}
-	S6M_CATCH(err)
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -365,10 +347,10 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		UserPasswordRequest req(&bb);
 		
 		username = strdup(req.getUsername().c_str());
-		if (!username)
+		if (username == NULL)
 			throw bad_alloc();
 		passwd = strdup(req.getUsername().c_str());
-		if (!username)
+		if (passwd == NULL)
 			throw bad_alloc();
 		
 		S6M_PasswdReq *pwReq = new S6M_PasswdReq();
@@ -378,7 +360,7 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		*ppwReq = pwReq;
 		return bb.getUsed();
 	}
-	S6M_CATCH(err)
+	S6M_CATCH(err);
 	
 	free(username);
 	free(passwd);
@@ -413,7 +395,7 @@ ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf
 		
 		return bb.getUsed();
 	}
-	S6M_CATCH(err)
+	S6M_CATCH(err);
 	
 	return -1;
 }
@@ -431,7 +413,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 		*ppwReply = pwReply;
 		return bb.getUsed();
 	}
-	S6M_CATCH(err)
+	S6M_CATCH(err);
 	
 	return -1;
 }

@@ -33,9 +33,9 @@ public:
 		return code;
 	}
 	
-	Address getAddr() const
+	const Address *getAddr() const
 	{
-		return addr;
+		return &addr;
 	}
 	
 	uint16_t getPort() const
@@ -48,9 +48,9 @@ public:
 		return initDataOff;
 	}
 	
-	OptionSet getOptionSet() const
+	const OptionSet *getOptionSet() const
 	{
-		return optionSet;
+		return &optionSet;
 	}
 };
 

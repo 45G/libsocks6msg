@@ -40,7 +40,7 @@ struct S6M_OptionSet
 		int spend;
 		uint32_t token;
 		
-		uint32_t base;
+		uint32_t windowBase;
 		uint32_t windowSize;
 		
 		SOCKS6TokenExpenditureCode replyCode;
