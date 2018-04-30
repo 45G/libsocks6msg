@@ -58,7 +58,7 @@ public:
 	
 	void pack(ByteBuffer *bb);
 	
-	size_t packedSize()
+	static size_t packedSize()
 	{
 		return 2;
 	}

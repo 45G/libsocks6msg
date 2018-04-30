@@ -1,4 +1,3 @@
-#if 0
 #include <stdlib.h>
 #include <string.h>
 #include <list>
@@ -39,6 +38,7 @@ static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
 	delete addr->domain;
 }
 
+#if 0
 /*
  * S6m_OptionSet
  */
@@ -313,10 +313,11 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enu
 	
 	return -1;
 }
+#endif
 
 void S6M_OpReply_Free(struct S6M_OpReply *opReply)
 {
-	delete opReply->addr.domain;
+	S6M_Addr_Cleanup(&opReply->addr);
 	delete opReply;
 }
 
@@ -328,20 +329,11 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 {
 	try
 	{
-		static const ssize_t verPackedSize = 1;
-		ssize_t userPackedSize = stringPackedSize(pwReq->username);
-		ssize_t passwdPackedSize = stringPackedSize(pwReq->passwd);
+		UserPasswordRequest req(string(pwReq->username), string(pwReq->passwd));
 		
-		return verPackedSize + userPackedSize + passwdPackedSize;
+		return req.packedSize();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err)
 	
 	return -1;
 }
@@ -352,22 +344,12 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 	{
 		ByteBuffer bb(buf, size);
 		
-		uint8_t *ver = bb.get<uint8_t>();
-		*ver = SOCKS6_PWAUTH_VERSION;
-		
-		stringPack(&bb, pwReq->username, true);
-		stringPack(&bb, pwReq->passwd, true);
+		UserPasswordRequest req(string(pwReq->username), string(pwReq->passwd));
+		req.pack(&bb);
 		
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err)
 	
 	return -1;
 }
@@ -380,40 +362,33 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 	try
 	{
 		ByteBuffer bb(buf, size);
+		UserPasswordRequest req(&bb);
 		
-		uint8_t *ver = bb.get<uint8_t>();
-		if (*ver != SOCKS6_PWAUTH_VERSION)
-			throw Exception(S6M_ERR_INVALID);
-		
-		username = stringParse(&bb, true);
-		passwd = stringParse(&bb, true);
+		username = strdup(req.getUsername().c_str());
+		if (!username)
+			throw bad_alloc();
+		passwd = strdup(req.getUsername().c_str());
+		if (!username)
+			throw bad_alloc();
 		
 		S6M_PasswdReq *pwReq = new S6M_PasswdReq();
-		memset(pwReq, 0, sizeof(S6M_PasswdReq));
 		pwReq->username = username;
 		pwReq->passwd = passwd;
 		
 		*ppwReq = pwReq;
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err)
 	
-	delete username;
-	delete passwd;
+	free(username);
+	free(passwd);
 	return -1;
 }
 
 void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
 {
-	delete pwReq->username;
-	delete pwReq->passwd;
+	free(pwReq->username);
+	free(pwReq->passwd);
 	delete pwReq;
 }
 
@@ -431,27 +406,14 @@ ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf
 {
 	try
 	{
-		S6M::ByteBuffer bb(buf, size);
+		ByteBuffer bb(buf, size);
 		
-		if (pwReply->fail != 0 && pwReply->fail != 1)
-			throw S6M::Exception(S6M_ERR_INVALID);
-		
-		uint8_t ver = 0x01;
-		uint8_t fail = pwReply->fail;
-		
-		bb.put(&ver);
-		bb.put(&fail);
+		UserPasswordReply rep(pwReply->success);
+		rep.pack(&bb);
 		
 		return bb.getUsed();
 	}
-	catch (S6M::Exception ex)
-	{
-		*err = ex.getError();
-	}
-	catch (bad_alloc)
-	{
-		*err = S6M_ERR_ALLOC;
-	}
+	S6M_CATCH(err)
 	
 	return -1;
 }
@@ -460,18 +422,16 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 {
 	try
 	{
-		S6M::ByteBuffer bb(buf, size);
-		
+		ByteBuffer bb(buf, size);
 		UserPasswordReply rep(&bb);
 		
 		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
 		pwReply->success = rep.isSuccessful();
 		
 		*ppwReply = pwReply;
-		
 		return bb.getUsed();
 	}
-	S6M_CATCH(err);
+	S6M_CATCH(err)
 	
 	return -1;
 }
@@ -480,4 +440,3 @@ void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply)
 {
 	delete pwReply;
 }
-#endif
