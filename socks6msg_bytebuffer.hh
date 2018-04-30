@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <exception>
-#include "socks6msg.h"
 #include "socks6msg_exception.hh"
 
 namespace S6M

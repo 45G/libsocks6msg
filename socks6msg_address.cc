@@ -106,7 +106,7 @@ Address::Address(ByteBuffer *bb)
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_BADADDR);
+		throw Exception(S6M_ERR_INVALID);
 	}
 }
 

@@ -1,7 +1,6 @@
 #include <boost/foreach.hpp>
 #include <list>
 #include "socks6msg_option.hh"
-#include "socks6msg.h"
 #include "socks6msg_optionset.hh"
 
 using namespace std;

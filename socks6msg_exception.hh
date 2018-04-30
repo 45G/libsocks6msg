@@ -13,7 +13,10 @@ class Exception: std::exception
 	
 public:
 	Exception(enum S6M_Error error)
-		: error(error) {}
+		: error(error)
+	{
+		//nothing
+	}
 
 	//const char *what() const;
 	
@@ -21,6 +24,16 @@ public:
 	{
 		return error;
 	}
+};
+
+class BadVersionException
+{
+	//TODO
+};
+
+class InvalidFieldException: Exception
+{
+	//TODO
 };
 
 }

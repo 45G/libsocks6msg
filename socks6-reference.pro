@@ -5,7 +5,6 @@ CONFIG -= qt
 
 SOURCES += \
     socks6msg.cc \
-    main.c \
     socks6msg_option.cc \
     socks6msg_optionset.cc \
     socks6msg_usrpasswd.cc \
@@ -14,7 +13,8 @@ SOURCES += \
     socks6msg_request.cc \
     socks6msg_version.cc \
     socks6msg_authreply.cc \
-    socks6msg_opreply.cc
+    socks6msg_opreply.cc \
+    main.cc
 
 HEADERS += \
     socks6.h \
@@ -29,4 +29,5 @@ HEADERS += \
     socks6msg_authreply.hh \
     socks6msg_bytebuffer.hh \
     socks6msg_exception.hh \
-    socks6msg_opreply.hh
+    socks6msg_opreply.hh \
+    socks6msg.hh

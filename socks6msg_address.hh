@@ -34,7 +34,7 @@ public:
 		: type(SOCKS6_ADDR_IPV6), ipv6(ipv6) {}
 	
 	Address(std::string domain)
-		: domain(domain) {}
+		: type(SOCKS6_ADDR_DOMAIN), domain(domain) {}
 	
 	Address(ByteBuffer *bb);
 	
