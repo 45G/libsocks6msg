@@ -32,9 +32,9 @@ int main()
 		ByteBuffer bb2(buffer, 1000);
 		Request req2(&bb2);
 	}
-	catch (Exception ex)
+	catch (Exception)
 	{
-		cout << ex.getError() << endl;
+		
 	}
 	
 	return 0;

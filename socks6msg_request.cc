@@ -16,7 +16,7 @@ Request::Request(SOCKS6RequestCode commandCode, Address addr, uint16_t port, con
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 }
 
@@ -37,7 +37,7 @@ Request::Request(ByteBuffer *bb)
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 	
 	addr = Address(bb);

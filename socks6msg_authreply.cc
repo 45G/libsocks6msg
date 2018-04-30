@@ -19,7 +19,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 		break;
 	
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 	
 	/* be permissive with the method */

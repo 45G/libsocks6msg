@@ -2,7 +2,7 @@
 #define SOCKS6MSG_BYTEBUFFER_HH
 
 #include <stdint.h>
-#include <exception>
+#include <unistd.h>
 #include "socks6msg_exception.hh"
 
 namespace S6M
@@ -42,7 +42,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw Exception(S6M_ERR_BUFFER);
+			throw EndOfBufferException();
 		
 		T *ret = reinterpret_cast<T *>(buf + used);
 		used += req;
@@ -54,7 +54,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw Exception(S6M_ERR_BUFFER);
+			throw EndOfBufferException();
 		
 		memcpy(buf + used, what, req);
 		used += req;

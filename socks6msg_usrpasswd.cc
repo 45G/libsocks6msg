@@ -20,7 +20,7 @@ UserPasswordRequest *UserPasswordRequest::parse(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	if (*ver != VERSION)
-		throw Exception(S6M_ERR_OTHERVER);
+		throw BadVersionException();
 	
 	String user(bb);
 	String pass(bb);
@@ -41,7 +41,7 @@ UserPasswordReply *UserPasswordReply::parse(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	if (*ver != VERSION)
-		throw Exception(S6M_ERR_OTHERVER);
+		throw BadVersionException();
 	
 	uint8_t *status = bb->get<uint8_t>();
 	

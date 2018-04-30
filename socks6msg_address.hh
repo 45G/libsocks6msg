@@ -5,6 +5,7 @@
 #include <netinet/ip6.h>
 #include <string>
 #include <vector>
+#include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
 #include "socks6msg_string.hh"
 

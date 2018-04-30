@@ -59,7 +59,7 @@ void Address::pack(ByteBuffer *bb)
 in_addr Address::getIPv4() const
 {
 	if (type != SOCKS6_ADDR_IPV4)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return ipv4;
 }
@@ -67,7 +67,7 @@ in_addr Address::getIPv4() const
 in6_addr Address::getIPv6() const
 {
 	if (type != SOCKS6_ADDR_IPV6)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return ipv6;
 }
@@ -75,7 +75,7 @@ in6_addr Address::getIPv6() const
 string Address::getDomain() const
 {
 	if (type != SOCKS6_ADDR_DOMAIN)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return domain.getStr();
 }
@@ -106,7 +106,7 @@ Address::Address(ByteBuffer *bb)
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 }
 

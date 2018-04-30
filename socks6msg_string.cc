@@ -10,13 +10,13 @@ String::String(const string &str, bool nonEmpty)
 	: str(str)
 {
 	if (nonEmpty && str.length() == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (str.length() > 255)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (str.find_first_of('\0') != string::npos)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 }
 
 String::String(ByteBuffer *bb, bool nonEmpty)
@@ -24,14 +24,14 @@ String::String(ByteBuffer *bb, bool nonEmpty)
 	uint8_t *len = bb->get<uint8_t>();
 	
 	if (nonEmpty && *len == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	uint8_t *rawStr = bb->get<uint8_t>(*len);
 	
 	str = string(reinterpret_cast<const char *>(rawStr), (size_t)*len);
 	
 	if (str.find_first_of('\0') != string::npos)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 }
 
 void String::pack(ByteBuffer *bb) const

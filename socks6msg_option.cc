@@ -1,5 +1,6 @@
-#include <boost/foreach.hpp>
+#include <arpa/inet.h>
 #include <list>
+#include <boost/foreach.hpp>
 #include "socks6msg_option.hh"
 #include "socks6msg_optionset.hh"
 
@@ -34,14 +35,11 @@ Option *Option::parse(void *buf)
 			return IdempotenceOption::parse(buf);
 		}
 		
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
-	catch (Exception ex)
+	catch (InvalidFieldException)
 	{
-		if (ex.getError() == S6M_ERR_INVALID)
-			return RawOption::parse(buf);
-		
-		throw ex;
+		return RawOption::parse(buf);
 	}
 }
 
@@ -97,7 +95,7 @@ Option *SocketOption::parse(void *buf)
 	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
 	
 	if (opt->optionHead.len < sizeof(SocketOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	switch (opt->leg)
 	{
@@ -107,7 +105,7 @@ Option *SocketOption::parse(void *buf)
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 	
 	switch (opt->level)
@@ -138,10 +136,10 @@ Option *SocketOption::parse(void *buf)
 	case SOCKS6_SOCKOPT_LEVEL_UDP:
 		break;
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 	
-	throw Exception(S6M_ERR_INVALID);
+	throw InvalidFieldException();
 }
 
 size_t TFOOption::packedSize() const
@@ -154,7 +152,7 @@ Option *TFOOption::parse(void *buf)
 	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
 	
 	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new TFOOption();
 }
@@ -174,10 +172,10 @@ Option *MPTCPOption::parse(void *buf)
 	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
 	
 	if (opt->optionHead.len != sizeof(SOCKS6SocketOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new MPTCPOption();
 }
@@ -206,11 +204,11 @@ Option *MPScehdOption::parse(void *buf)
 	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
 	
 	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	/* be permissive with scheduler values */
 	if (opt->scheduler == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new MPScehdOption((SOCKS6SocketOptionLeg)opt->socketOptionHead.leg, (SOCKS6MPTCPScheduler)opt->scheduler);
 }
@@ -248,7 +246,7 @@ MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sch
 	/* be permissive with scheduler values */
 	//TODO: really?
 	if (sched == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 }
 
 size_t AuthMethodOption::packedSize() const
@@ -274,7 +272,7 @@ Option *AuthMethodOption::parse(void *buf)
 	SOCKS6AuthMethodOption *opt = (SOCKS6AuthMethodOption *)buf;
 	
 	if (opt->optionHead.len < sizeof(SOCKS6AuthMethodOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	set<SOCKS6Method> methods;
 	int methodCount = opt->optionHead.len - sizeof(SOCKS6AuthMethodOption);
@@ -282,7 +280,7 @@ Option *AuthMethodOption::parse(void *buf)
 	for (int i = 0; i < methodCount; i++)
 	{
 		if (opt->methods[i] == SOCKS6_METHOD_UNACCEPTABLE)
-			throw Exception(S6M_ERR_INVALID);
+			throw InvalidFieldException();
 		
 		methods.insert((SOCKS6Method)opt->methods[i]);
 	}
@@ -302,9 +300,9 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 	: Option(SOCKS6_OPTION_AUTH_METHOD), methods(methods)
 {
 	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	if (methods.empty())
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 }
 
 void AuthDataOption::pack(uint8_t *buf) const
@@ -321,10 +319,10 @@ Option *AuthDataOption::parse(void *buf)
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
 	if (opt->optionHead.len < sizeof(SOCKS6AuthDataOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (opt->method == SOCKS6_METHOD_NOAUTH || opt->method == SOCKS6_METHOD_UNACCEPTABLE)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (opt->method == SOCKS6_METHOD_USRPASSWD)
 	{
@@ -332,11 +330,7 @@ Option *AuthDataOption::parse(void *buf)
 		{
 			return UsernamePasswdOption::parse(buf);
 		}
-		catch (Exception ex)
-		{
-			if (ex.getError() != S6M_ERR_INVALID)
-				throw ex;
-		}
+		catch (InvalidFieldException) {}
 	}
 	
 	return RawAuthDataOption::parse(buf);
@@ -401,7 +395,7 @@ Option *UsernamePasswdOption::parse(void *buf)
 	shared_ptr<UserPasswordRequest> req = shared_ptr<UserPasswordRequest>(UserPasswordRequest::parse(&bb));
 	
 	if (bb.getUsed() != expectedDataSize)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new UsernamePasswdOption(req->getUsername(), req->getPassword());	
 }
@@ -428,7 +422,7 @@ Option *IdempotenceOption::parse(void *buf)
 	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
 	if (opt->optionHead.len < sizeof (SOCKS6IdempotenceOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	switch ((SOCKS6IDempotenceType)opt->type)
 	{
@@ -445,7 +439,7 @@ Option *IdempotenceOption::parse(void *buf)
 		return TokenExpenditureReplyOption::parse(buf);
 	}
 	
-	throw Exception(S6M_ERR_INVALID);
+	throw InvalidFieldException();
 }
 
 size_t TokenWindowRequestOption::packedSize() const
@@ -458,7 +452,7 @@ Option *TokenWindowRequestOption::parse(void *buf)
 	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
 	if (opt->optionHead.len != sizeof(SOCKS6IdempotenceOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new TokenWindowRequestOption();
 }
@@ -488,11 +482,11 @@ Option *TokenWindowAdvertOption::parse(void *buf)
 	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
 	
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	uint32_t winSize = ntohl(opt->windowSize);
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new TokenWindowAdvertOption(ntohl(opt->windowBase), winSize);
 }
@@ -506,7 +500,7 @@ TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winS
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_ADVERT), winBase(winBase), winSize(winSize)
 {
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 }
 
 size_t TokenExpenditureRequestOption::packedSize() const
@@ -528,7 +522,7 @@ Option *TokenExpenditureRequestOption::parse(void *buf)
 	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
 	
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	return new TokenExpenditureRequestOption(ntohl(opt->token));
 }
@@ -557,7 +551,7 @@ Option *TokenExpenditureReplyOption::parse(void *buf)
 	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
 	
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	switch ((SOCKS6TokenExpenditureCode)opt->code)
 	{
@@ -568,7 +562,7 @@ Option *TokenExpenditureReplyOption::parse(void *buf)
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 	
 	return new TokenExpenditureReplyOption((SOCKS6TokenExpenditureCode)opt->code);
@@ -591,7 +585,7 @@ TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureC
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 }
 

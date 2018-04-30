@@ -1,6 +1,7 @@
 #ifndef SOCKS6MSG_VERSION_HH
 #define SOCKS6MSG_VERSION_HH
 
+#include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
 
 namespace S6M

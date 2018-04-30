@@ -7,11 +7,11 @@ Version::Version(ByteBuffer *bb)
 {
 	uint8_t *major = bb->get<uint8_t>();
 	if (*major != SOCKS6_VERSION_MAJOR)
-		throw Exception(S6M_ERR_OTHERVER);
+		throw BadVersionException();
 	
 	uint8_t *minor = bb->get<uint8_t>();
 	if (*minor != SOCKS6_VERSION_MINOR)
-		throw Exception(S6M_ERR_OTHERVER);
+		throw BadVersionException();
 }
 
 void Version::pack(ByteBuffer *bb)

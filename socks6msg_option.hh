@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
 #include "socks6msg_usrpasswd.hh"
 

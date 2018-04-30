@@ -20,7 +20,7 @@ OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address addr, uint
 		break;
 		
 	default:
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	}
 }
 

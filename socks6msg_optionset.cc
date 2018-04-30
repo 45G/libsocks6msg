@@ -71,7 +71,7 @@ OptionSet::OptionSet(ByteBuffer *bb)
 		
 		/* bad option length wrecks everything */
 		if (opt->len < 2)
-			throw Exception(S6M_ERR_INVALID);
+			throw InvalidFieldException();
 	
 		bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
 		
@@ -79,13 +79,7 @@ OptionSet::OptionSet(ByteBuffer *bb)
 		{
 			opts.push_back(shared_ptr<Option>(Option::parse(opt)));
 		}
-		catch (Exception ex)
-		{
-			/* silently ignote bad options */
-			if (ex.getError() == S6M_ERR_INVALID)
-				continue;
-			throw ex;
-		}
+		catch (InvalidFieldException) {}
 	}
 		
 	BOOST_FOREACH(shared_ptr<Option> opt, opts)
@@ -94,16 +88,9 @@ OptionSet::OptionSet(ByteBuffer *bb)
 		{
 			opt->apply(this);
 		}
-		catch (Exception ex)
+		catch (InvalidFieldException)
 		{
-			/* silently ignote bad options */
-			if (ex.getError() == S6M_ERR_INVALID)
-			{
-				extraOptions.push_back(opt);
-				continue;
-			}
-			
-			throw ex;
+			extraOptions.push_back(opt);
 		}
 	}
 }
@@ -115,7 +102,7 @@ void OptionSet::pack(ByteBuffer *bb)
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
 	if (opts.size() > 255)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	optsHead->optionCount = opts.size();
 	
@@ -129,7 +116,7 @@ size_t OptionSet::packedSize()
 {
 	list<shared_ptr<Option> > opts = generateOptions();
 	if (opts.size() > 255)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	size_t size = sizeof(SOCKS6Options);
 	
@@ -144,7 +131,7 @@ size_t OptionSet::packedSize()
 void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 {
 	if (mptcpSched.clientProxy != (SOCKS6MPTCPScheduler)0 && mptcpSched.clientProxy != sched)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	mptcpSched.clientProxy = sched;
 }
@@ -155,7 +142,7 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 	bool canSetPS = mptcpSched.proxyServer == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyServer == sched;
 	
 	if (!(canSetCP && canSetPS))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	mptcpSched.clientProxy = sched;
 	mptcpSched.proxyServer = sched;
@@ -164,7 +151,7 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
 {
 	if (mptcpSched.proxyServer != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyServer != sched)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	mptcpSched.proxyServer = sched;
 }
@@ -172,9 +159,9 @@ void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
 void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 {
 	if (size == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	if (idempotence.windowSize > 0 && (idempotence.base != base || idempotence.windowSize != size))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	idempotence.base = base;
 	idempotence.windowSize = size;
@@ -183,7 +170,7 @@ void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 void OptionSet::spendToken(uint32_t token)
 {
 	if (idempotence.spend && idempotence.token != token)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	idempotence.spend = true;
 	idempotence.token = token;
@@ -192,7 +179,7 @@ void OptionSet::spendToken(uint32_t token)
 void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 {
 	if (idempotence.replyCode != 0 && idempotence.replyCode != code)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	idempotence.replyCode = code;
 }
@@ -200,10 +187,10 @@ void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 {
 	if (user.size() == 0 || passwd.size() == 0)
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	if (userPasswdAuth.username.size() != 0 && (user != userPasswdAuth.username || passwd != userPasswdAuth.passwd))
-		throw Exception(S6M_ERR_INVALID);
+		throw InvalidFieldException();
 	
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
@@ -222,7 +209,7 @@ void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool
 			UserPasswordRequest *req = UserPasswordRequest::parse(&bb);
 			
 			if (bb.getUsed() != data.size())
-				throw Exception(S6M_ERR_INVALID);
+				throw InvalidFieldException();
 			
 			attemptUserPasswdAuth(req->getUsername(), req->getPassword());
 			
@@ -231,20 +218,18 @@ void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool
 			return;
 		}
 	}
-	catch (Exception ex)
-	{
-		if (ex.getError() != S6M_ERR_INVALID && ex.getError() != S6M_ERR_OTHERVER && ex.getError() != S6M_ERR_BUFFER)
-			throw ex;
-	}
+	catch (InvalidFieldException) {}
+	catch (BadVersionException) {}
+	catch (EndOfBufferException) {}
 	
 as_is:
 	std::map<SOCKS6Method, vector<uint8_t> >::iterator it = extraAuthData.find(method);
 	if (it != extraAuthData.end())
 	{
 		if (it->second.size() != data.size())
-			throw Exception(S6M_ERR_INVALID);
+			throw InvalidFieldException();
 		if (memcmp(it->second.data(), data.data(), data.size()) != 0)
-			throw Exception(S6M_ERR_INVALID);
+			throw InvalidFieldException();
 	}
 	
 	extraAuthData[method] = data;

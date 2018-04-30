@@ -111,9 +111,6 @@ enum S6M_Error
 	S6M_ERR_ALLOC       = -2,   /* malloc fail */
 	S6M_ERR_BUFFER      = -3,   /* reached end of buffer */
 	S6M_ERR_OTHERVER    = -4,   /* socks version other than the one supported */
-	S6M_ERR_BADADDR     = -5,   /* unknown address */
-	S6M_ERR_BADCMD      = -6,
-	S6M_ERR_UNSUPPORTED = -100, /* unsupported/unimplemented stuff */
 };
 
 #if 0
