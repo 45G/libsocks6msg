@@ -94,7 +94,7 @@ Option *SocketOption::parse(void *buf)
 {
 	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
 	
-	if (opt->optionHead.len < sizeof(SocketOption))
+	if (opt->optionHead.len < sizeof(SOCKS6SocketOption))
 		throw InvalidFieldException();
 	
 	switch (opt->leg)
@@ -373,7 +373,7 @@ RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t 
 
 size_t UsernamePasswdOption::packedSize() const
 {
-	return sizeof(AuthDataOption) + req.packedSize();
+	return sizeof(SOCKS6AuthDataOption) + req.packedSize();
 }
 
 void UsernamePasswdOption::pack(uint8_t *buf) const
@@ -392,13 +392,25 @@ Option *UsernamePasswdOption::parse(void *buf)
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
 	size_t expectedDataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
-	ByteBuffer bb((uint8_t *)buf, expectedDataSize);
-	UserPasswordRequest req(&bb);
 	
-	if (bb.getUsed() != expectedDataSize)
+	try
+	{
+		ByteBuffer bb((uint8_t *)buf, expectedDataSize);
+		UserPasswordRequest req(&bb);
+		
+		if (bb.getUsed() != expectedDataSize)
+			throw InvalidFieldException();
+		
+		return new UsernamePasswdOption(req.getUsername(), req.getPassword());
+	}
+	catch (EndOfBufferException)
+	{
 		throw InvalidFieldException();
-	
-	return new UsernamePasswdOption(req.getUsername(), req.getPassword());	
+	}
+	catch (BadVersionException)
+	{
+		throw InvalidFieldException();
+	}
 }
 
 void UsernamePasswdOption::apply(OptionSet *optSet) const
