@@ -1,4 +1,5 @@
-TEMPLATE = app
+TEMPLATE = lib
+CONFIG += staticlib
 CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
@@ -13,8 +14,7 @@ SOURCES += \
     socks6msg_request.cc \
     socks6msg_version.cc \
     socks6msg_authreply.cc \
-    socks6msg_opreply.cc \
-    main.cc
+    socks6msg_opreply.cc
 
 HEADERS += \
     socks6.h \
