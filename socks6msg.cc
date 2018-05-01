@@ -198,7 +198,7 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 	{
 		OptionSet optSet;
 		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
-		AuthenticationReply cppAuthReply(authReply->type, authReply->method, optSet);
+		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
 		
 		return cppAuthReply.packedSize();
 		
@@ -216,7 +216,7 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 		
 		OptionSet optSet;
 		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
-		AuthenticationReply cppAuthReply(authReply->type, authReply->method, optSet);
+		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
 		cppAuthReply.pack(&bb);
 		
 		return bb.getUsed();
@@ -239,7 +239,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		authReply = new S6M_AuthReply();
 		memset(authReply, 0, sizeof(S6M_AuthReply));
 		
-		authReply->type = cppAuthReply.getReplyCode();
+		authReply->code = cppAuthReply.getReplyCode();
 		authReply->method = cppAuthReply.getMethod();
 		S6M_OptionSet_Fill(&authReply->optionSet, cppAuthReply.getOptionSet());
 		
