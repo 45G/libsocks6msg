@@ -12,7 +12,7 @@ class OperationReply
 {
 	SOCKS6OperationReplyCode code;
 	
-	Address addr;
+	Address address;
 	uint16_t port;
 	
 	uint16_t initDataOff;
@@ -20,7 +20,7 @@ class OperationReply
 	OptionSet optionSet;
 	
 public:
-	OperationReply(SOCKS6OperationReplyCode code, Address addr, uint16_t port, uint16_t initDataOff, OptionSet optionSet);
+	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff, OptionSet optionSet);
 	
 	OperationReply(ByteBuffer *bb);
 	
@@ -33,9 +33,9 @@ public:
 		return code;
 	}
 	
-	const Address *getAddr() const
+	const Address *getAddress() const
 	{
-		return &addr;
+		return &address;
 	}
 	
 	uint16_t getPort() const

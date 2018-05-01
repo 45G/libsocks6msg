@@ -57,7 +57,7 @@ struct S6M_OptionSet
 
 struct S6M_Request
 {
-	enum SOCKS6RequestCode reqCode;
+	enum SOCKS6RequestCode code;
 	
 	struct S6M_Addr addr;
 	uint16_t port;

@@ -161,25 +161,73 @@ static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
 	free(optionSet->userPasswdAuth.passwd);
 }
 
-#if 0
 /*
  * S6M_Request_*
  */
+
 ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err)
 {
-	//TODO
+	try
+	{
+		Address addr = S6M_Addr_Flush(&req->addr);
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &req->optionSet);
+		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
+		
+		return cppReq.packedSize();
+	}
+	S6M_CATCH(err);
+	
+	return -1;
 }
 
 ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, enum S6M_Error *err)
 {
-	//TODO
+	try
+	{
+		ByteBuffer bb(buf, size);
+		
+		Address addr = S6M_Addr_Flush(&req->addr);
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &req->optionSet);
+		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
+		cppReq.pack(&bb);
+		
+		return bb.getUsed();
+		
+	}
+	S6M_CATCH(err);
+	
+	return -1;
 }
 
 ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err)
 {
-	//TODO
+	S6M_Request *req = NULL;
+	
+	try
+	{
+		ByteBuffer bb(buf, size);
+		Request cppReq(&bb);
+		
+		req = new S6M_Request();
+		memset(req, 0, sizeof(S6M_Request));
+		
+		req->code = cppReq.getCommandCode();
+		S6M_Addr_Fill(&req->addr, cppReq.getAddress());
+		req->port = cppReq.getPort();
+		req->initialDataLen = cppReq.getInitialDataLen();
+		S6M_OptionSet_Fill(&req->optionSet, cppReq.getOptionSet());
+		
+		*preq = req;
+		return bb.getUsed();
+	}
+	S6M_CATCH(err);
+	
+	if (req != NULL)
+		S6M_Request_Free(req);
+	return -1;
 }
-#endif
 
 void S6M_Request_Free(struct S6M_Request *req)
 {
@@ -315,7 +363,7 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enu
 		memset(opReply, 0, sizeof(S6M_OpReply));
 		
 		opReply->code = cppOpReply.getCode();
-		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddr());
+		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddress());
 		opReply->port = cppOpReply.getPort();
 		opReply->initDataOff = cppOpReply.getInitDataOff();
 		S6M_OptionSet_Fill(&opReply->optionSet, cppOpReply.getOptionSet());

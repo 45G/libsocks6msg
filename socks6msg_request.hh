@@ -12,7 +12,7 @@ class Request
 {
 	SOCKS6RequestCode commandCode;
 	
-	Address addr;
+	Address address;
 	uint16_t port;
 	
 	OptionSet optionSet;
@@ -20,7 +20,7 @@ class Request
 	uint16_t initialDataLen;
 	
 public:
-	Request(SOCKS6RequestCode commandCode, Address addr, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen);
+	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen);
 	
 	Request(ByteBuffer *bb);
 	
@@ -33,9 +33,9 @@ public:
 		return commandCode;
 	}
 	
-	Address getAddr() const
+	const Address *getAddress() const
 	{
-		return addr;
+		return &address;
 	}
 	
 	uint16_t getPort() const

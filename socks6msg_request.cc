@@ -4,8 +4,8 @@
 namespace S6M
 {
 
-Request::Request(SOCKS6RequestCode commandCode, Address addr, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen)
-	: commandCode(commandCode), addr(addr), port(port), optionSet(optionSet), initialDataLen(initialDataLen)
+Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen)
+	: commandCode(commandCode), address(address), port(port), optionSet(optionSet), initialDataLen(initialDataLen)
 {
 	switch (commandCode)
 	{
@@ -40,7 +40,7 @@ Request::Request(ByteBuffer *bb)
 		throw InvalidFieldException();
 	}
 	
-	addr = Address(bb);
+	address = Address(bb);
 	optionSet = OptionSet(bb);
 	
 	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
@@ -55,7 +55,7 @@ void Request::pack(ByteBuffer *bb)
 	rawRequest->commandCode = commandCode;
 	rawRequest->port = htons(port);
 	
-	addr.pack(bb);
+	address.pack(bb);
 	
 	optionSet.pack(bb);
 		       
@@ -65,7 +65,7 @@ void Request::pack(ByteBuffer *bb)
 
 size_t Request::packedSize()
 {
-	return Version::packedSize() + sizeof (SOCKS6Request) + addr.packedSize() + optionSet.packedSize() + sizeof(SOCKS6InitialData);
+	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + optionSet.packedSize() + sizeof(SOCKS6InitialData);
 }
 
 }

@@ -3,8 +3,8 @@
 namespace S6M
 {
 
-OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address addr, uint16_t port, uint16_t initDataOff, OptionSet optionSet)
-	: code(code), addr(addr), port(port), initDataOff(initDataOff), optionSet(optionSet)
+OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff, OptionSet optionSet)
+	: code(code), address(address), port(port), initDataOff(initDataOff), optionSet(optionSet)
 {
 	switch (code)
 	{
@@ -32,7 +32,7 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	port = ntohs(rawOpReply->bindPort);
 	initDataOff = ntohs(rawOpReply->initialDataOffset);
 	
-	addr = Address(bb);
+	address = Address(bb);
 	
 	optionSet = OptionSet(bb);
 }
@@ -45,14 +45,14 @@ void OperationReply::pack(ByteBuffer *bb)
 	rawOpReply->bindPort = htons(port);
 	rawOpReply->initialDataOffset = htons(initDataOff);
 	
-	addr.pack(bb);
+	address.pack(bb);
 	
 	optionSet.pack(bb);
 }
 
 size_t OperationReply::packedSize()
 {
-	return sizeof(SOCKS6OperationReply) + addr.packedSize() + optionSet.packedSize();
+	return sizeof(SOCKS6OperationReply) + address.packedSize() + optionSet.packedSize();
 }
 
 }
