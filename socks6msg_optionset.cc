@@ -136,6 +136,14 @@ void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 	mptcpSched.clientProxy = sched;
 }
 
+void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
+{
+	if (mptcpSched.proxyServer != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyServer != sched)
+		throw InvalidFieldException();
+	
+	mptcpSched.proxyServer = sched;
+}
+
 void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 {
 	bool canSetCP = mptcpSched.clientProxy == (SOCKS6MPTCPScheduler)0 || mptcpSched.clientProxy == sched;
@@ -145,14 +153,6 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 		throw InvalidFieldException();
 	
 	mptcpSched.clientProxy = sched;
-	mptcpSched.proxyServer = sched;
-}
-
-void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
-{
-	if (mptcpSched.proxyServer != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyServer != sched)
-		throw InvalidFieldException();
-	
 	mptcpSched.proxyServer = sched;
 }
 

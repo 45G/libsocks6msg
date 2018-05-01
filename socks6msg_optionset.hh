@@ -69,7 +69,7 @@ public:
 	
 	size_t packedSize();
 	
-	bool hasTFO() const
+	bool getTFO() const
 	{
 		return tfo;
 	}
@@ -79,7 +79,7 @@ public:
 		tfo = true;
 	}
 	
-	bool hasMPTCP() const
+	bool getMPTCP() const
 	{
 		return mptcp;
 	}
@@ -100,10 +100,11 @@ public:
 		return mptcpSched.proxyServer;
 	}
 	
-	void setBothScheds(SOCKS6MPTCPScheduler sched);
-	
 	void setProxyServerSched(SOCKS6MPTCPScheduler sched);
 	
+	void setBothScheds(SOCKS6MPTCPScheduler sched);
+	
+	//TODO: rename most of below methods
 	bool requestedTokenWindow() const
 	{
 		return idempotence.request;

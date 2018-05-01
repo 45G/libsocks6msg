@@ -83,8 +83,8 @@ static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
 
 static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 {
-	cSet->tfo = cppSet->hasTFO();
-	cSet->mptcp = cppSet->hasMPTCP();
+	cSet->tfo = cppSet->getTFO();
+	cSet->mptcp = cppSet->getMPTCP();
 	
 	cSet->mptcpSched.clientProxy = cppSet->getClientProxySched();
 	cSet->mptcpSched.proxyServer = cppSet->getProxyServerSched();
