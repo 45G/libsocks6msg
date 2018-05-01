@@ -135,6 +135,7 @@ Option *SocketOption::parse(void *buf)
 		
 	case SOCKS6_SOCKOPT_LEVEL_UDP:
 		break;
+		
 	default:
 		throw InvalidFieldException();
 	}

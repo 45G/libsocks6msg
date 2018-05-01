@@ -43,9 +43,9 @@ public:
 		return port;
 	}
 	
-	OptionSet getOptionSet() const
+	const OptionSet *getOptionSet() const
 	{
-		return optionSet;
+		return &optionSet;
 	}
 	
 	uint16_t getInitialDataLen() const

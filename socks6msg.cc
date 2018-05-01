@@ -33,7 +33,7 @@ using namespace S6M;
  * S6m_Addr
  */
 
-static void S6M_Addr_Fill(struct S6M_Addr *cAddr, const Address *cppAddr)
+static void S6M_Addr_Fill(S6M_Addr *cAddr, const Address *cppAddr)
 {
 	cAddr->type = cppAddr->getType();
 	
@@ -55,11 +55,27 @@ static void S6M_Addr_Fill(struct S6M_Addr *cAddr, const Address *cppAddr)
 	}
 }
 
+static Address S6M_Addr_Flush(const S6M_Addr *cAddr)
+{
+	switch (cAddr->type)
+	{
+	case SOCKS6_ADDR_IPV4:
+		return Address(cAddr->ipv4);
+		
+	case SOCKS6_ADDR_IPV6:
+		return Address(cAddr->ipv6);
+		
+	case SOCKS6_ADDR_DOMAIN:
+		return Address(string(cAddr->domain));
+	}
+	
+	throw InvalidFieldException();
+}
+
 static void S6M_Addr_Cleanup(struct S6M_Addr *addr)
 {
 	free(addr->domain);
 }
-
 
 /*
  * S6m_OptionSet
@@ -141,8 +157,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
 {
 	delete optionSet->knownMethods;
-	delete optionSet->userPasswdAuth.username;
-	delete optionSet->userPasswdAuth.passwd;
+	free(optionSet->userPasswdAuth.username);
+	free(optionSet->userPasswdAuth.passwd);
 }
 
 #if 0
@@ -163,6 +179,7 @@ ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6
 {
 	//TODO
 }
+#endif
 
 void S6M_Request_Free(struct S6M_Request *req)
 {
@@ -179,8 +196,12 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 {
 	try
 	{
-		OptionSet options(authReply);
-		return sizeof(SOCKS6Version) + sizeof(SOCKS6AuthReply) + Options_Packed_Size(&options);
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
+		AuthenticationReply cppAuthReply(authReply->type, authReply->method, optSet);
+		
+		return cppAuthReply.packedSize();
+		
 	}
 	S6M_CATCH(err);
 	
@@ -193,26 +214,13 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 	{
 		ByteBuffer bb(buf, size);
 		
-		if (authReply->type != SOCKS6_AUTH_REPLY_SUCCESS && authReply->type != SOCKS6_AUTH_REPLY_MORE)
-			throw Exception(S6M_ERR_INVALID);
-		
-		SOCKS6Version *ver = bb.get<SOCKS6Version>();
-		*ver = { 
-			.major = SOCKS6_VERSION_MAJOR,
-			.minor = SOCKS6_VERSION_MINOR,
-		};
-		
-		SOCKS6AuthReply *rawAuthReply = bb.get<SOCKS6AuthReply>();
-		*rawAuthReply =
-		{
-			.type = authReply->type,
-			.method = authReply->method
-		};
-		
-		OptionSet options(authReply);
-		Options_Pack(&bb, &options);
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
+		AuthenticationReply cppAuthReply(authReply->type, authReply->method, optSet);
+		cppAuthReply.pack(&bb);
 		
 		return bb.getUsed();
+		
 	}
 	S6M_CATCH(err);
 	
@@ -221,38 +229,36 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 
 ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply, enum S6M_Error *err)
 {
+	S6M_AuthReply *authReply = NULL;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
+		AuthenticationReply cppAuthReply(&bb);
 		
-		SOCKS6Version *ver = bb.get<SOCKS6Version>();
-		if (ver->major != SOCKS6_VERSION_MAJOR || ver->minor != SOCKS6_VERSION_MINOR)
-			throw Exception(S6M_ERR_OTHERVER);
-		
-		SOCKS6AuthReply *rawAuthReply = bb.get<SOCKS6AuthReply>();
-		if (rawAuthReply->type != SOCKS6_AUTH_REPLY_SUCCESS && rawAuthReply->type != SOCKS6_AUTH_REPLY_MORE)
-			throw Exception(S6M_ERR_INVALID);
-		
-		S6M_AuthReply *authReply = new S6M_AuthReply();
+		authReply = new S6M_AuthReply();
 		memset(authReply, 0, sizeof(S6M_AuthReply));
-		authReply->type = (SOCKS6AuthReplyCode)rawAuthReply->type;
-		authReply->method = (SOCKS6Method)rawAuthReply->method;
 		
-		OptionSet options OptionSet::parse(&bb);
-		(void)options; //no usable options in spec
+		authReply->type = cppAuthReply.getReplyCode();
+		authReply->method = cppAuthReply.getMethod();
+		S6M_OptionSet_Fill(&authReply->optionSet, cppAuthReply.getOptionSet());
 		
 		*pauthReply = authReply;
 		return bb.getUsed();
 	}
 	S6M_CATCH(err);
 	
+	if (authReply != NULL)
+		S6M_AuthReply_Free(authReply);
 	return -1;
 }
 
 void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
 {
+	S6M_OptionSet_Cleanup(&authReply->optionSet);
 	delete authReply;
 }
+
 
 /*
  * S6M_OpReply_*
@@ -262,21 +268,18 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 {
 	try
 	{
-		size_t size = sizeof(SOCKS6OperationReply);
+		Address addr = S6M_Addr_Flush(&opReply->addr);
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
 		
-		ssize_t addrSize = Addr_Packed_Size(&opReply->addr);
-		size += addrSize;
+		return cppOpReply.packedSize();
 		
-		OptionSet opts(opReply);
-		size += Options_Packed_Size(&opts);
-		
-		return size;
 	}
 	S6M_CATCH(err);
 	
 	return -1;
 }
-#endif
 
 ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
 {
@@ -284,11 +287,11 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	{
 		ByteBuffer bb(buf, size);
 		
-		Address addr; //TODO
+		Address addr = S6M_Addr_Flush(&opReply->addr);
 		OptionSet optSet;
 		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
-		OperationReply rep(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
-		rep.pack(&bb);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
+		cppOpReply.pack(&bb);
 		
 		return bb.getUsed();
 		
@@ -306,16 +309,16 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enu
 	try
 	{
 		ByteBuffer bb(buf, size);
-		OperationReply rep(&bb);
+		OperationReply cppOpReply(&bb);
 		
-		S6M_OpReply *opReply = new S6M_OpReply();
+		opReply = new S6M_OpReply();
 		memset(opReply, 0, sizeof(S6M_OpReply));
 		
-		opReply->code = rep.getCode();
-		S6M_Addr_Fill(&opReply->addr, rep.getAddr());
-		opReply->port = rep.getPort();
-		opReply->initDataOff = rep.getInitDataOff();
-		S6M_OptionSet_Fill(&opReply->optionSet, rep.getOptionSet());
+		opReply->code = cppOpReply.getCode();
+		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddr());
+		opReply->port = cppOpReply.getPort();
+		opReply->initDataOff = cppOpReply.getInitDataOff();
+		S6M_OptionSet_Fill(&opReply->optionSet, cppOpReply.getOptionSet());
 		
 		*popReply = opReply;
 		return bb.getUsed();

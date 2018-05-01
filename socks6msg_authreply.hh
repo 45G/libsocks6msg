@@ -35,9 +35,9 @@ public:
 		return method;
 	}
 	
-	OptionSet getOptionSet() const
+	const OptionSet *getOptionSet() const
 	{
-		return optionSet;
+		return &optionSet;
 	}
 	
 };
