@@ -12,15 +12,9 @@ void reqTest()
 	uint8_t buffer[1000];
 	ByteBuffer bb(buffer, 1000);
 	req.pack(&bb);
-	try
-	{
-		ByteBuffer bb2(buffer, 1000);
-		Request req2(&bb2);
-	}
-	catch (Exception)
-	{
-		
-	}
+	
+	ByteBuffer bb2(buffer, 1000);
+	Request req2(&bb2);
 	
 	cout << "req ok" << endl;
 }
@@ -32,15 +26,9 @@ void authTest()
 	uint8_t buffer[1000];
 	ByteBuffer bb(buffer, 1000);
 	arep.pack(&bb);
-	try
-	{
-		ByteBuffer bb2(buffer, 1000);
-		AuthenticationReply arep2(&bb2);
-	}
-	catch (Exception)
-	{
-		
-	}
+	
+	ByteBuffer bb2(buffer, 1000);
+	AuthenticationReply arep2(&bb2);
 	
 	cout << "auth ok" << endl;
 }
@@ -52,16 +40,10 @@ void opTest()
 	uint8_t buffer[1000];
 	ByteBuffer bb(buffer, 1000);
 	orep.pack(&bb);
-	try
-	{
-		ByteBuffer bb2(buffer, 1000);
-		OperationReply orep2(&bb2);
-	}
-	catch (Exception)
-	{
-		
-	}
 	
+	ByteBuffer bb2(buffer, 1000);
+	OperationReply orep2(&bb2);
+		
 	cout << "op ok" << endl;
 }
 
@@ -72,15 +54,8 @@ void upwTest()
 	ByteBuffer bb(buffer, 1000);
 	upw.pack(&bb);
 	
-	try
-	{
-		ByteBuffer bb2(buffer, 1000);
-		UserPasswordRequest upw2(&bb2);
-	}
-	catch (Exception)
-	{
-		
-	}
+	ByteBuffer bb2(buffer, 1000);
+	UserPasswordRequest upw2(&bb2);
 	
 	cout << "upw ok" << endl;
 }
@@ -100,7 +75,7 @@ void xmasTest()
 	ops.advetiseTokenWindow(123, 456);
 	ops.replyToExpenditure(SOCKS6_TOK_EXPEND_OUT_OF_WND);
 	
-	ops.advertiseMethod((SOCKS6Method)123);
+	ops.advertiseMethod(SOCKS6_METHOD_GSSAPI);
 	
 	ops.attemptUserPasswdAuth("caca", "maca");
 	
@@ -108,17 +83,11 @@ void xmasTest()
 	uint8_t buffer[1000];
 	ByteBuffer bb(buffer, 1000);
 	orep.pack(&bb);
-	try
-	{
-		ByteBuffer bb2(buffer, 1000);
-		OperationReply orep2(&bb2);
-	}
-	catch (Exception)
-	{
-		
-	}
 	
-	cout << "op ok" << endl;
+	ByteBuffer bb2(buffer, 1000);
+	OperationReply orep2(&bb2);
+	
+	cout << "xmas ok" << endl;
 }
 
 int main()

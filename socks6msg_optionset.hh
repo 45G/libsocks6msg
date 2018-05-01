@@ -63,7 +63,7 @@ public:
 	OptionSet()
 		: tfo(false), mptcp(false) {}
 	
-	OptionSet (ByteBuffer *bb);
+	OptionSet(ByteBuffer *bb);
 	
 	void pack(ByteBuffer *bb);
 	

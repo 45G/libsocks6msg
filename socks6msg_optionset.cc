@@ -61,6 +61,7 @@ both_sched_done:
 }
 
 OptionSet::OptionSet(ByteBuffer *bb)
+	: tfo(false), mptcp(false)
 {
 	list<shared_ptr<Option> > opts;
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();

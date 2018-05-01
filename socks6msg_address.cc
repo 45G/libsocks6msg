@@ -83,7 +83,7 @@ string Address::getDomain() const
 Address::Address(ByteBuffer *bb)
 {
 	uint8_t *rawType = bb->get<uint8_t>();
-	SOCKS6AddressType type = (SOCKS6AddressType)(*rawType);
+	type = (SOCKS6AddressType)(*rawType);
 	
 	switch (type)
 	{

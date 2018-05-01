@@ -395,7 +395,7 @@ Option *UsernamePasswdOption::parse(void *buf)
 	
 	try
 	{
-		ByteBuffer bb((uint8_t *)buf, expectedDataSize);
+		ByteBuffer bb(opt->methodData, expectedDataSize);
 		UserPasswordRequest req(&bb);
 		
 		if (bb.getUsed() != expectedDataSize)
