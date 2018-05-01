@@ -1,2 +1,2 @@
-# socks6-reference
-SOCKS 6 Reference implementation
+# libsocks6msg
+SOCKS 6 message library
