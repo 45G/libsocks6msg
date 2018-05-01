@@ -96,12 +96,12 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	}
 	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
 	
-	if (cppSet->getUsername().length() > 0)
+	if (cppSet->getUsername()->length() > 0)
 	{
-		cSet->userPasswdAuth.username = strdup(cppSet->getUsername().c_str());
+		cSet->userPasswdAuth.username = strdup(cppSet->getUsername()->c_str());
 		if (cSet->userPasswdAuth.username == NULL)
 			throw bad_alloc();
-		cSet->userPasswdAuth.username = strdup(cppSet->getPassword().c_str());
+		cSet->userPasswdAuth.username = strdup(cppSet->getPassword()->c_str());
 		if (cSet->userPasswdAuth.passwd == NULL)
 			throw bad_alloc();
 	}

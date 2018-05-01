@@ -162,28 +162,28 @@ public:
 	
 	void attemptUserPasswdAuth(const std::string &user, const std::string &passwd);
 	
-	std::string getUsername() const
+	const std::string *getUsername() const
 	{
-		return userPasswdAuth.username;
+		return &userPasswdAuth.username;
 	}
 	
-	std::string getPassword() const
+	const std::string *getPassword() const
 	{
-		return userPasswdAuth.passwd;
+		return &userPasswdAuth.passwd;
 	}
 	
 	void setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse = true);
 	
-	std::map<SOCKS6Method, std::vector<uint8_t> > getExtraAuthData() const
+	const std::map<SOCKS6Method, std::vector<uint8_t> > *getExtraAuthData() const
 	{
-		return extraAuthData;
+		return &extraAuthData;
 	}
 	
 	void addOption(SOCKS6OptionKind kind, const std::vector<uint8_t> &data, bool parse = true);
 	
-	std::list<boost::shared_ptr<Option> > getExtraOptions() const
+	const std::list<boost::shared_ptr<Option> > *getExtraOptions() const
 	{
-		return extraOptions;
+		return &extraOptions;
 	}
 };
 
