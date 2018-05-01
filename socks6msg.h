@@ -28,8 +28,8 @@ struct S6M_OptionSet
 	
 	struct
 	{
-		SOCKS6MPTCPScheduler clientProxy;
-		SOCKS6MPTCPScheduler proxyServer;
+		enum SOCKS6MPTCPScheduler clientProxy;
+		enum SOCKS6MPTCPScheduler proxyServer;
 		
 	} mptcpSched;
 	
@@ -43,10 +43,10 @@ struct S6M_OptionSet
 		uint32_t windowBase;
 		uint32_t windowSize;
 		
-		SOCKS6TokenExpenditureCode replyCode;
+		enum SOCKS6TokenExpenditureCode replyCode;
 	} idempotence;
 	
-	SOCKS6Method *knownMethods;
+	enum SOCKS6Method *knownMethods;
 	
 	struct
 	{
