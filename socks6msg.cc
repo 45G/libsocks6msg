@@ -107,6 +107,37 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	}
 }
 
+static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
+{
+	if (cSet->tfo)
+		cppSet->setTFO();
+	if (cSet->mptcp)
+		cppSet->setMPTCP();
+	
+	if (cSet->mptcpSched.clientProxy > 0)
+		cppSet->setClientProxySched(cSet->mptcpSched.clientProxy);
+	if (cSet->mptcpSched.proxyServer > 0)
+		cppSet->setProxyServerSched(cSet->mptcpSched.proxyServer);
+	
+	if (cSet->idempotence.request)
+		cppSet->requestTokenWindow();
+	if (cSet->idempotence.spend)
+		cppSet->spendToken(cSet->idempotence.token);
+	if (cSet->idempotence.windowSize > 0)
+		cppSet->advetiseTokenWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+	if (cSet->idempotence.replyCode > 0)
+		cppSet->replyToExpenditure(cSet->idempotence.replyCode);
+	
+	if (cSet->knownMethods != NULL)
+	{
+		for (SOCKS6Method *method = cSet->knownMethods; *method != SOCKS6_METHOD_NOAUTH; method++)
+			cppSet->advertiseMethod(*method);
+	}
+	
+	if (cSet->userPasswdAuth.username != NULL)
+		cppSet->attemptUserPasswdAuth(string(cSet->userPasswdAuth.username), string(cSet->userPasswdAuth.passwd));
+}
+
 static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
 {
 	delete optionSet->knownMethods;
@@ -254,7 +285,8 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 		ByteBuffer bb(buf, size);
 		
 		Address addr; //TODO
-		OptionSet optSet; //TODO
+		OptionSet optSet;
+		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
 		OperationReply rep(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
 		rep.pack(&bb);
 		
