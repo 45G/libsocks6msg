@@ -505,3 +505,31 @@ void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply)
 {
 	delete pwReply;
 }
+
+/*
+ * S6M_Error_*
+ */
+
+const char *S6M_Error_Msg(S6M_Error err)
+{
+	switch (err)
+	{
+	case S6M_ERR_SUCCESS:
+		return "Success";
+		
+	case S6M_ERR_INVALID:
+		return "Invalid field";
+		
+	case S6M_ERR_ALLOC:
+		return "Memory allocation failure";
+		
+	case S6M_ERR_BUFFER:
+		return "End of buffer";
+		
+	case S6M_ERR_OTHERVER:
+		return "Unsupported protocol version";
+		
+	default:
+		return "Not my problem!";
+	}
+}

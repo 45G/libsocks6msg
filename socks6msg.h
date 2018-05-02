@@ -105,8 +105,10 @@ enum S6M_Error
 	S6M_ERR_INVALID     = -1,   /* some invalid field */
 	S6M_ERR_ALLOC       = -2,   /* malloc fail */
 	S6M_ERR_BUFFER      = -3,   /* reached end of buffer */
-	S6M_ERR_OTHERVER    = -4,   /* socks version other than the one supported */
+	S6M_ERR_OTHERVER    = -4,   /* protocol version other than the one supported */
 };
+
+const char *S6M_Error_Msg(enum S6M_Error err);
 
 ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size, enum S6M_Error *err);
 ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, int size, enum S6M_Error *err);
