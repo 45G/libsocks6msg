@@ -14,19 +14,19 @@ using namespace S6M;
 #define S6M_CATCH(err) \
 	catch (InvalidFieldException) \
 	{ \
-		*(err) = S6M_ERR_INVALID; \
+		(err) = S6M_ERR_INVALID; \
 	} \
 	catch (EndOfBufferException) \
 	{ \
-		*(err) = S6M_ERR_BUFFER; \
+		(err) = S6M_ERR_BUFFER; \
 	} \
 	catch (BadVersionException) \
 	{ \
-		*(err) = S6M_ERR_OTHERVER; \
+		(err) = S6M_ERR_OTHERVER; \
 	} \
 	catch (bad_alloc) \
 	{ \
-		*(err) = S6M_ERR_ALLOC; \
+		(err) = S6M_ERR_ALLOC; \
 	}
 
 /*
@@ -165,8 +165,10 @@ static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
  * S6M_Request_*
  */
 
-ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *err)
+ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req)
 {
+	S6M_Error err;
+	
 	try
 	{
 		Address addr = S6M_Addr_Flush(&req->addr);
@@ -178,11 +180,13 @@ ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req, enum S6M_Error *e
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, enum S6M_Error *err)
+ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -198,11 +202,12 @@ ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, int size, 
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6M_Error *err)
+ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq)
 {
+	S6M_Error err;
 	S6M_Request *req = NULL;
 	
 	try
@@ -226,7 +231,7 @@ ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq, enum S6
 	
 	if (req != NULL)
 		S6M_Request_Free(req);
-	return -1;
+	return err;
 }
 
 void S6M_Request_Free(struct S6M_Request *req)
@@ -240,8 +245,10 @@ void S6M_Request_Free(struct S6M_Request *req)
  * S6M_AuthReply_*
  */
 
-ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6M_Error *err)
+ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply)
 {
+	S6M_Error err;
+	
 	try
 	{
 		OptionSet optSet;
@@ -253,11 +260,13 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply, enum S6
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, int size, enum S6M_Error *err)
+ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, int size)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -272,11 +281,12 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply, enum S6M_Error *err)
+ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply)
 {
+	S6M_Error err;
 	S6M_AuthReply *authReply = NULL;
 	
 	try
@@ -298,7 +308,7 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	
 	if (authReply != NULL)
 		S6M_AuthReply_Free(authReply);
-	return -1;
+	return err;
 }
 
 void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
@@ -312,8 +322,10 @@ void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
  * S6M_OpReply_*
  */
 
-ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Error *err)
+ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply)
 {
+	S6M_Error err;
+	
 	try
 	{
 		Address addr = S6M_Addr_Flush(&opReply->addr);
@@ -326,11 +338,13 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply, enum S6M_Erro
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size, enum S6M_Error *err)
+ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int size)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -346,12 +360,13 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, int si
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
 
-ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enum S6M_Error *err)
+ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 {
+	S6M_Error err;
 	S6M_OpReply *opReply = NULL;
 	
 	try
@@ -375,7 +390,7 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply, enu
 	
 	if (opReply != NULL)
 		S6M_OpReply_Free(opReply);
-	return -1;
+	return err;
 }
 
 
@@ -390,8 +405,10 @@ void S6M_OpReply_Free(struct S6M_OpReply *opReply)
  * S6M_PasswdReq_*
  */
 
-ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Error *err)
+ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq)
 {
+	S6M_Error err;
+	
 	try
 	{
 		UserPasswordRequest req(string(pwReq->username), string(pwReq->passwd));
@@ -400,11 +417,13 @@ ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq, enum S6M_Er
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int size, enum S6M_Error *err)
+ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int size)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -416,11 +435,12 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, int 
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **ppwReq, enum S6M_Error *err)
+ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **ppwReq)
 {
+	S6M_Error err;
 	char *username = NULL;
 	char *passwd = NULL;
 	
@@ -447,7 +467,7 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 	
 	free(username);
 	free(passwd);
-	return -1;
+	return err;
 }
 
 void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
@@ -461,14 +481,17 @@ void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
  * S6M_PasswdReply_*
  */
 
-ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply, enum S6M_Error *err)
+ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply)
 {
-	(void) pwReply; (void)err;
+	(void)pwReply;
+	
 	return UserPasswordReply::packedSize();
 }
 
-ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf, int size, enum S6M_Error *err)
+ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf, int size)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -480,11 +503,13 @@ ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply, uint8_t *buf
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
-ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwReply, enum S6M_Error *err)
+ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwReply)
 {
+	S6M_Error err;
+	
 	try
 	{
 		ByteBuffer bb(buf, size);
@@ -498,7 +523,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 	}
 	S6M_CATCH(err);
 	
-	return -1;
+	return err;
 }
 
 void S6M_PasswdReply_Free(struct S6M_PasswdReply *pwReply)
