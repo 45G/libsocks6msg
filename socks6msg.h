@@ -110,11 +110,11 @@ enum S6M_Error
 
 const char *S6M_Error_Msg(enum S6M_Error err);
 
-ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, int size);
-ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, int size);
-ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   uint8_t *buf, int size);
-ssize_t S6M_PasswdReq_Pack  (const struct S6M_PasswdReq   *pwReq,     uint8_t *buf, int size);
-ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply,   uint8_t *buf, int size);
+ssize_t S6M_Request_Pack    (const struct S6M_Request     *req,       uint8_t *buf, size_t size);
+ssize_t S6M_AuthReply_Pack  (const struct S6M_AuthReply   *authReply, uint8_t *buf, size_t size);
+ssize_t S6M_OpReply_Pack    (const struct S6M_OpReply     *opReply,   uint8_t *buf, size_t size);
+ssize_t S6M_PasswdReq_Pack  (const struct S6M_PasswdReq   *pwReq,     uint8_t *buf, size_t size);
+ssize_t S6M_PasswdReply_Pack(const struct S6M_PasswdReply *pwReply,   uint8_t *buf, size_t size);
 
 ssize_t S6M_Request_Packed_Size    (const struct S6M_Request     *req);
 ssize_t S6M_AuthReply_Packed_Size  (const struct S6M_AuthReply   *authReply);
