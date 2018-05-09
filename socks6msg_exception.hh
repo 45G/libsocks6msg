@@ -1,35 +1,60 @@
 #ifndef SOCKS6MSG_EXCEPTION_HH
 #define SOCKS6MSG_EXCEPTION_HH
 
+#include <stdint.h>
 #include <exception>
 
 namespace S6M
 {
 
-class Exception: std::exception
+class Exception: public std::exception
 {
 public:
-	Exception()
+	const char *what() const throw () = 0;
+};
+
+class BadVersionException: public Exception
+{
+	uint8_t maj;
+	
+public:
+	BadVersionException(uint8_t major)
+		: maj(major) {}
+	
+	const char *what() const throw ();
+	
+	uint8_t getMajor() const
 	{
-		//TODO
+		return maj;
 	}
-
-	//const char *what() const;
 };
 
-class BadVersionException: Exception
+class BadVersionMinorException: public BadVersionException
 {
-	//TODO
+	uint8_t min;
+	
+public:
+	BadVersionMinorException(uint8_t major, uint8_t minor)
+		: BadVersionException(major), min(minor) {}
+	
+	const char *what() const throw ();
+	
+	uint8_t getMinor() const
+	{
+		return min;
+	}
 };
 
-class InvalidFieldException: Exception
+class InvalidFieldException: public Exception
 {
-	//TODO
+public:
+	const char *what() const throw ();
 };
 
-class EndOfBufferException: Exception
+class EndOfBufferException: public Exception
 {
-	//TODO
+public:
+	const char *what() const throw ();
 };
 
 }

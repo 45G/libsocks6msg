@@ -8,11 +8,11 @@ Version::Version(ByteBuffer *bb)
 	/* parse byte-by-byte; other SOCKS versions don't have minors */
 	uint8_t *major = bb->get<uint8_t>();
 	if (*major != SOCKS6_VERSION_MAJOR)
-		throw BadVersionException();
+		throw BadVersionException(*major);
 	
 	uint8_t *minor = bb->get<uint8_t>();
 	if (*minor != SOCKS6_VERSION_MINOR)
-		throw BadVersionException();
+		throw BadVersionMinorException(*major, *minor);
 }
 
 void Version::pack(ByteBuffer *bb)

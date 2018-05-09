@@ -11,7 +11,7 @@ UserPasswordRequest::UserPasswordRequest(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	if (*ver != VERSION)
-		throw BadVersionException();
+		throw BadVersionException(*ver);
 	
 	username = String(bb);
 	password = String(bb);
@@ -30,7 +30,7 @@ UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	if (*ver != VERSION)
-		throw BadVersionException();
+		throw BadVersionException(*ver);
 	
 	uint8_t *status = bb->get<uint8_t>();
 	
