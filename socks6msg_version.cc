@@ -12,7 +12,7 @@ Version::Version(ByteBuffer *bb)
 	
 	uint8_t *minor = bb->get<uint8_t>();
 	if (*minor != SOCKS6_VERSION_MINOR)
-		throw BadVersionMinorException(*major, *minor);
+		throw BadVersionException(*major, *minor);
 }
 
 void Version::pack(ByteBuffer *bb)

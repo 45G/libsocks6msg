@@ -16,10 +16,11 @@ public:
 class BadVersionException: public Exception
 {
 	uint8_t maj;
+	uint8_t min;
 	
 public:
-	BadVersionException(uint8_t major)
-		: maj(major) {}
+	BadVersionException(uint8_t major, uint8_t minor = 0)
+		: maj(major), min(minor) {}
 	
 	const char *what() const throw ();
 	
@@ -27,17 +28,6 @@ public:
 	{
 		return maj;
 	}
-};
-
-class BadVersionMinorException: public BadVersionException
-{
-	uint8_t min;
-	
-public:
-	BadVersionMinorException(uint8_t major, uint8_t minor)
-		: BadVersionException(major), min(minor) {}
-	
-	const char *what() const throw ();
 	
 	uint8_t getMinor() const
 	{
