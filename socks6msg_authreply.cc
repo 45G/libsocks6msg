@@ -6,7 +6,7 @@ namespace S6M
 
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 {
-	Version ver(bb); (void)ver;
+	Version::parse(bb);
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = (SOCKS6AuthReplyCode)rawAuthReply->type;

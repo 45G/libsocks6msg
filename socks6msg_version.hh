@@ -9,10 +9,9 @@ namespace S6M
 
 class Version
 {
-public:
 	Version() {}
-	
-	Version(ByteBuffer *bb);
+public:
+	static void parse(ByteBuffer *bb);
 	
 	static size_t packedSize()
 	{

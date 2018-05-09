@@ -3,7 +3,7 @@
 namespace S6M
 {
 
-Version::Version(ByteBuffer *bb)
+void Version::parse(ByteBuffer *bb)
 {
 	/* parse byte-by-byte; other SOCKS versions don't have minors */
 	uint8_t *major = bb->get<uint8_t>();

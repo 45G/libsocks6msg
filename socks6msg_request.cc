@@ -22,7 +22,7 @@ Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, 
 
 Request::Request(ByteBuffer *bb)
 {
-	Version ver(bb); (void)ver;
+	Version::parse(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	commandCode = (SOCKS6RequestCode)rawRequest->commandCode;
