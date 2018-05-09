@@ -27,6 +27,10 @@ using namespace S6M;
 	catch (bad_alloc) \
 	{ \
 		(err) = S6M_ERR_ALLOC; \
+	} \
+	catch (...) \
+	{ \
+		(err) = S6M_ERR_UNSPEC; \
 	}
 
 /*
@@ -553,6 +557,9 @@ const char *S6M_Error_Msg(S6M_Error err)
 		
 	case S6M_ERR_OTHERVER:
 		return "Unsupported protocol version";
+		
+	case S6M_ERR_UNSPEC:
+		return "Unspecified error";
 		
 	default:
 		return "Not my problem!";
