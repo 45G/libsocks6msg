@@ -90,14 +90,14 @@ Address::Address(ByteBuffer *bb)
 	case SOCKS6_ADDR_IPV4:
 	{
 		in_addr *rawIPv4 = bb->get<in_addr>();
-		*rawIPv4 = ipv4;
+		ipv4 = *rawIPv4;
 		break;
 	}
 		
 	case SOCKS6_ADDR_IPV6:
 	{
 		in6_addr *rawIPv6 = bb->get<in6_addr>();
-		*rawIPv6 = ipv6;
+		ipv6 = *rawIPv6;
 		break;
 	}
 		
