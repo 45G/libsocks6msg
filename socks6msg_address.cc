@@ -12,7 +12,6 @@ size_t Address::packedSize()
 	switch (type)
 	{
 	case SOCKS6_ADDR_IPV4:
-	{
 		size += sizeof(in_addr);
 		break;
 		
@@ -23,7 +22,6 @@ size_t Address::packedSize()
 	case SOCKS6_ADDR_DOMAIN:
 		size += domain.packedSize();
 		break;
-	}
 	}
 	
 	return size;
