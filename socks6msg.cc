@@ -154,7 +154,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 			cppSet->advertiseMethod(*method);
 	}
 	
-	if (cSet->userPasswdAuth.username != NULL)
+	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
 		cppSet->attemptUserPasswdAuth(string(cSet->userPasswdAuth.username), string(cSet->userPasswdAuth.passwd));
 }
 
