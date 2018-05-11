@@ -4,7 +4,15 @@
 namespace S6M
 {
 
+AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method, OptionSet optionSet)
+	: replyCode(replyCode), method(method), optionSet(optionSet)
+{
+	if (optionSet.getMode() != OptionSet::M_AUTH_REP)
+		throw InvalidFieldException();
+}
+
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
+	: optionSet(OptionSet::M_AUTH_REP)
 {
 	Version::parse(bb);
 	
@@ -24,7 +32,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	
 	/* be permissive with the method */
 	
-	optionSet = OptionSet(bb);
+	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP);
 }
 
 void AuthenticationReply::pack(ByteBuffer *bb)

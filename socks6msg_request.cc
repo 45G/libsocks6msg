@@ -18,9 +18,13 @@ Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, 
 	default:
 		throw InvalidFieldException();
 	}
+	
+	if (optionSet.getMode() != OptionSet::M_REQ)
+		throw InvalidFieldException();
 }
 
 Request::Request(ByteBuffer *bb)
+	: optionSet(OptionSet::M_REQ)
 {
 	Version::parse(bb);
 	
@@ -41,7 +45,7 @@ Request::Request(ByteBuffer *bb)
 	}
 	
 	address = Address(bb);
-	optionSet = OptionSet(bb);
+	optionSet = OptionSet(bb, OptionSet::M_REQ);
 	
 	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
 	initialDataLen = ntohs(rawInitialData->initialDataLen);

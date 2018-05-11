@@ -176,7 +176,7 @@ ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&req->addr);
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_REQ);
 		S6M_OptionSet_Flush(&optSet, &req->optionSet);
 		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
 		
@@ -196,7 +196,7 @@ ssize_t S6M_Request_Pack(const struct S6M_Request *req, uint8_t *buf, size_t siz
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&req->addr);
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_REQ);
 		S6M_OptionSet_Flush(&optSet, &req->optionSet);
 		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
 		cppReq.pack(&bb);
@@ -255,7 +255,7 @@ ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply)
 	
 	try
 	{
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_AUTH_REP);
 		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
 		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
 		
@@ -275,7 +275,7 @@ ssize_t S6M_AuthReply_Pack(const struct S6M_AuthReply *authReply, uint8_t *buf, 
 	{
 		ByteBuffer bb(buf, size);
 		
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_AUTH_REP);
 		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
 		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
 		cppAuthReply.pack(&bb);
@@ -333,7 +333,7 @@ ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_OP_REP);
 		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
 		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
 		
@@ -354,7 +354,7 @@ ssize_t S6M_OpReply_Pack(const struct S6M_OpReply *opReply, uint8_t *buf, size_t
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OptionSet optSet;
+		OptionSet optSet(OptionSet::M_OP_REP);
 		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
 		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
 		cppOpReply.pack(&bb);

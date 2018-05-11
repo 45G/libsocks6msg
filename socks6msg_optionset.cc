@@ -59,8 +59,20 @@ both_sched_done:
 	return opts;
 }
 
-OptionSet::OptionSet(ByteBuffer *bb)
-	: tfo(false), mptcp(false)
+void OptionSet::enforceMode(OptionSet::Mode mode1)
+{
+	if (mode != mode1)
+		throw InvalidFieldException();
+}
+
+void OptionSet::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2)
+{
+	if (mode != mode1 && mode != mode2)
+		throw InvalidFieldException();
+}
+
+OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
+	: mode(mode), tfo(false), mptcp(false)
 {
 	list<boost::shared_ptr<Option> > opts;
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
@@ -128,8 +140,24 @@ size_t OptionSet::packedSize()
 	return size;
 }
 
+void OptionSet::setTFO()
+{
+	enforceMode(M_REQ, M_OP_REP);
+	
+	tfo = true;
+}
+
+void OptionSet::setMPTCP()
+{
+	enforceMode(M_OP_REP);
+	
+	mptcp = true;
+}
+
 void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 {
+	enforceMode(M_REQ, M_OP_REP);
+	
 	if (mptcpSched.clientProxy != (SOCKS6MPTCPScheduler)0 && mptcpSched.clientProxy != sched)
 		throw InvalidFieldException();
 	
@@ -138,6 +166,8 @@ void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 
 void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
 {
+	enforceMode(M_REQ, M_OP_REP);
+	
 	if (mptcpSched.proxyServer != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyServer != sched)
 		throw InvalidFieldException();
 	
@@ -146,6 +176,8 @@ void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
 
 void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 {
+	enforceMode(M_REQ, M_OP_REP);
+	
 	bool canSetCP = mptcpSched.clientProxy == (SOCKS6MPTCPScheduler)0 || mptcpSched.clientProxy == sched;
 	bool canSetPS = mptcpSched.proxyServer == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyServer == sched;
 	
@@ -156,8 +188,17 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 	mptcpSched.proxyServer = sched;
 }
 
+void OptionSet::requestTokenWindow()
+{
+	enforceMode(M_REQ);
+	
+	idempotence.request = true;
+}
+
 void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 {
+	enforceMode(M_OP_REP);
+	
 	if (size == 0)
 		throw InvalidFieldException();
 	if (idempotence.windowSize > 0 && (idempotence.base != base || idempotence.windowSize != size))
@@ -169,6 +210,8 @@ void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 
 void OptionSet::spendToken(uint32_t token)
 {
+	enforceMode(M_REQ);
+	
 	if (idempotence.spend && idempotence.token != token)
 		throw InvalidFieldException();
 	
@@ -178,6 +221,8 @@ void OptionSet::spendToken(uint32_t token)
 
 void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 {
+	enforceMode(M_OP_REP);
+	
 	if (code == 0)
 		throw InvalidFieldException();
 	
@@ -189,6 +234,8 @@ void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 
 void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 {
+	enforceMode(M_REQ);
+	
 	if (user.size() == 0 || passwd.size() == 0)
 		throw InvalidFieldException();
 	
@@ -201,6 +248,8 @@ void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 
 void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse)
 {
+	enforceMode(M_REQ, M_OP_REP);
+	
 	if (!parse)
 		goto as_is;
 	

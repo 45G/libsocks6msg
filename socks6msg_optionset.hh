@@ -15,6 +15,17 @@ namespace S6M
 
 class OptionSet
 {
+public:
+	enum Mode
+	{
+		M_REQ,
+		M_AUTH_REP,
+		M_OP_REP,
+	};
+	
+private:
+	Mode mode;
+	
 	bool tfo;
 	
 	bool mptcp;
@@ -59,34 +70,43 @@ class OptionSet
 	
 	std::list<boost::shared_ptr<Option> > generateOptions();
 	
-public:
-	OptionSet()
-		: tfo(false), mptcp(false) {}
+	void enforceMode(Mode mode1);
 	
-	OptionSet(ByteBuffer *bb);
+	void enforceMode(Mode mode1, Mode mode2);
+	
+	void enforceMode(Mode mode1, Mode mode2, Mode mode3)
+	{
+		(void)mode1; (void)mode2; (void)mode3;
+	}
+	
+public:
+	OptionSet(Mode mode)
+		: mode(mode), tfo(false), mptcp(false) {}
+	
+	OptionSet(ByteBuffer *bb, Mode mode);
 	
 	void pack(ByteBuffer *bb);
 	
 	size_t packedSize();
+	
+	Mode getMode() const
+	{
+		return mode;
+	}
 	
 	bool getTFO() const
 	{
 		return tfo;
 	}
 	
-	void setTFO()
-	{
-		tfo = true;
-	}
+	void setTFO();
 	
 	bool getMPTCP() const
 	{
 		return mptcp;
 	}
-	void setMPTCP()
-	{
-		mptcp = true;
-	}
+	
+	void setMPTCP();
 	
 	SOCKS6MPTCPScheduler getClientProxySched() const
 	{
@@ -110,10 +130,7 @@ public:
 		return idempotence.request;
 	}
 	
-	void requestTokenWindow()
-	{
-		idempotence.request = true;
-	}
+	void requestTokenWindow();
 	
 	bool advetisedTokenWindow() const
 	{
@@ -158,6 +175,8 @@ public:
 	
 	void advertiseMethod(SOCKS6Method method)
 	{
+		enforceMode(M_REQ);
+		
 		knownMethods.insert(method);
 	}
 	

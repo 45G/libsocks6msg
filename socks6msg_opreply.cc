@@ -22,9 +22,13 @@ OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, u
 	default:
 		throw InvalidFieldException();
 	}
+	
+	if (optionSet.getMode() != OptionSet::M_OP_REP)
+		throw InvalidFieldException();
 }
 
 OperationReply::OperationReply(ByteBuffer *bb)
+	: optionSet(OptionSet::M_OP_REP)
 {
 	SOCKS6OperationReply *rawOpReply = bb->get<SOCKS6OperationReply>();
 	
@@ -34,7 +38,7 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	address = Address(bb);
 	
-	optionSet = OptionSet(bb);
+	optionSet = OptionSet(bb, OptionSet::M_OP_REP);
 }
 
 void OperationReply::pack(ByteBuffer *bb)
