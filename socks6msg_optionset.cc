@@ -303,4 +303,16 @@ void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bo
 	opt->apply(this);
 }
 
+void OptionSet::addOption(boost::shared_ptr<Option> option)
+{
+	try
+	{
+		option->apply(this);
+	}
+	catch (InvalidFieldException)
+	{
+		extraOptions.push_back(option);
+	}
+}
+
 }

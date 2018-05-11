@@ -201,6 +201,8 @@ public:
 	
 	void addOption(SOCKS6OptionKind kind, const std::vector<uint8_t> &data, bool parse = true);
 	
+	void addOption(boost::shared_ptr<Option> option);
+	
 	const std::list<boost::shared_ptr<Option> > *getExtraOptions() const
 	{
 		return &extraOptions;
