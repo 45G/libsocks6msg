@@ -1,4 +1,3 @@
-#include <memory>
 #include <boost/foreach.hpp>
 #include "socks6msg_optionset.hh"
 
@@ -8,51 +7,51 @@ using namespace boost;
 namespace S6M
 {
 
-list<shared_ptr<Option> > OptionSet::generateOptions()
+list<boost::shared_ptr<Option> > OptionSet::generateOptions()
 {
-	list<shared_ptr<Option> > opts;
+	list<boost::shared_ptr<Option> > opts;
 	
 	if (tfo)
-		opts.push_back(shared_ptr<Option>(new TFOOption()));
+		opts.push_back(boost::shared_ptr<Option>(new TFOOption()));
 	if (mptcp)
-		opts.push_back(shared_ptr<Option>(new MPTCPOption()));
+		opts.push_back(boost::shared_ptr<Option>(new MPTCPOption()));
 	
 	if (mptcpSched.clientProxy > 0)
 	{
 		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
 		{
-			opts.push_back(shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy)));
+			opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy)));
 			goto both_sched_done;
 		}
 		else
 		{
-			opts.push_back(shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy)));
+			opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy)));
 		}
 	}
 	if (mptcpSched.proxyServer > 0)
-		opts.push_back(shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer)));
+		opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer)));
 	
 both_sched_done:
 	if (idempotence.request)
-		opts.push_back(shared_ptr<Option>(new TokenWindowRequestOption()));
+		opts.push_back(boost::shared_ptr<Option>(new TokenWindowRequestOption()));
 	if (idempotence.spend)
-		opts.push_back(shared_ptr<Option>(new TokenExpenditureRequestOption(idempotence.token)));
+		opts.push_back(boost::shared_ptr<Option>(new TokenExpenditureRequestOption(idempotence.token)));
 	if (idempotence.windowSize > 0)
-		opts.push_back(shared_ptr<Option>(new TokenWindowAdvertOption(idempotence.base, idempotence.windowSize)));
+		opts.push_back(boost::shared_ptr<Option>(new TokenWindowAdvertOption(idempotence.base, idempotence.windowSize)));
 	if (idempotence.replyCode > 0)
-		opts.push_back(shared_ptr<Option>(new TokenExpenditureReplyOption(idempotence.replyCode)));
+		opts.push_back(boost::shared_ptr<Option>(new TokenExpenditureReplyOption(idempotence.replyCode)));
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
 	if (userPasswdAuth.username.length() > 0)
 		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
-		opts.push_back(shared_ptr<Option>(new AuthMethodOption(extraMethods)));
+		opts.push_back(boost::shared_ptr<Option>(new AuthMethodOption(extraMethods)));
 	
 	if (!userPasswdAuth.username.empty())
-		opts.push_back(shared_ptr<Option>(new UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd)));
+		opts.push_back(boost::shared_ptr<Option>(new UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd)));
 	
-	BOOST_FOREACH(shared_ptr<Option> opt, extraOptions)
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
 	{
 		opts.push_back(opt);
 	}
@@ -63,7 +62,7 @@ both_sched_done:
 OptionSet::OptionSet(ByteBuffer *bb)
 	: tfo(false), mptcp(false)
 {
-	list<shared_ptr<Option> > opts;
+	list<boost::shared_ptr<Option> > opts;
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
 	for (int i = 0; i < optsHead->optionCount; i++)
@@ -78,12 +77,12 @@ OptionSet::OptionSet(ByteBuffer *bb)
 		
 		try
 		{
-			opts.push_back(shared_ptr<Option>(Option::parse(opt)));
+			opts.push_back(boost::shared_ptr<Option>(Option::parse(opt)));
 		}
 		catch (InvalidFieldException) {}
 	}
 		
-	BOOST_FOREACH(shared_ptr<Option> opt, opts)
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
 	{
 		try
 		{
@@ -98,7 +97,7 @@ OptionSet::OptionSet(ByteBuffer *bb)
 
 void OptionSet::pack(ByteBuffer *bb)
 {
-	list<shared_ptr<Option> > opts = generateOptions();
+	list<boost::shared_ptr<Option> > opts = generateOptions();
 	
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
@@ -107,7 +106,7 @@ void OptionSet::pack(ByteBuffer *bb)
 	
 	optsHead->optionCount = opts.size();
 	
-	BOOST_FOREACH(shared_ptr<Option> opt, opts)
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
 	{
 		opt->pack(bb);
 	}
@@ -115,13 +114,13 @@ void OptionSet::pack(ByteBuffer *bb)
 
 size_t OptionSet::packedSize()
 {
-	list<shared_ptr<Option> > opts = generateOptions();
+	list<boost::shared_ptr<Option> > opts = generateOptions();
 	if (opts.size() > 255)
 		throw InvalidFieldException();
 	
 	size_t size = sizeof(SOCKS6Options);
 	
-	BOOST_FOREACH(shared_ptr<Option> opt, opts)
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
 	{
 		size += opt->packedSize();
 	}
@@ -251,7 +250,7 @@ void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bo
 	uint8_t buf[rawLen];
 	ByteBuffer bb(buf, rawLen);
 	
-	shared_ptr<Option> opt(Option::parse(&bb));
+	boost::shared_ptr<Option> opt(Option::parse(&bb));
 	opt->apply(this);
 }
 
