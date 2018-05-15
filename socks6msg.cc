@@ -169,7 +169,7 @@ static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
  * S6M_Request_*
  */
 
-ssize_t S6M_Request_Packed_Size(const struct S6M_Request *req)
+ssize_t S6M_Request_PackedSize(const struct S6M_Request *req)
 {
 	S6M_Error err;
 	
@@ -249,7 +249,7 @@ void S6M_Request_Free(struct S6M_Request *req)
  * S6M_AuthReply_*
  */
 
-ssize_t S6M_AuthReply_Packed_Size(const struct S6M_AuthReply *authReply)
+ssize_t S6M_AuthReply_PackedSize(const struct S6M_AuthReply *authReply)
 {
 	S6M_Error err;
 	
@@ -326,7 +326,7 @@ void S6M_AuthReply_Free(struct S6M_AuthReply *authReply)
  * S6M_OpReply_*
  */
 
-ssize_t S6M_OpReply_Packed_Size(const struct S6M_OpReply *opReply)
+ssize_t S6M_OpReply_PackedSize(const struct S6M_OpReply *opReply)
 {
 	S6M_Error err;
 	
@@ -409,7 +409,7 @@ void S6M_OpReply_Free(struct S6M_OpReply *opReply)
  * S6M_PasswdReq_*
  */
 
-ssize_t S6M_PasswdReq_Packed_Size(const struct S6M_PasswdReq *pwReq)
+ssize_t S6M_PasswdReq_PackedSize(const struct S6M_PasswdReq *pwReq)
 {
 	S6M_Error err;
 	
@@ -485,7 +485,7 @@ void S6M_PasswdReq_Free(struct S6M_PasswdReq *pwReq)
  * S6M_PasswdReply_*
  */
 
-ssize_t S6M_PasswdReply_Packed_Size(const struct S6M_PasswdReply *pwReply)
+ssize_t S6M_PasswdReply_PackedSize(const struct S6M_PasswdReply *pwReply)
 {
 	(void)pwReply;
 	
