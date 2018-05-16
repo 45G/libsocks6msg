@@ -70,7 +70,7 @@ in6_addr Address::getIPv6() const
 	return ipv6;
 }
 
-string Address::getDomain() const
+const boost::shared_ptr<string> Address::getDomain() const
 {
 	if (type != SOCKS6_ADDR_DOMAIN)
 		throw InvalidFieldException();

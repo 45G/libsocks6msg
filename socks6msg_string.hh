@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include "socks6msg_bytebuffer.hh"
 
 namespace S6M
@@ -10,24 +11,24 @@ namespace S6M
 
 class String
 {
-	std::string str;
+	boost::shared_ptr<std::string> str;
 	
 public:
 	//TODO: get rid of this constructor
 	String() {}
 	
-	String(const std::string &str, bool nonEmpty = true);
+	String(const boost::shared_ptr<std::string> str, bool nonEmpty = true);
 	
 	String(ByteBuffer *bb, bool nonEmpty = true);
 	
 	size_t packedSize() const
 	{
-		return 1 + str.length();
+		return 1 + str->length();
 	}
 	
 	void pack(ByteBuffer *bb) const;
 	
-	std::string getStr() const
+	const boost::shared_ptr<std::string> getStr() const
 	{
 		return str;
 	}

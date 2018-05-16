@@ -60,8 +60,8 @@ private:
 	
 	struct
 	{
-		std::string username;
-		std::string passwd;
+		boost::shared_ptr<std::string> username;
+		boost::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
 	
 	void enforceMode(Mode mode1);
@@ -174,16 +174,16 @@ public:
 		knownMethods.insert(method);
 	}
 	
-	void attemptUserPasswdAuth(const std::string &user, const std::string &passwd);
+	void attemptUserPasswdAuth(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd);
 	
-	const std::string *getUsername() const
+	const boost::shared_ptr<std::string> getUsername() const
 	{
-		return &userPasswdAuth.username;
+		return userPasswdAuth.username;
 	}
 	
-	const std::string *getPassword() const
+	const boost::shared_ptr<std::string> getPassword() const
 	{
-		return &userPasswdAuth.passwd;
+		return userPasswdAuth.passwd;
 	}
 };
 

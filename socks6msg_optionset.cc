@@ -102,7 +102,7 @@ both_sched_done:
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username.length() > 0)
+	if (userPasswdAuth.username->length() > 0)
 		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
 	{
@@ -110,7 +110,7 @@ both_sched_done:
 		optsHead->optionCount++;
 	}
 	
-	if (!userPasswdAuth.username.empty())
+	if (!userPasswdAuth.username->empty())
 	{
 		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
 		optsHead->optionCount++;
@@ -153,12 +153,12 @@ both_sched_done:
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username.length() > 0)
+	if (userPasswdAuth.username->length() > 0)
 		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
 		size += AuthMethodOption(extraMethods).packedSize();
 	
-	if (!userPasswdAuth.username.empty())
+	if (!userPasswdAuth.username->empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
 	
 	return size;
@@ -256,14 +256,14 @@ void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 	idempotence.replyCode = code;
 }
 
-void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
+void OptionSet::attemptUserPasswdAuth(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd)
 {
 	enforceMode(M_REQ);
 	
-	if (user.size() == 0 || passwd.size() == 0)
+	if (user->size() == 0 || passwd->size() == 0)
 		throw InvalidFieldException();
 	
-	if (userPasswdAuth.username.size() != 0 && (user != userPasswdAuth.username || passwd != userPasswdAuth.passwd))
+	if (userPasswdAuth.username->size() != 0 && (*user != *userPasswdAuth.username || *passwd != *userPasswdAuth.passwd))
 		throw InvalidFieldException();
 	
 	userPasswdAuth.username = user;

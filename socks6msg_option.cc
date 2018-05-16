@@ -347,7 +347,7 @@ void UsernamePasswdOption::apply(OptionSet *optSet) const
 	optSet->attemptUserPasswdAuth(req.getUsername(), req.getPassword());
 }
 
-UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
+UsernamePasswdOption::UsernamePasswdOption(boost::shared_ptr<string> username, boost::shared_ptr<string> passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
 void IdempotenceOption::forcedPack(uint8_t *buf) const

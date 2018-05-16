@@ -169,7 +169,7 @@ public:
 	
 	virtual void apply(OptionSet *optSet) const;
 	
-	UsernamePasswdOption(std::string username, std::string passwd);
+	UsernamePasswdOption(boost::shared_ptr<std::string> username, boost::shared_ptr<std::string> passwd);
 };
 
 class IdempotenceOption: public Option

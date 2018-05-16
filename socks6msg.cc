@@ -52,7 +52,7 @@ static void S6M_Addr_Fill(S6M_Addr *cAddr, const Address *cppAddr)
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		cAddr->domain = strdup(cppAddr->getDomain().c_str());
+		cAddr->domain = strdup(cppAddr->getDomain()->c_str());
 		if (cAddr->domain == NULL)
 			throw bad_alloc();
 		break;
@@ -70,7 +70,7 @@ static Address S6M_Addr_Flush(const S6M_Addr *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(string(cAddr->domain));
+		return Address(boost::shared_ptr<std::string>(new string(cAddr->domain)));
 	}
 	
 	throw InvalidFieldException();
@@ -155,7 +155,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
-		cppSet->attemptUserPasswdAuth(string(cSet->userPasswdAuth.username), string(cSet->userPasswdAuth.passwd));
+		cppSet->attemptUserPasswdAuth(boost::shared_ptr<std::string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<std::string>(new string(cSet->userPasswdAuth.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
@@ -415,7 +415,7 @@ ssize_t S6M_PasswdReq_PackedSize(const struct S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(string(pwReq->username), string(pwReq->passwd));
+		UserPasswordRequest req(boost::shared_ptr<std::string>(new string(pwReq->username)), boost::shared_ptr<std::string>(new string(pwReq->passwd)));
 		
 		return req.packedSize();
 	}
@@ -432,7 +432,7 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(string(pwReq->username), string(pwReq->passwd));
+		UserPasswordRequest req(boost::shared_ptr<std::string> (new string(pwReq->username)), boost::shared_ptr<std::string>(new string(pwReq->passwd)));
 		req.pack(&bb);
 		
 		return bb.getUsed();
@@ -453,10 +453,10 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, struct S6M_PasswdReq **pp
 		ByteBuffer bb(buf, size);
 		UserPasswordRequest req(&bb);
 		
-		username = strdup(req.getUsername().c_str());
+		username = strdup(req.getUsername()->c_str());
 		if (username == NULL)
 			throw bad_alloc();
-		passwd = strdup(req.getUsername().c_str());
+		passwd = strdup(req.getUsername()->c_str());
 		if (passwd == NULL)
 			throw bad_alloc();
 		

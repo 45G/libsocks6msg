@@ -3,7 +3,6 @@
 
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
-#include <string>
 #include <vector>
 #include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
@@ -34,7 +33,7 @@ public:
 	Address(in6_addr ipv6)
 		: type(SOCKS6_ADDR_IPV6), ipv6(ipv6) {}
 	
-	Address(std::string domain)
+	Address(const boost::shared_ptr<std::string> domain)
 		: type(SOCKS6_ADDR_DOMAIN), domain(domain) {}
 	
 	Address(ByteBuffer *bb);
@@ -46,7 +45,7 @@ public:
 	
 	in_addr getIPv4() const;
 	in6_addr getIPv6() const;
-	std::string getDomain() const;
+	const boost::shared_ptr<std::string> getDomain() const;
 };
 
 }
