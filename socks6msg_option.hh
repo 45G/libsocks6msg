@@ -17,6 +17,9 @@ class Option
 {
 	SOCKS6OptionKind kind;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	SOCKS6OptionKind getKind() const
 	{
@@ -25,13 +28,11 @@ public:
 	
 	virtual size_t packedSize() const = 0;
 	
-	virtual void pack(uint8_t *buf) const;
-	
 	void pack(ByteBuffer *bb) const
 	{
 		uint8_t *buf = bb->get<uint8_t>(packedSize());
 		
-		pack(buf);
+		forcedPack(buf);
 	}
 	
 	static Option *parse(void *buf);
@@ -48,10 +49,11 @@ class RawOption: public Option
 {
 	std::vector<uint8_t> data;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -65,6 +67,9 @@ class SocketOption: public Option
 	SOCKS6SocketOptionLeg leg;
 	SOCKS6SocketOptionLevel level;
 	SOCKS6SocketOptionCode code;
+	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
 	
 public:
 	SOCKS6SocketOptionLeg getLeg() const
@@ -81,8 +86,6 @@ public:
 	{
 		return code;
 	}
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -120,10 +123,11 @@ class MPScehdOption: public SocketOption
 {
 	SOCKS6MPTCPScheduler sched;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -136,10 +140,11 @@ class AuthMethodOption: public Option
 {
 	std::set<SOCKS6Method> methods;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -152,13 +157,14 @@ class AuthDataOption: public Option
 {
 	SOCKS6Method method;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	SOCKS6Method getMethod() const
 	{
 		return method;
 	}
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -170,10 +176,11 @@ class RawAuthDataOption: public AuthDataOption
 {
 	std::vector<uint8_t> data;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -186,10 +193,11 @@ class UsernamePasswdOption: public AuthDataOption
 {
 	UserPasswordRequest req;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -202,9 +210,10 @@ class IdempotenceOption: public Option
 {
 	SOCKS6IDempotenceType type;
 	
-public:
-	virtual void pack(uint8_t *buf) const;
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
 	
+public:
 	static Option *parse(void *buf);
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
@@ -229,10 +238,12 @@ class TokenWindowAdvertOption: public IdempotenceOption
 	uint32_t winBase;
 	uint32_t winSize;
 	
+	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -245,10 +256,11 @@ class TokenExpenditureRequestOption: public IdempotenceOption
 {
 	uint32_t token;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	
@@ -262,10 +274,11 @@ class TokenExpenditureReplyOption: public IdempotenceOption
 {
 	SOCKS6TokenExpenditureCode code;
 	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
-	
-	virtual void pack(uint8_t *buf) const;
 	
 	static Option *parse(void *buf);
 	

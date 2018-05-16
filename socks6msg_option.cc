@@ -10,7 +10,7 @@ using namespace boost;
 namespace S6M
 {
 
-void Option::pack(uint8_t *buf) const
+void Option::forcedPack(uint8_t *buf) const
 {
 	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
 	
@@ -50,9 +50,9 @@ size_t RawOption::packedSize() const
 	return sizeof(SOCKS6Option) + data.size();
 }
 
-void RawOption::pack(uint8_t *buf) const
+void RawOption::forcedPack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	Option::forcedPack(buf);
 	
 	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
 	
@@ -79,9 +79,9 @@ RawOption::RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen)
 	memcpy(this->data.data(), data, dataLen);
 }
 
-void SocketOption::pack(uint8_t *buf) const
+void SocketOption::forcedPack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	Option::forcedPack(buf);
 	
 	SOCKS6SocketOption *opt = reinterpret_cast<SOCKS6SocketOption *>(buf);
 	
@@ -191,9 +191,9 @@ size_t MPScehdOption::packedSize() const
 	return sizeof(SOCKS6MPTCPSchedulerOption);
 }
 
-void MPScehdOption::pack(uint8_t *buf) const
+void MPScehdOption::forcedPack(uint8_t *buf) const
 {
-	SocketOption::pack(buf);
+	SocketOption::forcedPack(buf);
 	
 	SOCKS6MPTCPSchedulerOption *opt = reinterpret_cast<SOCKS6MPTCPSchedulerOption *>(buf);
 	
@@ -255,9 +255,9 @@ size_t AuthMethodOption::packedSize() const
 	return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
 }
 
-void AuthMethodOption::pack(uint8_t *buf) const
+void AuthMethodOption::forcedPack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	Option::forcedPack(buf);
 	
 	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
 	
@@ -306,9 +306,9 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 		throw InvalidFieldException();
 }
 
-void AuthDataOption::pack(uint8_t *buf) const
+void AuthDataOption::forcedPack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	Option::forcedPack(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
 	
@@ -342,9 +342,9 @@ size_t RawAuthDataOption::packedSize() const
 	return sizeof(SOCKS6Option) + data.size() * sizeof(uint8_t);
 }
 
-void RawAuthDataOption::pack(uint8_t *buf) const
+void RawAuthDataOption::forcedPack(uint8_t *buf) const
 {
-	AuthDataOption::pack(buf);
+	AuthDataOption::forcedPack(buf);
 	
 	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
 	
@@ -376,9 +376,9 @@ size_t UsernamePasswdOption::packedSize() const
 	return sizeof(SOCKS6AuthDataOption) + req.packedSize();
 }
 
-void UsernamePasswdOption::pack(uint8_t *buf) const
+void UsernamePasswdOption::forcedPack(uint8_t *buf) const
 {
-	AuthDataOption::pack(buf);
+	AuthDataOption::forcedPack(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
 	
@@ -421,9 +421,9 @@ void UsernamePasswdOption::apply(OptionSet *optSet) const
 UsernamePasswdOption::UsernamePasswdOption(string username, string passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
-void IdempotenceOption::pack(uint8_t *buf) const
+void IdempotenceOption::forcedPack(uint8_t *buf) const
 {
-	Option::pack(buf);
+	Option::forcedPack(buf);
 	
 	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
@@ -480,9 +480,9 @@ size_t TokenWindowAdvertOption::packedSize() const
 	return sizeof(SOCKS6WindowAdvertOption);
 }
 
-void TokenWindowAdvertOption::pack(uint8_t *buf) const
+void TokenWindowAdvertOption::forcedPack(uint8_t *buf) const
 {
-	IdempotenceOption::pack(buf);
+	IdempotenceOption::forcedPack(buf);
 	
 	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
 	
@@ -521,9 +521,9 @@ size_t TokenExpenditureRequestOption::packedSize() const
 	return sizeof(SOCKS6TokenExpenditureOption);
 }
 
-void TokenExpenditureRequestOption::pack(uint8_t *buf) const
+void TokenExpenditureRequestOption::forcedPack(uint8_t *buf) const
 {
-	IdempotenceOption::pack(buf);
+	IdempotenceOption::forcedPack(buf);
 	
 	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
 	
@@ -550,9 +550,9 @@ size_t TokenExpenditureReplyOption::packedSize() const
 	return sizeof(SOCKS6TokenExpenditureReplyOption);
 }
 
-void TokenExpenditureReplyOption::pack(uint8_t *buf) const
+void TokenExpenditureReplyOption::forcedPack(uint8_t *buf) const
 {
-	IdempotenceOption::pack(buf);
+	IdempotenceOption::forcedPack(buf);
 	
 	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
 	
