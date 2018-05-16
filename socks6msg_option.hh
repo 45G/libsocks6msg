@@ -175,7 +175,7 @@ public:
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
 };
 
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 class RawAuthDataOption: public AuthDataOption
 {
 	std::vector<uint8_t> data;

@@ -335,14 +335,14 @@ Option *AuthDataOption::parse(void *buf)
 		catch (InvalidFieldException) {}
 	}
 
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA	
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA	
 	return RawAuthDataOption::parse(buf);
 #else
 	throw InvalidFieldException();
 #endif
 }
 
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 size_t RawAuthDataOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + data.size() * sizeof(uint8_t);

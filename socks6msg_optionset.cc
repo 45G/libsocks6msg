@@ -129,7 +129,7 @@ both_sched_done:
 		optsHead->optionCount++;
 	}
 	
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 	if (extraAuthData.size() + optsHead->optionCount > 255)
 		throw InvalidFieldException();
 	optsHead->optionCount += extraAuthData.size();
@@ -139,7 +139,7 @@ both_sched_done:
 		throw InvalidFieldException();
 	optsHead->optionCount += extraOptions.size();
 	
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 	pair<SOCKS6Method, vector<uint8_t> > data;
 	BOOST_FOREACH(data, extraAuthData)
 	{
@@ -197,7 +197,7 @@ both_sched_done:
 	if (!userPasswdAuth.username.empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
 	
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 	pair<SOCKS6Method, vector<uint8_t> > data;
 	BOOST_FOREACH(data, extraAuthData)
 	{
@@ -319,7 +319,7 @@ void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 	userPasswdAuth.passwd = passwd;
 }
 
-#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
+#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse)
 {
 	enforceMode(M_REQ, M_OP_REP);
