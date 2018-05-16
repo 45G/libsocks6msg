@@ -40,12 +40,17 @@ Option *Option::parse(void *buf)
 	}
 	catch (InvalidFieldException)
 	{
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 		return RawOption::parse(buf);
+#endif
 	}
+	
+	throw InvalidFieldException();
 }
 
 Option::~Option() {}
 
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 size_t RawOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + data.size();
@@ -79,6 +84,7 @@ RawOption::RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen)
 	this->data.resize(dataLen);
 	memcpy(this->data.data(), data, dataLen);
 }
+#endif
 
 void SocketOption::forcedPack(uint8_t *buf) const
 {
@@ -337,9 +343,8 @@ Option *AuthDataOption::parse(void *buf)
 
 #if SOCKS6MSG_CONFIG_RAW_AUTH_DATA	
 	return RawAuthDataOption::parse(buf);
-#else
-	throw InvalidFieldException();
 #endif
+	throw InvalidFieldException();
 }
 
 #if SOCKS6MSG_CONFIG_RAW_AUTH_DATA

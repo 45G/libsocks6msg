@@ -68,7 +68,9 @@ private:
 	std::map<SOCKS6Method, std::vector<uint8_t> > extraAuthData;
 #endif
 	
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 	std::list<boost::shared_ptr<Option> > extraOptions;
+#endif
 	
 	void enforceMode(Mode mode1);
 	
@@ -201,6 +203,7 @@ public:
 	}
 #endif
 	
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 	void addOption(SOCKS6OptionKind kind, const std::vector<uint8_t> &data, bool parse = true);
 	
 	void addOption(boost::shared_ptr<Option> option);
@@ -209,6 +212,7 @@ public:
 	{
 		return &extraOptions;
 	}
+#endif
 };
 
 }

@@ -50,7 +50,9 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		}
 		catch (InvalidFieldException)
 		{
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 			extraOptions.push_back(opt);
+#endif
 		}
 	}
 }
@@ -133,24 +135,24 @@ both_sched_done:
 	if (extraAuthData.size() + optsHead->optionCount > 255)
 		throw InvalidFieldException();
 	optsHead->optionCount += extraAuthData.size();
-#endif
 	
-	if (extraOptions.size() + optsHead->optionCount > 255)
-		throw InvalidFieldException();
-	optsHead->optionCount += extraOptions.size();
-	
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
 	pair<SOCKS6Method, vector<uint8_t> > data;
 	BOOST_FOREACH(data, extraAuthData)
 	{
 		RawAuthDataOption(data.first, data.second.data(), data.second.size()).pack(bb);
 	}
 #endif
+
+#if SOCKS6MSG_CONFIG_RAW_OPTION	
+	if (extraOptions.size() + optsHead->optionCount > 255)
+		throw InvalidFieldException();
+	optsHead->optionCount += extraOptions.size();
 	
 	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
 	{
 		opt->pack(bb);
 	}
+#endif
 }
 
 size_t OptionSet::packedSize()
@@ -204,11 +206,13 @@ both_sched_done:
 		size += RawAuthDataOption(data.first, data.second.data(), data.second.size()).packedSize();
 	}
 #endif
-	
+
+#if SOCKS6MSG_CONFIG_RAW_OPTION	
 	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
 	{
 		size += opt->packedSize();
 	}
+#endif
 	
 	return size;
 }
@@ -360,6 +364,7 @@ as_is:
 }
 #endif
 
+#if SOCKS6MSG_CONFIG_RAW_OPTION
 void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse)
 {
 	RawOption rawOption(kind, data.data(), data.size());
@@ -389,5 +394,6 @@ void OptionSet::addOption(boost::shared_ptr<Option> option)
 		extraOptions.push_back(option);
 	}
 }
+#endif
 
 }

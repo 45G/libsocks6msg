@@ -63,7 +63,7 @@ public:
 	
 	RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen);
 };
-#endif /* SOCKS6MSG_CONFIG_RAW_METHOD_DATA */
+#endif /* SOCKS6MSG_CONFIG_RAW_OPTION */
 
 class SocketOption: public Option
 {
