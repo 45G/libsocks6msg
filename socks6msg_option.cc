@@ -178,10 +178,6 @@ void MPScehdOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
 		throw InvalidFieldException();
 	
-	/* be permissive with scheduler values */
-	if (opt->scheduler == 0)
-		throw InvalidFieldException();
-	
 	MPScehdOption((SOCKS6SocketOptionLeg)opt->socketOptionHead.leg, (SOCKS6MPTCPScheduler)opt->scheduler).apply(optionSet);
 }
 
@@ -250,12 +246,7 @@ void AuthMethodOption::parse(void *buf, OptionSet *optionSet)
 	int methodCount = opt->optionHead.len - sizeof(SOCKS6AuthMethodOption);
 	
 	for (int i = 0; i < methodCount; i++)
-	{
-		if (opt->methods[i] == SOCKS6_METHOD_UNACCEPTABLE)
-			throw InvalidFieldException();
-		
 		methods.insert((SOCKS6Method)opt->methods[i]);
-	}
 	
 	AuthMethodOption(methods).apply(optionSet);
 }
@@ -440,11 +431,7 @@ void TokenWindowAdvertOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
 		throw InvalidFieldException();
 	
-	uint32_t winSize = ntohl(opt->windowSize);
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw InvalidFieldException();
-	
-	TokenWindowAdvertOption(ntohl(opt->windowBase), winSize).apply(optionSet);
+	TokenWindowAdvertOption(ntohl(opt->windowBase), ntohl(opt->windowSize)).apply(optionSet);
 }
 
 void TokenWindowAdvertOption::apply(OptionSet *optSet) const
@@ -508,18 +495,6 @@ void TokenExpenditureReplyOption::parse(void *buf, OptionSet *optionSet)
 	
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
 		throw InvalidFieldException();
-	
-	switch ((SOCKS6TokenExpenditureCode)opt->code)
-	{
-	case SOCKS6_TOK_EXPEND_SUCCESS:
-	case SOCKS6_TOK_EXPEND_NO_WND:
-	case SOCKS6_TOK_EXPEND_OUT_OF_WND:
-	case SOCKS6_TOK_EXPEND_DUPLICATE:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
 	
 	TokenExpenditureReplyOption((SOCKS6TokenExpenditureCode)opt->code).apply(optionSet);
 }
