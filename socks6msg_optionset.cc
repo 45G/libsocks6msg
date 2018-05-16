@@ -256,7 +256,7 @@ void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 	idempotence.replyCode = code;
 }
 
-void OptionSet::attemptUserPasswdAuth(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd)
+void OptionSet::attemptUserPasswdAuth(const boost::shared_ptr<string> user, const boost::shared_ptr<string> passwd)
 {
 	enforceMode(M_REQ);
 	

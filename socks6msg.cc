@@ -70,7 +70,7 @@ static Address S6M_Addr_Flush(const S6M_Addr *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(boost::shared_ptr<std::string>(new string(cAddr->domain)));
+		return Address(boost::shared_ptr<string>(new string(cAddr->domain)));
 	}
 	
 	throw InvalidFieldException();
@@ -155,7 +155,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
-		cppSet->attemptUserPasswdAuth(boost::shared_ptr<std::string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<std::string>(new string(cSet->userPasswdAuth.passwd)));
+		cppSet->attemptUserPasswdAuth(boost::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(struct S6M_OptionSet *optionSet)
@@ -415,7 +415,7 @@ ssize_t S6M_PasswdReq_PackedSize(const struct S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(boost::shared_ptr<std::string>(new string(pwReq->username)), boost::shared_ptr<std::string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(boost::shared_ptr<string>(new string(pwReq->username)), boost::shared_ptr<string>(new string(pwReq->passwd)));
 		
 		return req.packedSize();
 	}
@@ -432,7 +432,7 @@ ssize_t S6M_PasswdReq_Pack(const struct S6M_PasswdReq *pwReq, uint8_t *buf, size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(boost::shared_ptr<std::string> (new string(pwReq->username)), boost::shared_ptr<std::string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(boost::shared_ptr<string> (new string(pwReq->username)), boost::shared_ptr<string>(new string(pwReq->passwd)));
 		req.pack(&bb);
 		
 		return bb.getUsed();
