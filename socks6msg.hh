@@ -6,5 +6,6 @@
 #include "socks6msg_authreply.hh"
 #include "socks6msg_opreply.hh"
 #include "socks6msg_usrpasswd.hh"
+#include "socks6msg_config.hh"
 
 #endif // SOCKS6MSG_HH
