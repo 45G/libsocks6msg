@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <list>
 #include <boost/foreach.hpp>
+#include "socks6msg_config.hh"
 #include "socks6msg_option.hh"
 #include "socks6msg_optionset.hh"
 
@@ -333,10 +334,15 @@ Option *AuthDataOption::parse(void *buf)
 		}
 		catch (InvalidFieldException) {}
 	}
-	
+
+#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA	
 	return RawAuthDataOption::parse(buf);
+#else
+	throw InvalidFieldException();
+#endif
 }
 
+#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
 size_t RawAuthDataOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + data.size() * sizeof(uint8_t);
@@ -370,6 +376,7 @@ RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t 
 	this->data.resize(dataLen);
 	memcpy(this->data.data(), data, dataLen);
 }
+#endif
 
 size_t UsernamePasswdOption::packedSize() const
 {

@@ -64,7 +64,9 @@ private:
 		std::string passwd;
 	} userPasswdAuth;
 	
+#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
 	std::map<SOCKS6Method, std::vector<uint8_t> > extraAuthData;
+#endif
 	
 	std::list<boost::shared_ptr<Option> > extraOptions;
 	
@@ -190,12 +192,14 @@ public:
 		return &userPasswdAuth.passwd;
 	}
 	
+#if SOCKS6MSG_CONFIG_RAW_METHOD_DATA
 	void setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse = true);
-	
+
 	const std::map<SOCKS6Method, std::vector<uint8_t> > *getExtraAuthData() const
 	{
 		return &extraAuthData;
 	}
+#endif
 	
 	void addOption(SOCKS6OptionKind kind, const std::vector<uint8_t> &data, bool parse = true);
 	
