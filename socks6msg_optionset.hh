@@ -68,8 +68,6 @@ private:
 	
 	std::list<boost::shared_ptr<Option> > extraOptions;
 	
-	std::list<boost::shared_ptr<Option> > generateOptions();
-	
 	void enforceMode(Mode mode1);
 	
 	void enforceMode(Mode mode1, Mode mode2);

@@ -7,58 +7,6 @@ using namespace boost;
 namespace S6M
 {
 
-list<boost::shared_ptr<Option> > OptionSet::generateOptions()
-{
-	list<boost::shared_ptr<Option> > opts;
-	
-	if (tfo)
-		opts.push_back(boost::shared_ptr<Option>(new TFOOption()));
-	if (mptcp)
-		opts.push_back(boost::shared_ptr<Option>(new MPTCPOption()));
-	
-	if (mptcpSched.clientProxy > 0)
-	{
-		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
-		{
-			opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy)));
-			goto both_sched_done;
-		}
-		else
-		{
-			opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy)));
-		}
-	}
-	if (mptcpSched.proxyServer > 0)
-		opts.push_back(boost::shared_ptr<Option>(new MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer)));
-	
-both_sched_done:
-	if (idempotence.request)
-		opts.push_back(boost::shared_ptr<Option>(new TokenWindowRequestOption()));
-	if (idempotence.spend)
-		opts.push_back(boost::shared_ptr<Option>(new TokenExpenditureRequestOption(idempotence.token)));
-	if (idempotence.windowSize > 0)
-		opts.push_back(boost::shared_ptr<Option>(new TokenWindowAdvertOption(idempotence.base, idempotence.windowSize)));
-	if (idempotence.replyCode > 0)
-		opts.push_back(boost::shared_ptr<Option>(new TokenExpenditureReplyOption(idempotence.replyCode)));
-	
-	set<SOCKS6Method> extraMethods(knownMethods);
-	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username.length() > 0)
-		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
-	if (!extraMethods.empty())
-		opts.push_back(boost::shared_ptr<Option>(new AuthMethodOption(extraMethods)));
-	
-	if (!userPasswdAuth.username.empty())
-		opts.push_back(boost::shared_ptr<Option>(new UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd)));
-	
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
-	{
-		opts.push_back(opt);
-	}
-	
-	return opts;
-}
-
 void OptionSet::enforceMode(OptionSet::Mode mode1)
 {
 	if (mode != mode1)
@@ -109,16 +57,89 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 
 void OptionSet::pack(ByteBuffer *bb)
 {
-	list<boost::shared_ptr<Option> > opts = generateOptions();
-	
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
+	optsHead->optionCount = 0;
 	
-	if (opts.size() > 255)
+	if (tfo)
+	{
+		TFOOption().pack(bb);
+		optsHead->optionCount++;
+	}
+	if (mptcp)
+	{
+		MPTCPOption().pack(bb);
+		optsHead->optionCount++;
+	}
+	
+	if (mptcpSched.clientProxy > 0)
+	{
+		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
+		{
+			MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).pack(bb);
+			optsHead->optionCount++;
+			goto both_sched_done;
+		}
+		else
+		{
+			MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).pack(bb);
+			optsHead->optionCount++;
+		}
+	}
+	if (mptcpSched.proxyServer > 0)
+	{
+		MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).pack(bb);
+		optsHead->optionCount++;
+	}
+	
+both_sched_done:
+	if (idempotence.request)
+	{
+		TokenWindowRequestOption().pack(bb);
+		optsHead->optionCount++;
+	}
+	if (idempotence.spend)
+	{
+		TokenExpenditureRequestOption(idempotence.token).pack(bb);
+		optsHead->optionCount++;
+	}
+	if (idempotence.windowSize > 0)
+	{
+		TokenWindowAdvertOption(idempotence.base, idempotence.windowSize).pack(bb);
+		optsHead->optionCount++;
+	}
+	if (idempotence.replyCode > 0)
+	{
+		TokenExpenditureReplyOption(idempotence.replyCode).pack(bb);
+		optsHead->optionCount++;
+	}
+	
+	set<SOCKS6Method> extraMethods(knownMethods);
+	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
+	if (userPasswdAuth.username.length() > 0)
+		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
+	if (!extraMethods.empty())
+	{
+		AuthMethodOption(extraMethods).pack(bb);
+		optsHead->optionCount++;
+	}
+	
+	if (!userPasswdAuth.username.empty())
+	{
+		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
+		optsHead->optionCount++;
+	}
+	
+	if (extraOptions.size() + extraAuthData.size() + optsHead->optionCount > 255)
 		throw InvalidFieldException();
+	optsHead->optionCount += extraOptions.size() + extraAuthData.size();
 	
-	optsHead->optionCount = opts.size();
+	pair<SOCKS6Method, vector<uint8_t> > data;
+	BOOST_FOREACH(data, extraAuthData)
+	{
+		RawAuthDataOption(data.first, data.second.data(), data.second.size()).pack(bb);
+	}
 	
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
 	{
 		opt->pack(bb);
 	}
@@ -126,13 +147,55 @@ void OptionSet::pack(ByteBuffer *bb)
 
 size_t OptionSet::packedSize()
 {
-	list<boost::shared_ptr<Option> > opts = generateOptions();
-	if (opts.size() > 255)
-		throw InvalidFieldException();
-	
 	size_t size = sizeof(SOCKS6Options);
 	
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
+	if (tfo)
+		size += TFOOption().packedSize();
+	if (mptcp)
+		size += MPTCPOption().packedSize();
+	
+	if (mptcpSched.clientProxy > 0)
+	{
+		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
+		{
+			size += MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).packedSize();
+			goto both_sched_done;
+		}
+		else
+		{
+			size += MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).packedSize();
+		}
+	}
+	if (mptcpSched.proxyServer > 0)
+		size += MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).packedSize();
+	
+both_sched_done:
+	if (idempotence.request)
+		size += TokenWindowRequestOption().packedSize();
+	if (idempotence.spend)
+		size += TokenExpenditureRequestOption(idempotence.token).packedSize();
+	if (idempotence.windowSize > 0)
+		size += TokenWindowAdvertOption(idempotence.base, idempotence.windowSize).packedSize();
+	if (idempotence.replyCode > 0)
+		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
+	
+	set<SOCKS6Method> extraMethods(knownMethods);
+	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
+	if (userPasswdAuth.username.length() > 0)
+		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
+	if (!extraMethods.empty())
+		size += AuthMethodOption(extraMethods).packedSize();
+	
+	if (!userPasswdAuth.username.empty())
+		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
+	
+	pair<SOCKS6Method, vector<uint8_t> > data;
+	BOOST_FOREACH(data, extraAuthData)
+	{
+		size += RawAuthDataOption(data.first, data.second.data(), data.second.size()).packedSize();
+	}
+	
+	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
 	{
 		size += opt->packedSize();
 	}
