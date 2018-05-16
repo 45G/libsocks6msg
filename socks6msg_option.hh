@@ -4,7 +4,6 @@
 #include <set>
 #include <vector>
 #include <string>
-#include "socks6msg_config.hh"
 #include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
 #include "socks6msg_usrpasswd.hh"
@@ -45,25 +44,6 @@ public:
 	
 	virtual ~Option();
 };
-
-#if SOCKS6MSG_CONFIG_RAW_OPTION
-class RawOption: public Option
-{
-	std::vector<uint8_t> data;
-	
-protected:
-	virtual void forcedPack(uint8_t *buf) const;
-	
-public:
-	virtual size_t packedSize() const;
-	
-	static Option *parse(void *buf);
-	
-	virtual void apply(OptionSet *optSet) const;
-	
-	RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen);
-};
-#endif /* SOCKS6MSG_CONFIG_RAW_OPTION */
 
 class SocketOption: public Option
 {
@@ -174,25 +154,6 @@ public:
 	AuthDataOption(SOCKS6Method method)
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
 };
-
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
-class RawAuthDataOption: public AuthDataOption
-{
-	std::vector<uint8_t> data;
-	
-protected:
-	virtual void forcedPack(uint8_t *buf) const;
-	
-public:
-	virtual size_t packedSize() const;
-	
-	static Option *parse(void *buf);
-	
-	virtual void apply(OptionSet *optSet) const;
-	
-	RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen);
-};
-#endif /* SOCKS6MSG_CONFIG_RAW_METHOD_DATA */
 
 class UsernamePasswdOption: public AuthDataOption
 {

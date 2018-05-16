@@ -48,12 +48,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		{
 			opt->apply(this);
 		}
-		catch (InvalidFieldException)
-		{
-#if SOCKS6MSG_CONFIG_RAW_OPTION
-			extraOptions.push_back(opt);
-#endif
-		}
+		catch (InvalidFieldException) {}
 	}
 }
 
@@ -130,29 +125,6 @@ both_sched_done:
 		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
 		optsHead->optionCount++;
 	}
-	
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
-	if (extraAuthData.size() + optsHead->optionCount > 255)
-		throw InvalidFieldException();
-	optsHead->optionCount += extraAuthData.size();
-	
-	pair<SOCKS6Method, vector<uint8_t> > data;
-	BOOST_FOREACH(data, extraAuthData)
-	{
-		RawAuthDataOption(data.first, data.second.data(), data.second.size()).pack(bb);
-	}
-#endif
-
-#if SOCKS6MSG_CONFIG_RAW_OPTION	
-	if (extraOptions.size() + optsHead->optionCount > 255)
-		throw InvalidFieldException();
-	optsHead->optionCount += extraOptions.size();
-	
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
-	{
-		opt->pack(bb);
-	}
-#endif
 }
 
 size_t OptionSet::packedSize()
@@ -198,21 +170,6 @@ both_sched_done:
 	
 	if (!userPasswdAuth.username.empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
-	
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
-	pair<SOCKS6Method, vector<uint8_t> > data;
-	BOOST_FOREACH(data, extraAuthData)
-	{
-		size += RawAuthDataOption(data.first, data.second.data(), data.second.size()).packedSize();
-	}
-#endif
-
-#if SOCKS6MSG_CONFIG_RAW_OPTION	
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, extraOptions)
-	{
-		size += opt->packedSize();
-	}
-#endif
 	
 	return size;
 }
@@ -322,78 +279,5 @@ void OptionSet::attemptUserPasswdAuth(const string &user, const string &passwd)
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
 }
-
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
-void OptionSet::setAuthData(SOCKS6Method method, std::vector<uint8_t> data, bool parse)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	
-	if (!parse)
-		goto as_is;
-	
-	try
-	{
-		if (method == SOCKS6_METHOD_USRPASSWD)
-		{
-			ByteBuffer bb(data.data(), data.size());
-			UserPasswordRequest req(&bb);
-			
-			if (bb.getUsed() != data.size())
-				throw InvalidFieldException();
-			
-			attemptUserPasswdAuth(req.getUsername(), req.getPassword());
-			
-			return;
-		}
-	}
-	catch (InvalidFieldException) {}
-	catch (BadVersionException) {}
-	catch (EndOfBufferException) {}
-	
-as_is:
-	std::map<SOCKS6Method, vector<uint8_t> >::iterator it = extraAuthData.find(method);
-	if (it != extraAuthData.end())
-	{
-		if (it->second.size() != data.size())
-			throw InvalidFieldException();
-		if (memcmp(it->second.data(), data.data(), data.size()) != 0)
-			throw InvalidFieldException();
-	}
-	
-	extraAuthData[method] = data;
-}
-#endif
-
-#if SOCKS6MSG_CONFIG_RAW_OPTION
-void OptionSet::addOption(SOCKS6OptionKind kind, const vector<uint8_t> &data, bool parse)
-{
-	RawOption rawOption(kind, data.data(), data.size());
-	
-	if (!parse)
-	{
-		rawOption.apply(this);
-		return;
-	}
-	
-	size_t rawLen = rawOption.packedSize();
-	uint8_t buf[rawLen];
-	ByteBuffer bb(buf, rawLen);
-	
-	boost::shared_ptr<Option> opt(Option::parse(&bb));
-	opt->apply(this);
-}
-
-void OptionSet::addOption(boost::shared_ptr<Option> option)
-{
-	try
-	{
-		option->apply(this);
-	}
-	catch (InvalidFieldException)
-	{
-		extraOptions.push_back(option);
-	}
-}
-#endif
 
 }

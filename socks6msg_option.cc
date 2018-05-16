@@ -1,7 +1,6 @@
 #include <arpa/inet.h>
 #include <list>
 #include <boost/foreach.hpp>
-#include "socks6msg_config.hh"
 #include "socks6msg_option.hh"
 #include "socks6msg_optionset.hh"
 
@@ -23,68 +22,21 @@ Option *Option::parse(void *buf)
 {
 	SOCKS6Option *opt = (SOCKS6Option *)buf;
 	
-	try
-	{
-		switch (opt->kind) {
-		case SOCKS6_OPTION_SOCKET:
-			return SocketOption::parse(buf);
-		case SOCKS6_OPTION_AUTH_METHOD:
-			return AuthMethodOption::parse(buf);
-		case SOCKS6_OPTION_AUTH_DATA:
-			return AuthDataOption::parse(buf);
-		case SOCKS6_OPTION_IDEMPOTENCE:
-			return IdempotenceOption::parse(buf);
-		}
-		
-		throw InvalidFieldException();
-	}
-	catch (InvalidFieldException)
-	{
-#if SOCKS6MSG_CONFIG_RAW_OPTION
-		return RawOption::parse(buf);
-#endif
+	switch (opt->kind) {
+	case SOCKS6_OPTION_SOCKET:
+		return SocketOption::parse(buf);
+	case SOCKS6_OPTION_AUTH_METHOD:
+		return AuthMethodOption::parse(buf);
+	case SOCKS6_OPTION_AUTH_DATA:
+		return AuthDataOption::parse(buf);
+	case SOCKS6_OPTION_IDEMPOTENCE:
+		return IdempotenceOption::parse(buf);
 	}
 	
 	throw InvalidFieldException();
 }
 
 Option::~Option() {}
-
-#if SOCKS6MSG_CONFIG_RAW_OPTION
-size_t RawOption::packedSize() const
-{
-	return sizeof(SOCKS6Option) + data.size();
-}
-
-void RawOption::forcedPack(uint8_t *buf) const
-{
-	Option::forcedPack(buf);
-	
-	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
-	
-	memcpy(opt->data, data.data(), data.size());	
-}
-
-Option *RawOption::parse(void *buf)
-{
-	SOCKS6Option *opt = (SOCKS6Option *)buf;
-	size_t dataSize = opt->len - sizeof(SOCKS6Option);
-	
-	return new RawOption((SOCKS6OptionKind)opt->kind, opt->data, dataSize);
-}
-
-void RawOption::apply(OptionSet *optSet) const
-{
-	optSet->addOption(getKind(), data, false);
-}
-
-RawOption::RawOption(SOCKS6OptionKind kind, const uint8_t *data, size_t dataLen)
-	: Option(kind)
-{
-	this->data.resize(dataLen);
-	memcpy(this->data.data(), data, dataLen);
-}
-#endif
 
 void SocketOption::forcedPack(uint8_t *buf) const
 {
@@ -333,55 +285,10 @@ Option *AuthDataOption::parse(void *buf)
 		throw InvalidFieldException();
 	
 	if (opt->method == SOCKS6_METHOD_USRPASSWD)
-	{
-		try
-		{
-			return UsernamePasswdOption::parse(buf);
-		}
-		catch (InvalidFieldException) {}
-	}
+		return UsernamePasswdOption::parse(buf);
 
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA	
-	return RawAuthDataOption::parse(buf);
-#endif
 	throw InvalidFieldException();
 }
-
-#if SOCKS6MSG_CONFIG_RAW_AUTH_DATA
-size_t RawAuthDataOption::packedSize() const
-{
-	return sizeof(SOCKS6Option) + data.size() * sizeof(uint8_t);
-}
-
-void RawAuthDataOption::forcedPack(uint8_t *buf) const
-{
-	AuthDataOption::forcedPack(buf);
-	
-	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
-	
-	memcpy(opt->methods, data.data(), data.size());
-}
-
-Option *RawAuthDataOption::parse(void *buf)
-{
-	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
-	size_t dataSize = opt->optionHead.len - sizeof(SOCKS6AuthDataOption);
-	
-	return new RawAuthDataOption((SOCKS6Method)opt->method, opt->methodData, dataSize);
-}
-
-void RawAuthDataOption::apply(OptionSet *optSet) const
-{
-	optSet->setAuthData(getMethod(), data, false);
-}
-
-RawAuthDataOption::RawAuthDataOption(SOCKS6Method method, uint8_t *data, size_t dataLen)
-	: AuthDataOption(method)
-{
-	this->data.resize(dataLen);
-	memcpy(this->data.data(), data, dataLen);
-}
-#endif
 
 size_t UsernamePasswdOption::packedSize() const
 {
