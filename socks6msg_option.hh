@@ -35,7 +35,7 @@ public:
 		forcedPack(buf);
 	}
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const = 0;
 	
@@ -70,7 +70,7 @@ public:
 		return code;
 	}
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	SocketOption(SOCKS6SocketOptionLeg leg, SOCKS6SocketOptionLevel level, SOCKS6SocketOptionCode code)
 		: Option(SOCKS6_OPTION_SOCKET), leg(leg), level(level), code(code) {}
@@ -81,7 +81,7 @@ class TFOOption: public SocketOption
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -94,7 +94,7 @@ class MPTCPOption: public SocketOption
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -112,7 +112,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -129,7 +129,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -149,7 +149,7 @@ public:
 		return method;
 	}
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	AuthDataOption(SOCKS6Method method)
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
@@ -165,7 +165,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -180,7 +180,7 @@ protected:
 	virtual void forcedPack(uint8_t *buf) const;
 	
 public:
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
@@ -191,7 +191,7 @@ class TokenWindowRequestOption: public IdempotenceOption
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -211,7 +211,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -228,7 +228,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	
@@ -246,7 +246,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static Option *parse(void *buf);
+	static void parse(void *buf, OptionSet *optionSet);
 	
 	virtual void apply(OptionSet *optSet) const;
 	

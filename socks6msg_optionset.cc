@@ -22,7 +22,6 @@ void OptionSet::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2)
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 	: mode(mode), tfo(false), mptcp(false)
 {
-	list<boost::shared_ptr<Option> > opts;
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
 	for (int i = 0; i < optsHead->optionCount; i++)
@@ -37,16 +36,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		
 		try
 		{
-			opts.push_back(boost::shared_ptr<Option>(Option::parse(opt)));
-		}
-		catch (InvalidFieldException) {}
-	}
-		
-	BOOST_FOREACH(boost::shared_ptr<Option> opt, opts)
-	{
-		try
-		{
-			opt->apply(this);
+			Option::parse(opt, this);
 		}
 		catch (InvalidFieldException) {}
 	}
