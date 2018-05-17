@@ -16,7 +16,7 @@ ENUM enumCast(int val)
 	switch ((ENUM)val) {}
 }
 
-template<>
+template <>
 SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
 {
 	SOCKS6MPTCPScheduler conv = SOCKS6MPTCPScheduler(val);
@@ -32,7 +32,7 @@ SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
 	throw InvalidFieldException();
 }
 
-template<>
+template <>
 SOCKS6SocketOptionLeg enumCast<SOCKS6SocketOptionLeg>(int val)
 {
 	SOCKS6SocketOptionLeg conv = SOCKS6SocketOptionLeg(val);
@@ -48,7 +48,7 @@ SOCKS6SocketOptionLeg enumCast<SOCKS6SocketOptionLeg>(int val)
 	throw InvalidFieldException();
 }
 
-template<>
+template <>
 SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val)
 {
 	SOCKS6TokenExpenditureCode conv = SOCKS6TokenExpenditureCode(val);
