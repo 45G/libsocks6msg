@@ -1,5 +1,6 @@
 #include "socks6msg_authreply.hh"
 #include "socks6msg_version.hh"
+#include "socks6msg_sanity.hh"
 
 namespace S6M
 {
@@ -17,20 +18,9 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	Version::parse(bb);
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
-	replyCode = (SOCKS6AuthReplyCode)rawAuthReply->type;
-	method  = (SOCKS6Method)rawAuthReply->method;
-	
-	switch (replyCode)
-	{
-	case SOCKS6_AUTH_REPLY_SUCCESS:
-	case SOCKS6_AUTH_REPLY_MORE:
-		break;
-	
-	default:
-		throw InvalidFieldException();
-	}
-	
+	replyCode = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
 	/* be permissive with the method */
+	method  = (SOCKS6Method)rawAuthReply->method;
 	
 	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP);
 }

@@ -1,5 +1,6 @@
 #include "socks6msg_request.hh"
 #include "socks6msg_version.hh"
+#include "socks6msg_sanity.hh"
 
 namespace S6M
 {
@@ -7,18 +8,6 @@ namespace S6M
 Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen)
 	: commandCode(commandCode), address(address), port(port), optionSet(optionSet), initialDataLen(initialDataLen)
 {
-	switch (commandCode)
-	{
-	case SOCKS6_REQUEST_NOOP:
-	case SOCKS6_REQUEST_CONNECT:
-	case SOCKS6_REQUEST_BIND:
-	case SOCKS6_REQUEST_UDP_ASSOC:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
-	
 	if (optionSet.getMode() != OptionSet::M_REQ)
 		throw InvalidFieldException();
 }
@@ -29,20 +18,8 @@ Request::Request(ByteBuffer *bb)
 	Version::parse(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	commandCode = (SOCKS6RequestCode)rawRequest->commandCode;
+	commandCode = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
 	port = ntohs(rawRequest->port);
-	
-	switch (commandCode)
-	{
-	case SOCKS6_REQUEST_NOOP:
-	case SOCKS6_REQUEST_CONNECT:
-	case SOCKS6_REQUEST_BIND:
-	case SOCKS6_REQUEST_UDP_ASSOC:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
 	
 	address = Address(bb);
 	optionSet = OptionSet(bb, OptionSet::M_REQ);
