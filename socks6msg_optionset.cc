@@ -102,7 +102,7 @@ both_sched_done:
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username->length() > 0)
+	if (userPasswdAuth.username.get() != NULL && userPasswdAuth.username->length() > 0)
 		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
 	{
@@ -110,7 +110,7 @@ both_sched_done:
 		optsHead->optionCount++;
 	}
 	
-	if (!userPasswdAuth.username->empty())
+	if (userPasswdAuth.username.get() != NULL && !userPasswdAuth.username->empty())
 	{
 		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
 		optsHead->optionCount++;
