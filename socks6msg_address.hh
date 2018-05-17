@@ -24,6 +24,7 @@ public:
 	
 	void pack(ByteBuffer *bb);
 	
+	//TODO: get rid of this
 	Address()
 		: type((SOCKS6AddressType)0) {}
 	
