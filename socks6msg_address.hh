@@ -44,9 +44,20 @@ public:
 		return type;
 	}
 	
-	in_addr getIPv4() const;
-	in6_addr getIPv6() const;
-	const boost::shared_ptr<std::string> getDomain() const;
+	in_addr getIPv4() const
+	{
+		return ipv4;
+	}
+	
+	in6_addr getIPv6() const
+	{
+		return ipv6;
+	}
+	
+	const boost::shared_ptr<std::string> getDomain() const
+	{
+		return domain.getStr();
+	}
 };
 
 }
