@@ -37,8 +37,6 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const = 0;
-	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}
 	
@@ -83,8 +81,6 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
 	TFOOption()
 		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_TFO) {}
 };
@@ -95,8 +91,6 @@ public:
 	virtual size_t packedSize() const;
 	
 	static void parse(void *buf, OptionSet *optionSet);
-	
-	virtual void apply(OptionSet *optSet) const;
 	
 	MPTCPOption()
 		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MPTCP) {}
@@ -114,9 +108,8 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
-	MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched);
+	MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
+		: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched) {}
 };
 
 class AuthMethodOption: public Option
@@ -130,8 +123,6 @@ public:
 	virtual size_t packedSize() const;
 	
 	static void parse(void *buf, OptionSet *optionSet);
-	
-	virtual void apply(OptionSet *optSet) const;
 	
 	AuthMethodOption(std::set<SOCKS6Method> methods);
 };
@@ -167,8 +158,6 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
 	UsernamePasswdOption(boost::shared_ptr<std::string> username, boost::shared_ptr<std::string> passwd);
 };
 
@@ -193,8 +182,6 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
 	TokenWindowRequestOption()
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ) {}
 };
@@ -213,8 +200,6 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
 };
 
@@ -229,8 +214,6 @@ public:
 	virtual size_t packedSize() const;
 	
 	static void parse(void *buf, OptionSet *optionSet);
-	
-	virtual void apply(OptionSet *optSet) const;
 	
 	TokenExpenditureRequestOption(uint32_t token)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
@@ -248,9 +231,8 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	virtual void apply(OptionSet *optSet) const;
-	
-	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code);
+	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
+		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code) {}
 };
 
 }

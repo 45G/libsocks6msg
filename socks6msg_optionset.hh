@@ -171,6 +171,9 @@ public:
 	{
 		enforceMode(M_REQ);
 		
+		if (method == SOCKS6_METHOD_UNACCEPTABLE)
+			throw InvalidFieldException();
+		
 		knownMethods.insert(method);
 	}
 	

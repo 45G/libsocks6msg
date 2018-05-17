@@ -31,4 +31,5 @@ HEADERS += \
     socks6msg_bytebuffer.hh \
     socks6msg_exception.hh \
     socks6msg_opreply.hh \
-    socks6msg.hh
+    socks6msg.hh \
+    socks6msg_sanity.hh

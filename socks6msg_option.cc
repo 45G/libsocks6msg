@@ -126,12 +126,7 @@ void TFOOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
 		throw InvalidFieldException();
 	
-	TFOOption().apply(optionSet);
-}
-
-void TFOOption::apply(OptionSet *optSet) const
-{
-	optSet->setTFO();
+	optionSet->setTFO();
 }
 
 size_t MPTCPOption::packedSize() const
@@ -149,12 +144,7 @@ void MPTCPOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
 		throw InvalidFieldException();
 	
-	MPTCPOption().apply(optionSet);
-}
-
-void MPTCPOption::apply(OptionSet *optSet) const
-{
-	optSet->setMPTCP();
+	optionSet->setMPTCP();
 }
 
 size_t MPScehdOption::packedSize() const
@@ -178,43 +168,31 @@ void MPScehdOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
 		throw InvalidFieldException();
 	
-	MPScehdOption((SOCKS6SocketOptionLeg)opt->socketOptionHead.leg, (SOCKS6MPTCPScheduler)opt->scheduler).apply(optionSet);
-}
-
-void MPScehdOption::apply(OptionSet *optSet) const
-{
-	switch (getLeg())
+	switch (opt->scheduler)
+	{
+	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
+	case SOCKS6_MPTCP_SCHEDULER_RR:
+	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
+		break;
+		
+	default:
+		throw InvalidFieldException();
+	}
+	
+	SOCKS6MPTCPScheduler sched = (SOCKS6MPTCPScheduler)opt->scheduler;
+	
+	switch (opt->socketOptionHead.leg)
 	{
 	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
-		optSet->setClientProxySched(sched);
+		optionSet->setClientProxySched(sched);
 		break;
 	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
-		optSet->setProxyServerSched(sched);
+		optionSet->setProxyServerSched(sched);
 		break;
 	case SOCKS6_SOCKOPT_LEG_BOTH:
-		optSet->setBothScheds(sched);
+		optionSet->setBothScheds(sched);
 		break;
 	}
-}
-
-MPScehdOption::MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
-	: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched)
-{
-//	switch (sched)
-//	{
-//	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-//	case SOCKS6_MPTCP_SCHEDULER_RR:
-//	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-//		break;
-		
-//	default:
-//		throw Exception(S6M_ERR_INVALID);
-//	}
-	
-	/* be permissive with scheduler values */
-	//TODO: really?
-	if (sched == 0)
-		throw InvalidFieldException();
 }
 
 size_t AuthMethodOption::packedSize() const
@@ -242,21 +220,10 @@ void AuthMethodOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->optionHead.len < sizeof(SOCKS6AuthMethodOption))
 		throw InvalidFieldException();
 	
-	set<SOCKS6Method> methods;
 	int methodCount = opt->optionHead.len - sizeof(SOCKS6AuthMethodOption);
 	
 	for (int i = 0; i < methodCount; i++)
-		methods.insert((SOCKS6Method)opt->methods[i]);
-	
-	AuthMethodOption(methods).apply(optionSet);
-}
-
-void AuthMethodOption::apply(OptionSet *optSet) const
-{
-	BOOST_FOREACH(SOCKS6Method method, methods)
-	{
-		optSet->advertiseMethod(method);
-	}
+		optionSet->advertiseMethod((SOCKS6Method)opt->methods[i]);
 }
 
 AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
@@ -330,7 +297,7 @@ void UsernamePasswdOption::parse(void *buf, OptionSet *optionSet)
 		if (bb.getUsed() != expectedDataSize)
 			throw InvalidFieldException();
 		
-		UsernamePasswdOption(req.getUsername(), req.getPassword()).apply(optionSet);
+		optionSet->attemptUserPasswdAuth(req.getUsername(), req.getPassword());
 	}
 	catch (EndOfBufferException)
 	{
@@ -340,11 +307,6 @@ void UsernamePasswdOption::parse(void *buf, OptionSet *optionSet)
 	{
 		throw InvalidFieldException();
 	}
-}
-
-void UsernamePasswdOption::apply(OptionSet *optSet) const
-{
-	optSet->attemptUserPasswdAuth(req.getUsername(), req.getPassword());
 }
 
 UsernamePasswdOption::UsernamePasswdOption(boost::shared_ptr<string> username, boost::shared_ptr<string> passwd)
@@ -401,12 +363,7 @@ void TokenWindowRequestOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->optionHead.len != sizeof(SOCKS6IdempotenceOption))
 		throw InvalidFieldException();
 	
-	TokenWindowRequestOption().apply(optionSet);
-}
-
-void TokenWindowRequestOption::apply(OptionSet *optSet) const
-{
-	optSet->requestTokenWindow();
+	optionSet->requestTokenWindow();
 }
 
 size_t TokenWindowAdvertOption::packedSize() const
@@ -431,12 +388,13 @@ void TokenWindowAdvertOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowAdvertOption))
 		throw InvalidFieldException();
 	
-	TokenWindowAdvertOption(ntohl(opt->windowBase), ntohl(opt->windowSize)).apply(optionSet);
-}
-
-void TokenWindowAdvertOption::apply(OptionSet *optSet) const
-{
-	optSet->advetiseTokenWindow(winBase, winSize);
+	uint32_t winBase = ntohl(opt->windowBase);
+	uint32_t winSize = ntohl(opt->windowSize);
+	
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
+		throw InvalidFieldException();
+	
+	optionSet->advetiseTokenWindow(winBase, winSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -467,12 +425,7 @@ void TokenExpenditureRequestOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureOption))
 		throw InvalidFieldException();
 	
-	TokenExpenditureRequestOption(ntohl(opt->token)).apply(optionSet);
-}
-
-void TokenExpenditureRequestOption::apply(OptionSet *optSet) const
-{
-	optSet->spendToken(token);
+	optionSet->spendToken(ntohl(opt->token));
 }
 
 size_t TokenExpenditureReplyOption::packedSize() const
@@ -496,18 +449,7 @@ void TokenExpenditureReplyOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
 		throw InvalidFieldException();
 	
-	TokenExpenditureReplyOption((SOCKS6TokenExpenditureCode)opt->code).apply(optionSet);
-}
-
-void TokenExpenditureReplyOption::apply(OptionSet *optSet) const
-{
-	optSet->replyToExpenditure(code);
-}
-
-TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
-	: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code)
-{
-	switch (code)
+	switch (opt->code)
 	{
 	case SOCKS6_TOK_EXPEND_SUCCESS:
 	case SOCKS6_TOK_EXPEND_NO_WND:
@@ -518,6 +460,8 @@ TokenExpenditureReplyOption::TokenExpenditureReplyOption(SOCKS6TokenExpenditureC
 	default:
 		throw InvalidFieldException();
 	}
+	
+	optionSet->replyToExpenditure((SOCKS6TokenExpenditureCode)opt->code);
 }
 
 }
