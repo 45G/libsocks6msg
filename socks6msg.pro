@@ -15,7 +15,8 @@ SOURCES += \
     socks6msg_version.cc \
     socks6msg_authreply.cc \
     socks6msg_opreply.cc \
-    socks6msg_exception.cc
+    socks6msg_exception.cc \
+    socks6msg_sanity.cc
 
 HEADERS += \
     socks6.h \
