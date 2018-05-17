@@ -5,8 +5,10 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
+#include "socks6.h"
 #include "socks6msg_bytebuffer.hh"
 
 namespace S6M
