@@ -96,7 +96,7 @@ public:
 		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MPTCP) {}
 };
 
-class MPScehdOption: public SocketOption
+class MPSchedOption: public SocketOption
 {
 	SOCKS6MPTCPScheduler sched;
 	
@@ -108,7 +108,7 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	MPScehdOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
+	MPSchedOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
 		: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched) {}
 };
 

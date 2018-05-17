@@ -90,7 +90,7 @@ void SocketOption::parse(void *buf, OptionSet *optionSet)
 			break;
 			
 		case SOCKS6_SOCKOPT_CODE_MP_SCHED:
-			MPScehdOption::parse(buf, optionSet);
+			MPSchedOption::parse(buf, optionSet);
 			break;
 			
 		default:
@@ -139,12 +139,12 @@ void MPTCPOption::parse(void *buf, OptionSet *optionSet)
 	optionSet->setMPTCP();
 }
 
-size_t MPScehdOption::packedSize() const
+size_t MPSchedOption::packedSize() const
 {
 	return sizeof(SOCKS6MPTCPSchedulerOption);
 }
 
-void MPScehdOption::forcedPack(uint8_t *buf) const
+void MPSchedOption::forcedPack(uint8_t *buf) const
 {
 	SocketOption::forcedPack(buf);
 	
@@ -153,7 +153,7 @@ void MPScehdOption::forcedPack(uint8_t *buf) const
 	opt->scheduler = sched;
 }
 
-void MPScehdOption::parse(void *buf, OptionSet *optionSet)
+void MPSchedOption::parse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
 	

@@ -62,19 +62,19 @@ void OptionSet::pack(ByteBuffer *bb)
 	{
 		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
 		{
-			MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).pack(bb);
+			MPSchedOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).pack(bb);
 			optsHead->optionCount++;
 			goto both_sched_done;
 		}
 		else
 		{
-			MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).pack(bb);
+			MPSchedOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).pack(bb);
 			optsHead->optionCount++;
 		}
 	}
 	if (mptcpSched.proxyServer > 0)
 	{
-		MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).pack(bb);
+		MPSchedOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).pack(bb);
 		optsHead->optionCount++;
 	}
 	
@@ -130,16 +130,16 @@ size_t OptionSet::packedSize()
 	{
 		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
 		{
-			size += MPScehdOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).packedSize();
+			size += MPSchedOption(SOCKS6_SOCKOPT_LEG_BOTH, mptcpSched.clientProxy).packedSize();
 			goto both_sched_done;
 		}
 		else
 		{
-			size += MPScehdOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).packedSize();
+			size += MPSchedOption(SOCKS6_SOCKOPT_LEG_CLIENT_PROXY, mptcpSched.clientProxy).packedSize();
 		}
 	}
 	if (mptcpSched.proxyServer > 0)
-		size += MPScehdOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).packedSize();
+		size += MPSchedOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, mptcpSched.proxyServer).packedSize();
 	
 both_sched_done:
 	if (idempotence.request)
