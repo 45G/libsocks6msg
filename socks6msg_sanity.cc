@@ -1,5 +1,7 @@
 #include "socks6msg_sanity.hh"
 
+#pragma GCC diagnostic error "-Wswitch"
+
 namespace S6M
 {
 

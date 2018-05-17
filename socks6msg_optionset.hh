@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include "socks6msg_bytebuffer.hh"
-#include "socks6msg_option.hh"
 
 namespace S6M
 {
