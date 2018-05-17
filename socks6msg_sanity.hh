@@ -1,7 +1,7 @@
 #ifndef SOCKS6MSG_SANITY_HH
 #define SOCKS6MSG_SANITY_HH
 
-#pragma GCC diagnostic error "-Wswitch
+#pragma GCC diagnostic error "-Wswitch"
 
 #include "socks6.h"
 #include "socks6msg_exception.hh"
@@ -10,22 +10,56 @@ namespace S6M
 {
 
 template <typename ENUM>
-ENUM enumSanity(int val)
+ENUM enumCast(int val)
 {
 	/* fail if instantiated */
 	switch ((ENUM)val) {}
 }
 
-SOCKS6MPTCPScheduler enumSanity<SOCKS6MPTCPScheduler>(int val)
+template<>
+SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
 {
-	SOCKS6MPTCPScheduler sched = SOCKS6MPTCPScheduler(val);
+	SOCKS6MPTCPScheduler conv = SOCKS6MPTCPScheduler(val);
 	
-	switch (sched)
+	switch (conv)
 	{
 	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
 	case SOCKS6_MPTCP_SCHEDULER_RR:
 	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		return sched;
+		return conv;
+	}
+	
+	throw InvalidFieldException();
+}
+
+template<>
+SOCKS6SocketOptionLeg enumCast<SOCKS6SocketOptionLeg>(int val)
+{
+	SOCKS6SocketOptionLeg conv = SOCKS6SocketOptionLeg(val);
+	
+	switch (conv)
+	{
+	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
+	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
+	case SOCKS6_SOCKOPT_LEG_BOTH:
+		return conv;
+	}
+	
+	throw InvalidFieldException();
+}
+
+template<>
+SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val)
+{
+	SOCKS6TokenExpenditureCode conv = SOCKS6TokenExpenditureCode(val);
+	
+	switch (conv)
+	{
+	case SOCKS6_TOK_EXPEND_SUCCESS:
+	case SOCKS6_TOK_EXPEND_NO_WND:
+	case SOCKS6_TOK_EXPEND_OUT_OF_WND:
+	case SOCKS6_TOK_EXPEND_DUPLICATE:
+		return conv;
 	}
 	
 	throw InvalidFieldException();

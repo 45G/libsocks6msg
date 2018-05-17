@@ -3,6 +3,7 @@
 #include <boost/foreach.hpp>
 #include "socks6msg_option.hh"
 #include "socks6msg_optionset.hh"
+#include "socks6msg_sanity.hh"
 
 using namespace std;
 using namespace boost;
@@ -64,16 +65,7 @@ void SocketOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->optionHead.len < sizeof(SOCKS6SocketOption))
 		throw InvalidFieldException();
 	
-	switch (opt->leg)
-	{
-	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
-	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
-	case SOCKS6_SOCKOPT_LEG_BOTH:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
+	enumCast<SOCKS6SocketOptionLeg>(opt->leg);
 	
 	switch (opt->level)
 	{
@@ -168,18 +160,7 @@ void MPScehdOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
 		throw InvalidFieldException();
 	
-	switch (opt->scheduler)
-	{
-	case SOCKS6_MPTCP_SCHEDULER_DEFAULT:
-	case SOCKS6_MPTCP_SCHEDULER_RR:
-	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
-	
-	SOCKS6MPTCPScheduler sched = (SOCKS6MPTCPScheduler)opt->scheduler;
+	SOCKS6MPTCPScheduler sched = enumCast<SOCKS6MPTCPScheduler>(opt->scheduler);
 	
 	switch (opt->socketOptionHead.leg)
 	{
@@ -448,19 +429,7 @@ void TokenExpenditureReplyOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
 		throw InvalidFieldException();
 	
-	switch (opt->code)
-	{
-	case SOCKS6_TOK_EXPEND_SUCCESS:
-	case SOCKS6_TOK_EXPEND_NO_WND:
-	case SOCKS6_TOK_EXPEND_OUT_OF_WND:
-	case SOCKS6_TOK_EXPEND_DUPLICATE:
-		break;
-		
-	default:
-		throw InvalidFieldException();
-	}
-	
-	optionSet->replyToExpenditure((SOCKS6TokenExpenditureCode)opt->code);
+	optionSet->replyToExpenditure(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
 }
 
 }
