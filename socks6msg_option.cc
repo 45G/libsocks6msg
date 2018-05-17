@@ -345,10 +345,9 @@ void IdempotenceOption::parse(void *buf, OptionSet *optionSet)
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY:
 		TokenExpenditureReplyOption::parse(buf, optionSet);
 		break;
-		
-	default:
-		throw InvalidFieldException();
 	}
+	
+	throw InvalidFieldException();
 }
 
 size_t TokenWindowRequestOption::packedSize() const
