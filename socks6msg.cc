@@ -169,7 +169,7 @@ struct S6M_RequestExtended: public S6M_Request
 	boost::shared_ptr<string> cppPasswd;
 };
 
-ssize_t S6M_Request_PackedSize(const S6M_Request *req)
+ssize_t S6M_Request_packedSize(const S6M_Request *req)
 {
 	S6M_Error err;
 	
@@ -187,7 +187,7 @@ ssize_t S6M_Request_PackedSize(const S6M_Request *req)
 	return err;
 }
 
-ssize_t S6M_Request_Pack(const S6M_Request *req, uint8_t *buf, size_t size)
+ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 {
 	S6M_Error err;
 	
@@ -209,7 +209,7 @@ ssize_t S6M_Request_Pack(const S6M_Request *req, uint8_t *buf, size_t size)
 	return err;
 }
 
-ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq)
+ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 {
 	S6M_Error err;
 	S6M_RequestExtended *req = NULL;
@@ -237,11 +237,11 @@ ssize_t S6M_Request_Parse(uint8_t *buf, size_t size, S6M_Request **preq)
 	S6M_CATCH(err);
 	
 	if (req != NULL)
-		S6M_Request_Free(req);
+		S6M_Request_free(req);
 	return err;
 }
 
-void S6M_Request_Free(S6M_Request *req)
+void S6M_Request_free(S6M_Request *req)
 {
 	S6M_OptionSet_Cleanup(&req->optionSet);
 	delete req;
@@ -257,7 +257,7 @@ struct S6M_AuthReplyExtended: public S6M_AuthReply
 	boost::shared_ptr<string> cppPasswd;
 };
 
-ssize_t S6M_AuthReply_PackedSize(const S6M_AuthReply *authReply)
+ssize_t S6M_AuthReply_packedSize(const S6M_AuthReply *authReply)
 {
 	S6M_Error err;
 	
@@ -275,7 +275,7 @@ ssize_t S6M_AuthReply_PackedSize(const S6M_AuthReply *authReply)
 	return err;
 }
 
-ssize_t S6M_AuthReply_Pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t size)
+ssize_t S6M_AuthReply_pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t size)
 {
 	S6M_Error err;
 	
@@ -296,7 +296,7 @@ ssize_t S6M_AuthReply_Pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t 
 	return err;
 }
 
-ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply)
+ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply)
 {
 	S6M_Error err;
 	S6M_AuthReplyExtended *authReply = NULL;
@@ -321,11 +321,11 @@ ssize_t S6M_AuthReply_Parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	S6M_CATCH(err);
 	
 	if (authReply != NULL)
-		S6M_AuthReply_Free(authReply);
+		S6M_AuthReply_free(authReply);
 	return err;
 }
 
-void S6M_AuthReply_Free(S6M_AuthReply *authReply)
+void S6M_AuthReply_free(S6M_AuthReply *authReply)
 {
 	S6M_OptionSet_Cleanup(&authReply->optionSet);
 	delete (S6M_AuthReply *)authReply;
@@ -343,7 +343,7 @@ struct S6M_OpReplyExtended: public S6M_OpReply
 	boost::shared_ptr<string> cppPasswd;
 };
 
-ssize_t S6M_OpReply_PackedSize(const S6M_OpReply *opReply)
+ssize_t S6M_OpReply_packedSize(const S6M_OpReply *opReply)
 {
 	S6M_Error err;
 	
@@ -362,7 +362,7 @@ ssize_t S6M_OpReply_PackedSize(const S6M_OpReply *opReply)
 	return err;
 }
 
-ssize_t S6M_OpReply_Pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
+ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 {
 	S6M_Error err;
 	
@@ -385,7 +385,7 @@ ssize_t S6M_OpReply_Pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 }
 
 
-ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
+ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 {
 	S6M_Error err;
 	S6M_OpReplyExtended *opReply = NULL;
@@ -413,12 +413,12 @@ ssize_t S6M_OpReply_Parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 	S6M_CATCH(err);
 	
 	if (opReply != NULL)
-		S6M_OpReply_Free(opReply);
+		S6M_OpReply_free(opReply);
 	return err;
 }
 
 
-void S6M_OpReply_Free(S6M_OpReply *opReply)
+void S6M_OpReply_free(S6M_OpReply *opReply)
 {
 	S6M_OptionSet_Cleanup(&opReply->optionSet);
 	delete (S6M_OpReplyExtended *)opReply;
@@ -428,7 +428,15 @@ void S6M_OpReply_Free(S6M_OpReply *opReply)
  * S6M_PasswdReq_*
  */
 
-ssize_t S6M_PasswdReq_PackedSize(const S6M_PasswdReq *pwReq)
+struct S6M_PasswdReqExtended: public S6M_PasswdReq
+{
+	UserPasswordRequest cppReq;
+	
+	S6M_PasswdReqExtended(ByteBuffer *bb)
+		: cppReq(bb) {}
+};
+
+ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 {
 	S6M_Error err;
 	
@@ -443,7 +451,7 @@ ssize_t S6M_PasswdReq_PackedSize(const S6M_PasswdReq *pwReq)
 	return err;
 }
 
-ssize_t S6M_PasswdReq_Pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size)
+ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size)
 {
 	S6M_Error err;
 	
@@ -461,7 +469,7 @@ ssize_t S6M_PasswdReq_Pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	return err;
 }
 
-ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
+ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 {
 	S6M_Error err;
 	char *username = NULL;
@@ -470,16 +478,8 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 	try
 	{
 		ByteBuffer bb(buf, size);
-		UserPasswordRequest req(&bb);
+		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended(&bb);
 		
-		username = strdup(req.getUsername()->c_str());
-		if (username == NULL)
-			throw bad_alloc();
-		passwd = strdup(req.getUsername()->c_str());
-		if (passwd == NULL)
-			throw bad_alloc();
-		
-		S6M_PasswdReq *pwReq = new S6M_PasswdReq();
 		pwReq->username = username;
 		pwReq->passwd = passwd;
 		
@@ -488,30 +488,26 @@ ssize_t S6M_PasswdReq_Parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 	}
 	S6M_CATCH(err);
 	
-	free(username);
-	free(passwd);
 	return err;
 }
 
-void S6M_PasswdReq_Free(S6M_PasswdReq *pwReq)
+void S6M_PasswdReq_free(S6M_PasswdReq *pwReq)
 {
-	free(pwReq->username);
-	free(pwReq->passwd);
-	delete pwReq;
+	delete (S6M_PasswdReqExtended *)pwReq;
 }
 
 /*
  * S6M_PasswdReply_*
  */
 
-ssize_t S6M_PasswdReply_PackedSize(const S6M_PasswdReply *pwReply)
+ssize_t S6M_PasswdReply_packedSize(const S6M_PasswdReply *pwReply)
 {
 	(void)pwReply;
 	
 	return UserPasswordReply::packedSize();
 }
 
-ssize_t S6M_PasswdReply_Pack(const S6M_PasswdReply *pwReply, uint8_t *buf, size_t size)
+ssize_t S6M_PasswdReply_pack(const S6M_PasswdReply *pwReply, uint8_t *buf, size_t size)
 {
 	S6M_Error err;
 	
@@ -529,7 +525,7 @@ ssize_t S6M_PasswdReply_Pack(const S6M_PasswdReply *pwReply, uint8_t *buf, size_
 	return err;
 }
 
-ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwReply)
+ssize_t S6M_PasswdReply_parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwReply)
 {
 	S6M_Error err;
 	
@@ -549,7 +545,7 @@ ssize_t S6M_PasswdReply_Parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 	return err;
 }
 
-void S6M_PasswdReply_Free(S6M_PasswdReply *pwReply)
+void S6M_PasswdReply_free(S6M_PasswdReply *pwReply)
 {
 	delete pwReply;
 }
@@ -558,7 +554,7 @@ void S6M_PasswdReply_Free(S6M_PasswdReply *pwReply)
  * S6M_Error_*
  */
 
-const char *S6M_Error_Msg(S6M_Error err)
+const char *S6M_Error_msg(S6M_Error err)
 {
 	switch (err)
 	{
