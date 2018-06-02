@@ -140,6 +140,7 @@ enum SOCKS6OperationReplyCode
 	SOCKS6_OPERATION_REPLY_TTL_EXPIRED        = 0x06, /* TTL expired */
 	SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED  = 0x07, /* command not supported */
 	SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED = 0x08, /* address type not supported */
+	SOCKS6_OPERATION_REPLY_TIMEOUT            = 0x09, /* connection attempt timed out */
 };
 
 struct SOCKS6Option
