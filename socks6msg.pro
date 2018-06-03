@@ -1,3 +1,4 @@
+TARGET = socks6msg
 TEMPLATE = lib
 CONFIG += staticlib
 CONFIG += console c++11
@@ -34,3 +35,16 @@ HEADERS += \
     socks6msg_opreply.hh \
     socks6msg.hh \
     socks6msg_sanity.hh
+
+unix {
+    headers.path = /usr/local/include/socks6msg
+    headers.files += $$HEADERS
+    INSTALLS += headers
+    exists(/usr/local/lib64) {
+        target.path = /usr/local/lib64
+    }
+    else {
+        target.path = /usr/local/lib
+    }
+    INSTALLS += target
+}
