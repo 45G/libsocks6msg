@@ -12,7 +12,7 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-struct S6M_Addr
+struct S6M_Address
 {
 	enum SOCKS6AddressType type;
 	struct in_addr ipv4;
@@ -59,7 +59,7 @@ struct S6M_Request
 {
 	enum SOCKS6RequestCode code;
 	
-	struct S6M_Addr addr;
+	struct S6M_Address addr;
 	uint16_t port;
 	
 	uint16_t initialDataLen;
@@ -80,7 +80,7 @@ struct S6M_OpReply
 {
 	enum SOCKS6OperationReplyCode code;
 	
-	struct S6M_Addr addr;
+	struct S6M_Address addr;
 	uint16_t port;
 	
 	uint16_t initDataOff;

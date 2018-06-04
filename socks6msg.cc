@@ -37,7 +37,7 @@ using namespace S6M;
  * S6m_Addr
  */
 
-static void S6M_Addr_Fill(S6M_Addr *cAddr, const Address *cppAddr)
+static void S6M_Addr_Fill(S6M_Address *cAddr, const Address *cppAddr)
 {
 	cAddr->type = cppAddr->getType();
 	
@@ -59,7 +59,7 @@ static void S6M_Addr_Fill(S6M_Addr *cAddr, const Address *cppAddr)
 	}
 }
 
-static Address S6M_Addr_Flush(const S6M_Addr *cAddr)
+static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 {
 	switch (cAddr->type)
 	{
