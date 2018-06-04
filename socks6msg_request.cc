@@ -8,6 +8,9 @@ namespace S6M
 Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen)
 	: commandCode(commandCode), address(address), port(port), optionSet(optionSet), initialDataLen(initialDataLen)
 {
+	if (address.getType() == Address::INVALID_TYPE)
+		throw InvalidFieldException();
+	
 	if (optionSet.getMode() != OptionSet::M_REQ)
 		throw InvalidFieldException();
 }

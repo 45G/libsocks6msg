@@ -7,6 +7,9 @@ namespace S6M
 OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff, OptionSet optionSet)
 	: code(code), address(address), port(port), initDataOff(initDataOff), optionSet(optionSet)
 {
+	if (address.getType() == Address::INVALID_TYPE)
+		throw InvalidFieldException();
+		
 	if (optionSet.getMode() != OptionSet::M_OP_REP)
 		throw InvalidFieldException();
 }
