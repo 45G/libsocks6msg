@@ -6,7 +6,6 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    socks6msg.cc \
     socks6msg_option.cc \
     socks6msg_optionset.cc \
     socks6msg_usrpasswd.cc \
@@ -17,7 +16,8 @@ SOURCES += \
     socks6msg_authreply.cc \
     socks6msg_opreply.cc \
     socks6msg_exception.cc \
-    socks6msg_sanity.cc
+    socks6msg_sanity.cc \
+    socks6msg_cbindings.cc
 
 HEADERS += \
     socks6.h \
