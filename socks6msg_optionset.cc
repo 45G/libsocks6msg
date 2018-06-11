@@ -222,7 +222,7 @@ void OptionSet::requestTokenWindow()
 
 void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 {
-	enforceMode(M_OP_REP);
+	enforceMode(M_AUTH_REP, M_OP_REP);
 	
 	if (size == 0)
 		throw InvalidFieldException();
