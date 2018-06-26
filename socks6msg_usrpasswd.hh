@@ -30,6 +30,8 @@ public:
 	
 	void pack(ByteBuffer *bb) const;
 	
+	size_t pack(uint8_t *buf, size_t bufSize) const;
+	
 	size_t packedSize() const
 	{
 		return 1 + username.packedSize() + password.packedSize();

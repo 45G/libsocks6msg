@@ -25,7 +25,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP);
 }
 
-void AuthenticationReply::pack(ByteBuffer *bb)
+void AuthenticationReply::pack(ByteBuffer *bb) const
 {
 	Version::pack(bb);
 	
@@ -34,6 +34,13 @@ void AuthenticationReply::pack(ByteBuffer *bb)
 	rawAuthReply->method = method;
 	
 	optionSet.pack(bb);
+}
+
+size_t AuthenticationReply::pack(uint8_t *buf, size_t bufSize) const
+{
+	ByteBuffer bb(buf, bufSize);
+	pack(&bb);
+	return bb.getUsed();
 }
 
 size_t AuthenticationReply::packedSize()

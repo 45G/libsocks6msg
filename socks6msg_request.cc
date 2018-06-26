@@ -31,7 +31,7 @@ Request::Request(ByteBuffer *bb)
 	initialDataLen = ntohs(rawInitialData->initialDataLen);
 }
 
-void Request::pack(ByteBuffer *bb)
+void Request::pack(ByteBuffer *bb) const
 {
 	Version::pack(bb);
 	
@@ -45,6 +45,13 @@ void Request::pack(ByteBuffer *bb)
 		       
 	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
 	rawInitialData->initialDataLen = htons(initialDataLen);
+}
+
+size_t Request::pack(uint8_t *buf, size_t bufSize) const
+{
+	ByteBuffer bb(buf, bufSize);
+	pack(&bb);
+	return bb.getUsed();
 }
 
 size_t Request::packedSize()

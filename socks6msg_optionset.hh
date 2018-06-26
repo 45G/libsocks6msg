@@ -80,7 +80,7 @@ public:
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
 	
 	size_t packedSize();
 	

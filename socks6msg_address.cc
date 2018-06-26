@@ -27,7 +27,7 @@ size_t Address::packedSize()
 	return size;
 }
 
-void Address::pack(ByteBuffer *bb)
+void Address::pack(ByteBuffer *bb)  const
 {
 	uint8_t *rawType = bb->get<uint8_t>();
 	*rawType = type;

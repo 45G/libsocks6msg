@@ -20,7 +20,9 @@ public:
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
+	
+	size_t pack(uint8_t *buf, size_t bufSize) const;
 	
 	size_t packedSize();
 	

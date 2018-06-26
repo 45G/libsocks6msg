@@ -26,6 +26,13 @@ void UserPasswordRequest::pack(ByteBuffer *bb) const
 	password.pack(bb);
 }
 
+size_t UserPasswordRequest::pack(uint8_t *buf, size_t bufSize) const
+{
+	ByteBuffer bb(buf, bufSize);
+	pack(&bb);
+	return bb.getUsed();
+}
+
 UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
 {
 	uint8_t *ver = bb->get<uint8_t>();

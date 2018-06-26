@@ -43,7 +43,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 	}
 }
 
-void OptionSet::pack(ByteBuffer *bb)
+void OptionSet::pack(ByteBuffer *bb) const
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	optsHead->optionCount = 0;

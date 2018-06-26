@@ -24,7 +24,7 @@ public:
 	
 	size_t packedSize();
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
 	
 	//TODO: get rid of this
 	Address()
