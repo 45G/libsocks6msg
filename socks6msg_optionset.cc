@@ -103,8 +103,6 @@ both_sched_done:
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username.get() != NULL && userPasswdAuth.username->length() > 0)
-		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
 	{
 		AuthMethodOption(extraMethods).pack(bb);
@@ -153,9 +151,6 @@ both_sched_done:
 		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
 	
 	set<SOCKS6Method> extraMethods(knownMethods);
-	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (userPasswdAuth.username->length() > 0)
-		extraMethods.erase(SOCKS6_METHOD_USRPASSWD);
 	if (!extraMethods.empty())
 		size += AuthMethodOption(extraMethods).packedSize();
 	
