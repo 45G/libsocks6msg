@@ -24,7 +24,7 @@ void Option::parse(void *buf, OptionSet *optionSet)
 	SOCKS6Option *opt = (SOCKS6Option *)buf;
 	
 	switch (opt->kind) {
-	case SOCKS6_OPTION_SOCKET:
+	case SOCKS6_OPTION_STACK:
 		StackOption::parse(buf, optionSet);
 		break;
 		

@@ -71,7 +71,7 @@ public:
 	static void parse(void *buf, OptionSet *optionSet);
 	
 	StackOption(SOCKS6StackLeg leg, SOCKS6StackLevel level, SOCKS6StackOptionCode code)
-		: Option(SOCKS6_OPTION_SOCKET), leg(leg), level(level), code(code) {}
+		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
 class TFOOption: public StackOption
