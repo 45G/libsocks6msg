@@ -158,7 +158,7 @@ enum SOCKS6OptionKind
 	SOCKS6_OPTION_IDEMPOTENCE = 0x04,
 };
 
-struct SOCKS6SocketOption
+struct SOCKS6StackOption
 {
 	struct SOCKS6Option optionHead;
 #if BYTE_ORDER == LITTLE_ENDIAN
@@ -174,38 +174,39 @@ struct SOCKS6SocketOption
 	uint8_t data[0];
 } __attribute__((packed));
 
-enum SOCKS6SocketOptionLeg
+enum SOCKS6StackLeg
 {
-	SOCKS6_SOCKOPT_LEG_CLIENT_PROXY = 0x01,
-	SOCKS6_SOCKOPT_LEG_PROXY_SERVER = 0x02,
-	SOCKS6_SOCKOPT_LEG_BOTH         = 0x03,
+	SOCKS6_STACK_LEG_CLIENT_PROXY = 0x01,
+	SOCKS6_STACK_LEG_PROXY_SERVER = 0x02,
+	SOCKS6_STACK_LEG_BOTH         = 0x03,
 };
 
-enum SOCKS6SocketOptionLevel
+enum SOCKS6StackLevel
 {
-	SOCKS6_SOCKOPT_LEVEL_IP   = 0x01,
-	SOCKS6_SOCKOPT_LEVEL_IPV4 = 0x02,
-	SOCKS6_SOCKOPT_LEVEL_IPV6 = 0x03,
-	SOCKS6_SOCKOPT_LEVEL_TCP  = 0x04,
-	SOCKS6_SOCKOPT_LEVEL_UDP  = 0x05,
-	SOCKS6_SOCKOPT_LEVEL_TLS  = 0x06,
+	SOCKS6_STACK_LEVEL_IP   = 0x01,
+	SOCKS6_STACK_LEVEL_IPV4 = 0x02,
+	SOCKS6_STACK_LEVEL_IPV6 = 0x03,
+	SOCKS6_STACK_LEVEL_TCP  = 0x04,
+	SOCKS6_STACK_LEVEL_UDP  = 0x05,
+	SOCKS6_STACK_LEVEL_TLS  = 0x06,
 };
 
-enum SOCKS6SocketOptionCode
+enum SOCKS6StackOptionCode
 {
-	/* socket */
-	/* ipv4 */
-	/* ipv6 */
-	/* tcp */
-	SOCKS6_SOCKOPT_CODE_TFO      = 0x17,
-	SOCKS6_SOCKOPT_CODE_MPTCP    = 0x2a,
-	SOCKS6_SOCKOPT_CODE_MP_SCHED = 0x2b,
-	/* udp */
+	/* IP */
+	/* IPv4 */
+	/* IPv6 */
+	/* TCP */
+	SOCKS6_STACK_CODE_TFO      = 0x17,
+	SOCKS6_STACK_CODE_MPTCP    = 0x2a,
+	SOCKS6_STACK_CODE_MP_SCHED = 0x2b,
+	/* UDP */
+	/* TLS*/
 };
 
 struct SOCKS6MPTCPSchedulerOption
 {
-	struct SOCKS6SocketOption socketOptionHead;
+	struct SOCKS6StackOption socketOptionHead;
 	uint8_t scheduler;
 } __attribute__((packed));
 

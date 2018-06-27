@@ -20,7 +20,7 @@ template <>
 SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val);
 
 template <>
-SOCKS6SocketOptionLeg enumCast<SOCKS6SocketOptionLeg>(int val);
+SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val);
 
 template <>
 SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val);

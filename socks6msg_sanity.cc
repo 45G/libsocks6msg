@@ -22,15 +22,15 @@ SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
 }
 
 template <>
-SOCKS6SocketOptionLeg enumCast<SOCKS6SocketOptionLeg>(int val)
+SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 {
-	SOCKS6SocketOptionLeg conv = (SOCKS6SocketOptionLeg)val;
+	SOCKS6StackLeg conv = (SOCKS6StackLeg)val;
 	
 	switch (conv)
 	{
-	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
-	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
-	case SOCKS6_SOCKOPT_LEG_BOTH:
+	case SOCKS6_STACK_LEG_CLIENT_PROXY:
+	case SOCKS6_STACK_LEG_PROXY_SERVER:
+	case SOCKS6_STACK_LEG_BOTH:
 		return conv;
 	}
 	

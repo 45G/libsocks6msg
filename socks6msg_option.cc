@@ -25,7 +25,7 @@ void Option::parse(void *buf, OptionSet *optionSet)
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_SOCKET:
-		SocketOption::parse(buf, optionSet);
+		StackOption::parse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD:
@@ -47,25 +47,25 @@ void Option::parse(void *buf, OptionSet *optionSet)
 
 Option::~Option() {}
 
-void SocketOption::forcedPack(uint8_t *buf) const
+void StackOption::forcedPack(uint8_t *buf) const
 {
 	Option::forcedPack(buf);
 	
-	SOCKS6SocketOption *opt = reinterpret_cast<SOCKS6SocketOption *>(buf);
+	SOCKS6StackOption *opt = reinterpret_cast<SOCKS6StackOption *>(buf);
 	
 	opt->leg = getLeg();
 	opt->level = getLevel();
 	opt->code = getCode();
 }
 
-void SocketOption::parse(void *buf, OptionSet *optionSet)
+void StackOption::parse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->optionHead.len < sizeof(SOCKS6SocketOption))
+	if (opt->optionHead.len < sizeof(SOCKS6StackOption))
 		throw InvalidFieldException();
 	
-	enumCast<SOCKS6SocketOptionLeg>(opt->leg);
+	enumCast<SOCKS6StackLeg>(opt->leg);
 	
 	switch (opt->level)
 	{
@@ -78,18 +78,18 @@ void SocketOption::parse(void *buf, OptionSet *optionSet)
 //	case SOCKS6_SOCKOPT_LEVEL_IPV6:
 //		break;
 		
-	case SOCKS6_SOCKOPT_LEVEL_TCP:
+	case SOCKS6_STACK_LEVEL_TCP:
 		switch (opt->code)
 		{
-		case SOCKS6_SOCKOPT_CODE_TFO:
+		case SOCKS6_STACK_CODE_TFO:
 			TFOOption::parse(buf, optionSet);
 			break;
 			
-		case SOCKS6_SOCKOPT_CODE_MPTCP:
+		case SOCKS6_STACK_CODE_MPTCP:
 			MPTCPOption::parse(buf, optionSet);
 			break;
 			
-		case SOCKS6_SOCKOPT_CODE_MP_SCHED:
+		case SOCKS6_STACK_CODE_MP_SCHED:
 			MPSchedOption::parse(buf, optionSet);
 			break;
 			
@@ -108,14 +108,14 @@ void SocketOption::parse(void *buf, OptionSet *optionSet)
 
 size_t TFOOption::packedSize() const
 {
-	return sizeof(SOCKS6SocketOption);
+	return sizeof(SOCKS6StackOption);
 }
 
 void TFOOption::parse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
+	if (opt->leg != SOCKS6_STACK_LEG_PROXY_SERVER)
 		throw InvalidFieldException();
 	
 	optionSet->setTFO();
@@ -123,17 +123,17 @@ void TFOOption::parse(void *buf, OptionSet *optionSet)
 
 size_t MPTCPOption::packedSize() const
 {
-	return sizeof(SOCKS6SocketOption);
+	return sizeof(SOCKS6StackOption);
 }
 
 void MPTCPOption::parse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6SocketOption *opt = (SOCKS6SocketOption *)buf;
+	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->optionHead.len != sizeof(SOCKS6SocketOption))
+	if (opt->optionHead.len != sizeof(SOCKS6StackOption))
 		throw InvalidFieldException();
 	
-	if (opt->leg != SOCKS6_SOCKOPT_LEG_PROXY_SERVER)
+	if (opt->leg != SOCKS6_STACK_LEG_PROXY_SERVER)
 		throw InvalidFieldException();
 	
 	optionSet->setMPTCP();
@@ -146,7 +146,7 @@ size_t MPSchedOption::packedSize() const
 
 void MPSchedOption::forcedPack(uint8_t *buf) const
 {
-	SocketOption::forcedPack(buf);
+	StackOption::forcedPack(buf);
 	
 	SOCKS6MPTCPSchedulerOption *opt = reinterpret_cast<SOCKS6MPTCPSchedulerOption *>(buf);
 	
@@ -164,13 +164,13 @@ void MPSchedOption::parse(void *buf, OptionSet *optionSet)
 	
 	switch (opt->socketOptionHead.leg)
 	{
-	case SOCKS6_SOCKOPT_LEG_CLIENT_PROXY:
+	case SOCKS6_STACK_LEG_CLIENT_PROXY:
 		optionSet->setClientProxySched(sched);
 		break;
-	case SOCKS6_SOCKOPT_LEG_PROXY_SERVER:
+	case SOCKS6_STACK_LEG_PROXY_SERVER:
 		optionSet->setProxyServerSched(sched);
 		break;
-	case SOCKS6_SOCKOPT_LEG_BOTH:
+	case SOCKS6_STACK_LEG_BOTH:
 		optionSet->setBothScheds(sched);
 		break;
 	}

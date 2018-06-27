@@ -43,38 +43,38 @@ public:
 	virtual ~Option();
 };
 
-class SocketOption: public Option
+class StackOption: public Option
 {
-	SOCKS6SocketOptionLeg leg;
-	SOCKS6SocketOptionLevel level;
-	SOCKS6SocketOptionCode code;
+	SOCKS6StackLeg leg;
+	SOCKS6StackLevel level;
+	SOCKS6StackOptionCode code;
 	
 protected:
 	virtual void forcedPack(uint8_t *buf) const;
 	
 public:
-	SOCKS6SocketOptionLeg getLeg() const
+	SOCKS6StackLeg getLeg() const
 	{
 		return leg;
 	}
 	
-	SOCKS6SocketOptionLevel getLevel() const
+	SOCKS6StackLevel getLevel() const
 	{
 		return level;
 	}
 	
-	SOCKS6SocketOptionCode getCode() const
+	SOCKS6StackOptionCode getCode() const
 	{
 		return code;
 	}
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	SocketOption(SOCKS6SocketOptionLeg leg, SOCKS6SocketOptionLevel level, SOCKS6SocketOptionCode code)
+	StackOption(SOCKS6StackLeg leg, SOCKS6StackLevel level, SOCKS6StackOptionCode code)
 		: Option(SOCKS6_OPTION_SOCKET), leg(leg), level(level), code(code) {}
 };
 
-class TFOOption: public SocketOption
+class TFOOption: public StackOption
 {
 public:
 	virtual size_t packedSize() const;
@@ -82,10 +82,10 @@ public:
 	static void parse(void *buf, OptionSet *optionSet);
 	
 	TFOOption()
-		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_TFO) {}
+		: StackOption(SOCKS6_STACK_LEG_PROXY_SERVER, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO) {}
 };
 
-class MPTCPOption: public SocketOption
+class MPTCPOption: public StackOption
 {
 public:
 	virtual size_t packedSize() const;
@@ -93,10 +93,10 @@ public:
 	static void parse(void *buf, OptionSet *optionSet);
 	
 	MPTCPOption()
-		: SocketOption(SOCKS6_SOCKOPT_LEG_PROXY_SERVER, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MPTCP) {}
+		: StackOption(SOCKS6_STACK_LEG_PROXY_SERVER, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP) {}
 };
 
-class MPSchedOption: public SocketOption
+class MPSchedOption: public StackOption
 {
 	SOCKS6MPTCPScheduler sched;
 	
@@ -108,8 +108,8 @@ public:
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	MPSchedOption(SOCKS6SocketOptionLeg leg, SOCKS6MPTCPScheduler sched)
-		: SocketOption(leg, SOCKS6_SOCKOPT_LEVEL_TCP, SOCKS6_SOCKOPT_CODE_MP_SCHED), sched(sched) {}
+	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
+		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
 };
 
 class AuthMethodOption: public Option
