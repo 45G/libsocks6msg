@@ -188,7 +188,8 @@ enum SOCKS6StackLevel
 	SOCKS6_STACK_LEVEL_IPV6 = 0x03,
 	SOCKS6_STACK_LEVEL_TCP  = 0x04,
 	SOCKS6_STACK_LEVEL_UDP  = 0x05,
-	SOCKS6_STACK_LEVEL_TLS  = 0x06,
+	/* for future revisions */
+	//SOCKS6_STACK_LEVEL_TLS  = 0x06,
 };
 
 enum SOCKS6StackOptionCode
