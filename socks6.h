@@ -16,7 +16,7 @@ extern "C"
  * 100 + draft revision: accurately represents draft revision
  * 200 + draft revision: builds upon draft revision (subject to heavy API change)
  * 255: no particular draft revision
- * currently: post-draft-02 (202)
+ * currently: draft-03 (103)
  */
 #define SOCKS6_VERSION_MINOR 103
 
