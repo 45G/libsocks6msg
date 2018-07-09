@@ -13,6 +13,9 @@ Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, 
 	
 	if (optionSet.getMode() != OptionSet::M_REQ)
 		throw InvalidFieldException();
+
+	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
+		throw InvalidFieldException();
 }
 
 Request::Request(ByteBuffer *bb)
@@ -29,6 +32,9 @@ Request::Request(ByteBuffer *bb)
 	
 	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
 	initialDataLen = ntohs(rawInitialData->initialDataLen);
+
+	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
+		throw InvalidFieldException();
 }
 
 void Request::pack(ByteBuffer *bb) const
