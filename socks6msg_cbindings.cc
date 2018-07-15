@@ -178,7 +178,7 @@ ssize_t S6M_Request_packedSize(const S6M_Request *req)
 		Address addr = S6M_Addr_Flush(&req->addr);
 		OptionSet optSet(OptionSet::M_REQ);
 		S6M_OptionSet_Flush(&optSet, &req->optionSet);
-		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
+		Request cppReq(req->code, addr, req->port, req->initialDataLen, optSet);
 		
 		return cppReq.packedSize();
 	}
@@ -198,7 +198,7 @@ ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 		Address addr = S6M_Addr_Flush(&req->addr);
 		OptionSet optSet(OptionSet::M_REQ);
 		S6M_OptionSet_Flush(&optSet, &req->optionSet);
-		Request cppReq(req->code, addr, req->port, optSet, req->initialDataLen);
+		Request cppReq(req->code, addr, req->port, req->initialDataLen, optSet);
 		cppReq.pack(&bb);
 		
 		return bb.getUsed();

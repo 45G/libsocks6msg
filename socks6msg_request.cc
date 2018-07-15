@@ -5,8 +5,8 @@
 namespace S6M
 {
 
-Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen)
-	: commandCode(commandCode), address(address), port(port), optionSet(optionSet), initialDataLen(initialDataLen)
+Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, uint16_t initialDataLen, const OptionSet &optionSet)
+	: commandCode(commandCode), address(address), port(port), initialDataLen(initialDataLen), optionSet(optionSet)
 {
 	if (address.getType() == Address::INVALID_TYPE)
 		throw InvalidFieldException();

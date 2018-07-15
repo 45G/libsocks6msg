@@ -15,12 +15,12 @@ class Request
 	Address address;
 	uint16_t port;
 	
-	OptionSet optionSet;
-	
 	uint16_t initialDataLen;
 	
+	OptionSet optionSet;
+	
 public:
-	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, const OptionSet &optionSet, uint16_t initialDataLen);
+	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, uint16_t initialDataLen, const OptionSet &optionSet = OptionSet(OptionSet::M_REQ));
 	
 	Request(ByteBuffer *bb);
 	
