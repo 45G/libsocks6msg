@@ -177,20 +177,23 @@ public:
 
 class TokenWindowRequestOption: public IdempotenceOption
 {
+	uint32_t winSize;
+	
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+	
 public:
 	virtual size_t packedSize() const;
 	
 	static void parse(void *buf, OptionSet *optionSet);
 	
-	TokenWindowRequestOption()
-		: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ) {}
+	TokenWindowRequestOption(uint32_t winSize);
 };
 
 class TokenWindowAdvertOption: public IdempotenceOption
 {
 	uint32_t winBase;
 	uint32_t winSize;
-	
 	
 protected:
 	virtual void forcedPack(uint8_t *buf) const;

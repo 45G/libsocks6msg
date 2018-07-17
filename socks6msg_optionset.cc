@@ -80,9 +80,9 @@ void OptionSet::pack(ByteBuffer *bb) const
 	}
 	
 both_sched_done:
-	if (idempotence.request)
+	if (idempotence.request > 0)
 	{
-		TokenWindowRequestOption().pack(bb);
+		TokenWindowRequestOption(idempotence.request).pack(bb);
 		optsHead->optionCount++;
 	}
 	if (idempotence.spend)
@@ -141,8 +141,8 @@ size_t OptionSet::packedSize()
 		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_SERVER, mptcpSched.proxyServer).packedSize();
 	
 both_sched_done:
-	if (idempotence.request)
-		size += TokenWindowRequestOption().packedSize();
+	if (idempotence.request > 0)
+		size += TokenWindowRequestOption(idempotence.request).packedSize();
 	if (idempotence.spend)
 		size += TokenExpenditureRequestOption(idempotence.token).packedSize();
 	if (idempotence.windowSize > 0)
@@ -208,11 +208,14 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 	mptcpSched.proxyServer = sched;
 }
 
-void OptionSet::requestTokenWindow()
+void OptionSet::requestTokenWindow(uint32_t winSize)
 {
 	enforceMode(M_REQ);
 	
-	idempotence.request = true;
+	if (idempotence.request != 0 && idempotence.request != winSize)
+		throw InvalidFieldException();
+	
+	idempotence.request = winSize;
 }
 
 void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)

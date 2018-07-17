@@ -37,7 +37,7 @@ struct S6M_OptionSet
 	
 	struct
 	{
-		int request;
+		uint32_t request;
 		
 		int spend;
 		uint32_t token;

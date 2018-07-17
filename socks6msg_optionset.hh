@@ -43,7 +43,7 @@ private:
 	
 	struct Idem
 	{
-		bool request;
+		uint32_t request;
 		
 		bool spend;
 		uint32_t token;
@@ -54,7 +54,7 @@ private:
 		SOCKS6TokenExpenditureCode replyCode;
 		
 		Idem()
-			: request(false), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
+			: request(0), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
 	} idempotence;
 	
 	std::set<SOCKS6Method> knownMethods;
@@ -120,12 +120,12 @@ public:
 	void setBothScheds(SOCKS6MPTCPScheduler sched);
 	
 	//TODO: rename most of below methods
-	bool requestedTokenWindow() const
+	uint32_t requestedTokenWindow() const
 	{
 		return idempotence.request;
 	}
 	
-	void requestTokenWindow();
+	void requestTokenWindow(uint32_t winSize);
 	
 	bool advetisedTokenWindow() const
 	{

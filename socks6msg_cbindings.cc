@@ -134,8 +134,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->mptcpSched.proxyServer > 0)
 		cppSet->setProxyServerSched(cSet->mptcpSched.proxyServer);
 	
-	if (cSet->idempotence.request)
-		cppSet->requestTokenWindow();
+	if (cSet->idempotence.request > 0)
+		cppSet->requestTokenWindow(cSet->idempotence.request);
 	if (cSet->idempotence.spend)
 		cppSet->spendToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)

@@ -331,19 +331,40 @@ void IdempotenceOption::parse(void *buf, OptionSet *optionSet)
 	throw InvalidFieldException();
 }
 
+void TokenWindowRequestOption::forcedPack(uint8_t *buf) const
+{
+	IdempotenceOption::forcedPack(buf);
+	
+	SOCKS6WindowRequestOption *opt = reinterpret_cast<SOCKS6WindowRequestOption *>(buf);
+	
+	opt->windowSize = htonl(winSize);
+}
+
 size_t TokenWindowRequestOption::packedSize() const
 {
-	return sizeof(SOCKS6IdempotenceOption);
+	return sizeof(SOCKS6WindowRequestOption);
 }
 
 void TokenWindowRequestOption::parse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
+	SOCKS6WindowRequestOption *opt = reinterpret_cast<SOCKS6WindowRequestOption *>(buf);
 	
-	if (opt->optionHead.len != sizeof(SOCKS6IdempotenceOption))
+	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6WindowRequestOption))
 		throw InvalidFieldException();
 	
-	optionSet->requestTokenWindow();
+	uint32_t winSize = ntohl(opt->windowSize);
+	
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
+		throw InvalidFieldException();
+	
+	optionSet->requestTokenWindow(winSize);
+}
+
+TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
+	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ)
+{
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
+		throw InvalidFieldException();
 }
 
 size_t TokenWindowAdvertOption::packedSize() const
