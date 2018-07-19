@@ -4,8 +4,8 @@
 namespace S6M
 {
 
-OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff, OptionSet optionSet)
-	: code(code), address(address), port(port), initDataOff(initDataOff), optionSet(optionSet)
+OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff)
+	: code(code), address(address), port(port), initDataOff(initDataOff), optionSet(OptionSet::M_OP_REP)
 {
 	if (address.getType() == Address::INVALID_TYPE)
 		throw InvalidFieldException();

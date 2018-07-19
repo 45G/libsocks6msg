@@ -176,9 +176,8 @@ ssize_t S6M_Request_packedSize(const S6M_Request *req)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&req->addr);
-		OptionSet optSet(OptionSet::M_REQ);
-		S6M_OptionSet_Flush(&optSet, &req->optionSet);
-		Request cppReq(req->code, addr, req->port, req->initialDataLen, optSet);
+		Request cppReq(req->code, addr, req->port, req->initialDataLen);
+		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
 		
 		return cppReq.packedSize();
 	}
@@ -196,9 +195,8 @@ ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&req->addr);
-		OptionSet optSet(OptionSet::M_REQ);
-		S6M_OptionSet_Flush(&optSet, &req->optionSet);
-		Request cppReq(req->code, addr, req->port, req->initialDataLen, optSet);
+		Request cppReq(req->code, addr, req->port, req->initialDataLen);
+		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
 		cppReq.pack(&bb);
 		
 		return bb.getUsed();
@@ -263,9 +261,8 @@ ssize_t S6M_AuthReply_packedSize(const S6M_AuthReply *authReply)
 	
 	try
 	{
-		OptionSet optSet(OptionSet::M_AUTH_REP);
-		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
-		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
+		AuthenticationReply cppAuthReply(authReply->code, authReply->method);
+		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
 		
 		return cppAuthReply.packedSize();
 		
@@ -283,9 +280,8 @@ ssize_t S6M_AuthReply_pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t 
 	{
 		ByteBuffer bb(buf, size);
 		
-		OptionSet optSet(OptionSet::M_AUTH_REP);
-		S6M_OptionSet_Flush(&optSet, &authReply->optionSet);
-		AuthenticationReply cppAuthReply(authReply->code, authReply->method, optSet);
+		AuthenticationReply cppAuthReply(authReply->code, authReply->method);
+		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
 		cppAuthReply.pack(&bb);
 		
 		return bb.getUsed();
@@ -350,9 +346,8 @@ ssize_t S6M_OpReply_packedSize(const S6M_OpReply *opReply)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OptionSet optSet(OptionSet::M_OP_REP);
-		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
-		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff);
+		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
 		
 		return cppOpReply.packedSize();
 		
@@ -371,9 +366,8 @@ ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OptionSet optSet(OptionSet::M_OP_REP);
-		S6M_OptionSet_Flush(&optSet, &opReply->optionSet);
-		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff, optSet);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff);
+		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
 		cppOpReply.pack(&bb);
 		
 		return bb.getUsed();

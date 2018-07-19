@@ -16,7 +16,7 @@ class AuthenticationReply
 	OptionSet optionSet;
 	
 public:
-	AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method, OptionSet optionSet = OptionSet(OptionSet::M_AUTH_REP));
+	AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method);
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
@@ -36,7 +36,7 @@ public:
 		return method;
 	}
 	
-	const OptionSet *getOptionSet() const
+	OptionSet *getOptionSet()
 	{
 		return &optionSet;
 	}

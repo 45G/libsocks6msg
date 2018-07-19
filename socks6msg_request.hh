@@ -20,7 +20,7 @@ class Request
 	OptionSet optionSet;
 	
 public:
-	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, uint16_t initialDataLen, const OptionSet &optionSet = OptionSet(OptionSet::M_REQ));
+	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, uint16_t initialDataLen);
 	
 	Request(ByteBuffer *bb);
 	
@@ -45,7 +45,7 @@ public:
 		return port;
 	}
 	
-	const OptionSet *getOptionSet() const
+	OptionSet *getOptionSet()
 	{
 		return &optionSet;
 	}

@@ -5,8 +5,8 @@
 namespace S6M
 {
 
-AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method, OptionSet optionSet)
-	: replyCode(replyCode), method(method), optionSet(optionSet)
+AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method)
+	: replyCode(replyCode), method(method), optionSet(OptionSet::M_AUTH_REP)
 {
 	if (optionSet.getMode() != OptionSet::M_AUTH_REP)
 		throw InvalidFieldException();

@@ -20,7 +20,7 @@ class OperationReply
 	OptionSet optionSet;
 	
 public:
-	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff, OptionSet optionSet = OptionSet(OptionSet::M_OP_REP));
+	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff);
 	
 	OperationReply(ByteBuffer *bb);
 	
@@ -50,7 +50,7 @@ public:
 		return initDataOff;
 	}
 	
-	const OptionSet *getOptionSet() const
+	OptionSet *getOptionSet()
 	{
 		return &optionSet;
 	}
