@@ -57,7 +57,7 @@ private:
 			: request(0), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
 	} idempotence;
 	
-	std::set<SOCKS6Method> knownMethods;
+	std::set<SOCKS6Method> advertisedMethods;
 	
 	struct
 	{
@@ -127,11 +127,6 @@ public:
 	
 	void requestTokenWindow(uint32_t winSize);
 	
-	bool advetisedTokenWindow() const
-	{
-		return idempotence.windowSize > 0;
-	}
-	
 	uint32_t getTokenWindowBase() const
 	{
 		return idempotence.base;
@@ -142,11 +137,11 @@ public:
 		return idempotence.windowSize;
 	}
 	
-	void advetiseTokenWindow(uint32_t base, uint32_t size);
+	void setTokenWindow(uint32_t base, uint32_t size);
 	
-	void spendToken(uint32_t token);
+	void setToken(uint32_t token);
 	
-	bool expenditureAttempted() const
+	bool hasToken() const
 	{
 		return idempotence.spend;
 	}
@@ -156,16 +151,16 @@ public:
 		return idempotence.token;
 	}
 	
-	void replyToExpenditure(SOCKS6TokenExpenditureCode code);
+	void setExpenditureReply(SOCKS6TokenExpenditureCode code);
 	
-	SOCKS6TokenExpenditureCode getExpenditureReplyCode() const
+	SOCKS6TokenExpenditureCode getExpenditureReply() const
 	{
 		return idempotence.replyCode;
 	}
 	
-	const std::set<SOCKS6Method> *getKnownMethods() const
+	const std::set<SOCKS6Method> *getAdvertisedMethods() const
 	{
-		return &knownMethods;
+		return &advertisedMethods;
 	}
 	
 	void advertiseMethod(SOCKS6Method method)
@@ -175,10 +170,10 @@ public:
 		if (method == SOCKS6_METHOD_UNACCEPTABLE)
 			throw InvalidFieldException();
 		
-		knownMethods.insert(method);
+		advertisedMethods.insert(method);
 	}
 	
-	void attemptUserPasswdAuth(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd);
+	void setUsernamePassword(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd);
 	
 	const boost::shared_ptr<std::string> getUsername() const
 	{

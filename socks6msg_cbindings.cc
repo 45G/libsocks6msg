@@ -89,19 +89,16 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->mptcpSched.proxyServer = cppSet->getProxyServerSched();
 	
 	cSet->idempotence.request = cppSet->requestedTokenWindow();
-	cSet->idempotence.spend = cppSet->expenditureAttempted();
+	cSet->idempotence.spend = cppSet->hasToken();
 	if (cSet->idempotence.spend)
 		cSet->idempotence.token = cppSet->getToken();
-	if (cppSet->advetisedTokenWindow())
-	{
-		cSet->idempotence.windowBase = cppSet->getTokenWindowBase();
-		cSet->idempotence.windowSize = cppSet->getTokenWindowSize();
-	}
-	cSet->idempotence.replyCode = cppSet->getExpenditureReplyCode();
+	cSet->idempotence.windowBase = cppSet->getTokenWindowBase();
+	cSet->idempotence.windowSize = cppSet->getTokenWindowSize();
+	cSet->idempotence.replyCode = cppSet->getExpenditureReply();
 	
 	int i = 0;
-	cSet->knownMethods = new SOCKS6Method[cppSet->getKnownMethods()->size()];
-	BOOST_FOREACH(SOCKS6Method method, *(cppSet->getKnownMethods()))
+	cSet->knownMethods = new SOCKS6Method[cppSet->getAdvertisedMethods()->size()];
+	BOOST_FOREACH(SOCKS6Method method, *(cppSet->getAdvertisedMethods()))
 	{
 		if (method == SOCKS6_METHOD_NOAUTH)
 			continue;
@@ -137,11 +134,11 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.request > 0)
 		cppSet->requestTokenWindow(cSet->idempotence.request);
 	if (cSet->idempotence.spend)
-		cppSet->spendToken(cSet->idempotence.token);
+		cppSet->setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
-		cppSet->advetiseTokenWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+		cppSet->setTokenWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
 	if (cSet->idempotence.replyCode > 0)
-		cppSet->replyToExpenditure(cSet->idempotence.replyCode);
+		cppSet->setExpenditureReply(cSet->idempotence.replyCode);
 	
 	if (cSet->knownMethods != NULL)
 	{
@@ -150,7 +147,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
-		cppSet->attemptUserPasswdAuth(boost::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
+		cppSet->setUsernamePassword(boost::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)

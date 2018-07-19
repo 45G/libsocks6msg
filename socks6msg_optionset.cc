@@ -101,7 +101,7 @@ both_sched_done:
 		optsHead->optionCount++;
 	}
 	
-	set<SOCKS6Method> extraMethods(knownMethods);
+	set<SOCKS6Method> extraMethods(advertisedMethods);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
 	if (!extraMethods.empty())
 	{
@@ -150,7 +150,7 @@ both_sched_done:
 	if (idempotence.replyCode > 0)
 		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
 	
-	set<SOCKS6Method> extraMethods(knownMethods);
+	set<SOCKS6Method> extraMethods(advertisedMethods);
 	if (!extraMethods.empty())
 		size += AuthMethodOption(extraMethods).packedSize();
 	
@@ -218,7 +218,7 @@ void OptionSet::requestTokenWindow(uint32_t winSize)
 	idempotence.request = winSize;
 }
 
-void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
+void OptionSet::setTokenWindow(uint32_t base, uint32_t size)
 {
 	enforceMode(M_AUTH_REP);
 	
@@ -231,7 +231,7 @@ void OptionSet::advetiseTokenWindow(uint32_t base, uint32_t size)
 	idempotence.windowSize = size;
 }
 
-void OptionSet::spendToken(uint32_t token)
+void OptionSet::setToken(uint32_t token)
 {
 	enforceMode(M_REQ);
 	
@@ -242,7 +242,7 @@ void OptionSet::spendToken(uint32_t token)
 	idempotence.token = token;
 }
 
-void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
+void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
 {
 	enforceMode(M_OP_REP);
 	
@@ -255,7 +255,7 @@ void OptionSet::replyToExpenditure(SOCKS6TokenExpenditureCode code)
 	idempotence.replyCode = code;
 }
 
-void OptionSet::attemptUserPasswdAuth(const boost::shared_ptr<string> user, const boost::shared_ptr<string> passwd)
+void OptionSet::setUsernamePassword(const boost::shared_ptr<string> user, const boost::shared_ptr<string> passwd)
 {
 	enforceMode(M_REQ);
 	

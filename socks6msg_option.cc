@@ -278,7 +278,7 @@ void UsernamePasswdOption::parse(void *buf, OptionSet *optionSet)
 		if (bb.getUsed() != expectedDataSize)
 			throw InvalidFieldException();
 		
-		optionSet->attemptUserPasswdAuth(req.getUsername(), req.getPassword());
+		optionSet->setUsernamePassword(req.getUsername(), req.getPassword());
 	}
 	catch (EndOfBufferException)
 	{
@@ -395,7 +395,7 @@ void TokenWindowAdvertOption::parse(void *buf, OptionSet *optionSet)
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
 		throw InvalidFieldException();
 	
-	optionSet->advetiseTokenWindow(winBase, winSize);
+	optionSet->setTokenWindow(winBase, winSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -426,7 +426,7 @@ void TokenExpenditureRequestOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureOption))
 		throw InvalidFieldException();
 	
-	optionSet->spendToken(ntohl(opt->token));
+	optionSet->setToken(ntohl(opt->token));
 }
 
 size_t TokenExpenditureReplyOption::packedSize() const
@@ -450,7 +450,7 @@ void TokenExpenditureReplyOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->idempotenceOptionHead.optionHead.len != sizeof(SOCKS6TokenExpenditureReplyOption))
 		throw InvalidFieldException();
 	
-	optionSet->replyToExpenditure(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
+	optionSet->setExpenditureReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
 }
 
 }
