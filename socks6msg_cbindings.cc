@@ -371,7 +371,6 @@ ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 		cppOpReply.pack(&bb);
 		
 		return bb.getUsed();
-		
 	}
 	S6M_CATCH(err);
 	
