@@ -262,7 +262,7 @@ void OptionSet::setUsernamePassword(const boost::shared_ptr<string> user, const 
 	if (user->size() == 0 || passwd->size() == 0)
 		throw InvalidFieldException();
 	
-	if (userPasswdAuth.username->size() != 0 && (*user != *userPasswdAuth.username || *passwd != *userPasswdAuth.passwd))
+	if (userPasswdAuth.username.get() != NULL && (*user != *userPasswdAuth.username || *passwd != *userPasswdAuth.passwd))
 		throw InvalidFieldException();
 	
 	userPasswdAuth.username = user;
