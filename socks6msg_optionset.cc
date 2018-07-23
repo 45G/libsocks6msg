@@ -244,7 +244,7 @@ void OptionSet::setToken(uint32_t token)
 
 void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
 {
-	enforceMode(M_OP_REP);
+	enforceMode(M_AUTH_REP);
 	
 	if (code == 0)
 		throw InvalidFieldException();
