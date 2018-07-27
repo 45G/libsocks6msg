@@ -361,7 +361,7 @@ void TokenWindowRequestOption::parse(void *buf, OptionSet *optionSet)
 }
 
 TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
-	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ)
+	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ), winSize(winSize)
 {
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
 		throw InvalidFieldException();
