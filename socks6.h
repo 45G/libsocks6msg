@@ -13,8 +13,8 @@ extern "C"
 /**
  * @brief VERSION_MINOR
  * < 100 standardized
- * 100 + draft revision: accurately represents draft revision
- * 200 + draft revision: builds upon draft revision (subject to heavy API change)
+ * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
+ * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
  * 255: no particular draft revision
  * currently: post-draft-03 (203)
  */
