@@ -10,9 +10,6 @@ Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, 
 {
 	if (address.getType() == Address::INVALID_TYPE)
 		throw InvalidFieldException();
-	
-	if (optionSet.getMode() != OptionSet::M_REQ)
-		throw InvalidFieldException();
 
 	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
 		throw InvalidFieldException();

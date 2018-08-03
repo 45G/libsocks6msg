@@ -9,9 +9,6 @@ OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, u
 {
 	if (address.getType() == Address::INVALID_TYPE)
 		throw InvalidFieldException();
-		
-	if (optionSet.getMode() != OptionSet::M_OP_REP)
-		throw InvalidFieldException();
 }
 
 OperationReply::OperationReply(ByteBuffer *bb)
