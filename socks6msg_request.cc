@@ -22,13 +22,12 @@ Request::Request(ByteBuffer *bb)
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	commandCode = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
+	initialDataLen = ntohs(rawRequest->initialDataLen);
 	port = ntohs(rawRequest->port);
 	
 	address = Address(bb);
-	optionSet = OptionSet(bb, OptionSet::M_REQ);
 	
-	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
-	initialDataLen = ntohs(rawInitialData->initialDataLen);
+	optionSet = OptionSet(bb, OptionSet::M_REQ);
 
 	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
 		throw InvalidFieldException();
@@ -39,15 +38,13 @@ void Request::pack(ByteBuffer *bb) const
 	Version::pack(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
+	rawRequest->initialDataLen = htons(initialDataLen);
 	rawRequest->commandCode = commandCode;
 	rawRequest->port = htons(port);
 	
 	address.pack(bb);
 	
 	optionSet.pack(bb);
-		       
-	SOCKS6InitialData *rawInitialData = bb->get<SOCKS6InitialData>();
-	rawInitialData->initialDataLen = htons(initialDataLen);
 }
 
 size_t Request::pack(uint8_t *buf, size_t bufSize) const
@@ -59,7 +56,7 @@ size_t Request::pack(uint8_t *buf, size_t bufSize) const
 
 size_t Request::packedSize()
 {
-	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + optionSet.packedSize() + sizeof(SOCKS6InitialData);
+	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + optionSet.packedSize();
 }
 
 }

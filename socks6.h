@@ -31,6 +31,7 @@ struct SOCKS6Version
 struct SOCKS6Request
 {
 	uint8_t commandCode;
+	uint16_t initialDataLen;
 	uint16_t port;
 	uint8_t address[0];
 } __attribute__((packed));
@@ -83,12 +84,6 @@ struct SOCKS6Options
 {
 	uint8_t optionCount;
 	uint8_t options[0];
-} __attribute__((packed));
-
-struct SOCKS6InitialData
-{
-	uint16_t initialDataLen;
-	uint8_t initialData[0];
 } __attribute__((packed));
 
 struct SOCKS6AuthReply
