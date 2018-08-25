@@ -69,14 +69,23 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 	
 	switch (opt->level)
 	{
-//	case SOCKS6_SOCKOPT_LEVEL_SOCKET:
+//	case SOCKS6_SOCKOPT_LEVEL_IP:
 //		break;
 		
 //	case SOCKS6_SOCKOPT_LEVEL_IPV4:
 //		break;
 		
-//	case SOCKS6_SOCKOPT_LEVEL_IPV6:
-//		break;
+	case SOCKS6_STACK_LEVEL_IPV6:
+		switch (opt->code)
+		{
+		case SOCKS6_STACK_CODE_SEGMENTS:
+			SegmentOption::parse(buf, optionSet);
+			break;
+
+		default:
+			throw InvalidFieldException();
+		}
+		break;
 		
 	case SOCKS6_STACK_LEVEL_TCP:
 		switch (opt->code)
