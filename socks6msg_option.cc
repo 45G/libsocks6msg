@@ -137,7 +137,7 @@ void SegmentOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->socketOptionHead.leg != SOCKS6_STACK_LEG_PROXY_SERVER)
 		throw InvalidFieldException();
 
-	size_t segmentsSize = opt->socketOptionHead.optionHead.len - sizeof(opt->socketOptionHead);
+	size_t segmentsSize = opt->socketOptionHead.optionHead.len - sizeof(SOCKS6SegmentOption);
 	if (segmentsSize % 16 != 0)
 		throw InvalidFieldException();
 
@@ -148,14 +148,14 @@ void SegmentOption::parse(void *buf, OptionSet *optionSet)
 
 	vector<in6_addr> forwardSegments;
 	forwardSegments.reserve(opt->forwardSegmentCount);
-	for (unsigned i = 0; i < segmentCount; i++)
-		forwardSegments[i] = *reinterpret_cast<in6_addr *>(&opt->segments[i]);
+	for (unsigned i = 0; i < opt->forwardSegmentCount; i++)
+		forwardSegments.push_back(*reinterpret_cast<in6_addr *>(&opt->segments[i]));
 	optionSet->setForwardSegments(forwardSegments);
 
 	vector<in6_addr> returnSegments;
 	returnSegments.reserve(returnSegmentCount);
 	for (int i = 0; i < returnSegmentCount; i++)
-		returnSegments[i] = *reinterpret_cast<in6_addr *>(&opt->segments[i + opt->forwardSegmentCount]);
+		returnSegments.push_back(*reinterpret_cast<in6_addr *>(&opt->segments[i + opt->forwardSegmentCount]));
 	optionSet->setReturnSegments(returnSegments);
 }
 
