@@ -74,6 +74,24 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
+class SegmentOption: public StackOption
+{
+	std::vector<in6_addr> forwardSegments;
+	std::vector<in6_addr> returnSegments;
+
+protected:
+	void forcedPack(uint8_t *buf) const;
+
+public:
+	SegmentOption(const std::vector<in6_addr> &forwardSegments, const std::vector<in6_addr> &returnSegments)
+		: StackOption(SOCKS6_STACK_LEG_PROXY_SERVER, SOCKS6_STACK_LEVEL_IPV6, SOCKS6_STACK_CODE_SEGMENTS),
+		  forwardSegments(forwardSegments), returnSegments(returnSegments) {}
+
+	static void parse(void *buf, OptionSet *optionSet);
+
+	size_t packedSize() const;
+};
+
 class TFOOption: public StackOption
 {
 public:

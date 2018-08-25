@@ -1,6 +1,7 @@
 #ifndef SOCKS6MSG_OPTIONSET_HH
 #define SOCKS6MSG_OPTIONSET_HH
 
+#include <netinet/ip6.h>
 #include <string>
 #include <list>
 #include <map>
@@ -64,6 +65,9 @@ private:
 		boost::shared_ptr<std::string> username;
 		boost::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
+
+	std::vector<in6_addr> forwardSegments;
+	std::vector<in6_addr> returnSegments;
 	
 	void enforceMode(Mode mode1);
 	
@@ -183,6 +187,20 @@ public:
 	const boost::shared_ptr<std::string> getPassword() const
 	{
 		return userPasswdAuth.passwd;
+	}
+
+	void setForwardSegments(const std::vector<in6_addr> &segments);
+
+	const std::vector<in6_addr> *getForwardSegments()
+	{
+		return &forwardSegments;
+	}
+
+	void setReturnSegments(const std::vector<in6_addr> &segments);
+
+	const std::vector<in6_addr> *getReturnSegments()
+	{
+		return &returnSegments;
 	}
 };
 

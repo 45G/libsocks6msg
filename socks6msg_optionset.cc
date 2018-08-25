@@ -114,6 +114,12 @@ both_sched_done:
 		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
 		optsHead->optionCount++;
 	}
+
+	if (forwardSegments.size() + returnSegments.size() > 0)
+	{
+		SegmentOption(forwardSegments, returnSegments).pack(bb);
+		optsHead->optionCount++;
+	}
 }
 
 size_t OptionSet::packedSize()
@@ -156,6 +162,9 @@ both_sched_done:
 	
 	if (!userPasswdAuth.username->empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
+
+	if (forwardSegments.size() + returnSegments.size() > 0)
+		size += SegmentOption(forwardSegments, returnSegments).packedSize();
 	
 	return size;
 }
@@ -267,6 +276,59 @@ void OptionSet::setUsernamePassword(const boost::shared_ptr<string> user, const 
 	
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
+}
+
+//static bool operator ==(const in6_addr first, const in6_addr second)
+//{
+//	for (int i = 0; i < 4; i++)
+//	{
+//		if (first.__in6_u.__u6_addr32[i] != second.__in6_u.__u6_addr32[i])
+//			return false;
+//	}
+//	return true;
+//}
+
+static bool equal(const vector<in6_addr> &first, const vector<in6_addr> &second)
+{
+	if (first.size() != second.size())
+		return false;
+
+	for (unsigned i = 0; i < first.size(); i++)
+	{
+		for (int j = 0; j < 4; i++)
+		{
+			if (first[i].__in6_u.__u6_addr32[j] != second[i].__in6_u.__u6_addr32[j])
+				return false;
+		}
+	}
+
+	return true;
+}
+
+void OptionSet::setForwardSegments(const std::vector<in6_addr> &segments)
+{
+	enforceMode(M_REQ);
+
+	if (forwardSegments.size() > 0 && !equal(segments, forwardSegments))
+		    throw InvalidFieldException();
+
+	if (segments.size() + returnSegments.size() > 15) //TODO: more elegant!
+		throw InvalidFieldException();
+
+	forwardSegments = segments;
+}
+
+void OptionSet::setReturnSegments(const std::vector<in6_addr> &segments)
+{
+	enforceMode(M_REQ);
+
+	if (returnSegments.size() > 0 && !equal(segments, returnSegments))
+		    throw InvalidFieldException();
+
+	if (segments.size() + forwardSegments.size() > 15) //TODO: more elegant!
+		throw InvalidFieldException();
+
+	returnSegments = segments;
 }
 
 }

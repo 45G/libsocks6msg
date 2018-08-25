@@ -192,6 +192,7 @@ enum SOCKS6StackOptionCode
 	/* IP */
 	/* IPv4 */
 	/* IPv6 */
+	SOCKS6_STACK_CODE_SEGMENTS = 0x01,
 	/* TCP */
 	SOCKS6_STACK_CODE_TFO      = 0x01,
 	SOCKS6_STACK_CODE_MPTCP    = 0x02,
@@ -199,6 +200,13 @@ enum SOCKS6StackOptionCode
 	/* UDP */
 	/* TLS*/
 };
+
+struct SOCKS6SegmentOption
+{
+	struct SOCKS6StackOption socketOptionHead;
+	uint8_t forwardSegmentCount;
+	uint8_t segments[0][16];
+} __attribute__((packed));
 
 struct SOCKS6MPTCPSchedulerOption
 {

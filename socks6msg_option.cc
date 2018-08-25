@@ -106,6 +106,55 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 	}
 }
 
+void SegmentOption::forcedPack(uint8_t *buf) const
+{
+	StackOption::forcedPack(buf);
+
+	SOCKS6SegmentOption *opt = reinterpret_cast<SOCKS6SegmentOption *>(buf);
+
+	opt->forwardSegmentCount = forwardSegments.size();
+
+	for (unsigned i = 0; i < forwardSegments.size(); i++)
+		memcpy(&opt->segments[i], &forwardSegments[i], 16);
+
+	for (unsigned i = 0; i < returnSegments.size(); i++)
+		memcpy(&opt->segments[i + opt->forwardSegmentCount], &returnSegments[i], 16);
+}
+
+void SegmentOption::parse(void *buf, OptionSet *optionSet)
+{
+	SOCKS6SegmentOption *opt = (SOCKS6SegmentOption *)buf;
+
+	if (opt->socketOptionHead.leg != SOCKS6_STACK_LEG_PROXY_SERVER)
+		throw InvalidFieldException();
+
+	size_t segmentsSize = opt->socketOptionHead.optionHead.len - sizeof(opt->socketOptionHead);
+	if (segmentsSize % 16 != 0)
+		throw InvalidFieldException();
+
+	size_t segmentCount = segmentsSize / 16;
+	ssize_t returnSegmentCount = segmentCount - opt->forwardSegmentCount;
+	if (returnSegmentCount < 0)
+		throw InvalidFieldException();
+
+	vector<in6_addr> forwardSegments;
+	forwardSegments.reserve(opt->forwardSegmentCount);
+	for (unsigned i = 0; i < segmentCount; i++)
+		forwardSegments[i] = *reinterpret_cast<in6_addr *>(&opt->segments[i]);
+	optionSet->setForwardSegments(forwardSegments);
+
+	vector<in6_addr> returnSegments;
+	returnSegments.reserve(returnSegmentCount);
+	for (int i = 0; i < returnSegmentCount; i++)
+		returnSegments[i] = *reinterpret_cast<in6_addr *>(&opt->segments[i + opt->forwardSegmentCount]);
+	optionSet->setReturnSegments(returnSegments);
+}
+
+size_t SegmentOption::packedSize() const
+{
+	return sizeof(SOCKS6SegmentOption) + (forwardSegments.size() + returnSegments.size()) * 16;
+}
+
 size_t TFOOption::packedSize() const
 {
 	return sizeof(SOCKS6StackOption);
