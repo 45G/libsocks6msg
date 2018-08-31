@@ -16,9 +16,9 @@ extern "C"
  * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
  * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
  * 255: no particular draft revision
- * currently: draft-04 (104)
+ * currently: post-draft-04 (204)
  */
-#define SOCKS6_VERSION_MINOR 104
+#define SOCKS6_VERSION_MINOR 204
 
 #define SOCKS6_PWAUTH_VERSION 0x01
 
@@ -30,9 +30,9 @@ struct SOCKS6Version
 
 struct SOCKS6Request
 {
-	uint8_t commandCode;
 	uint16_t initialDataLen;
 	uint16_t port;
+	uint8_t commandCode;
 	uint8_t address[0];
 } __attribute__((packed));
 
@@ -118,9 +118,9 @@ enum SOCKS6Method
 
 struct SOCKS6OperationReply
 {
-	uint8_t code;
 	uint16_t initialDataOffset;
 	uint16_t bindPort;
+	uint8_t code;
 	uint8_t bindAddress[0];
 } __attribute__((packed));
 
