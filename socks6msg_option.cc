@@ -16,7 +16,7 @@ void Option::forcedPack(uint8_t *buf) const
 	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
 	
 	opt->kind = getKind();
-	opt->len = packedSize();
+	opt->len  = packedSize();
 }
 
 void Option::parse(void *buf, OptionSet *optionSet)
@@ -53,9 +53,9 @@ void StackOption::forcedPack(uint8_t *buf) const
 	
 	SOCKS6StackOption *opt = reinterpret_cast<SOCKS6StackOption *>(buf);
 	
-	opt->leg = getLeg();
+	opt->leg   = getLeg();
 	opt->level = getLevel();
-	opt->code = getCode();
+	opt->code  = getCode();
 }
 
 void StackOption::parse(void *buf, OptionSet *optionSet)
