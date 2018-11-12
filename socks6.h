@@ -16,9 +16,9 @@ extern "C"
  * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
  * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
  * 255: no particular draft revision
- * currently: draft-04 (104)
+ * currently: post-draft-04 (204)
  */
-#define SOCKS6_VERSION_MINOR 104
+#define SOCKS6_VERSION_MINOR 204
 
 #define SOCKS6_PWAUTH_VERSION 0x01
 
@@ -31,7 +31,6 @@ struct SOCKS6Version
 struct SOCKS6Request
 {
 	uint8_t commandCode;
-	uint16_t initialDataLen;
 	uint16_t port;
 	uint8_t address[0];
 } __attribute__((packed));
@@ -67,10 +66,6 @@ enum SOCKS6RequestCode
 	SOCKS6_REQUEST_CONNECT    = 0x01,
 	SOCKS6_REQUEST_BIND       = 0x02,
 	SOCKS6_REQUEST_UDP_ASSOC  = 0x03,
-	/* for future revisions */
-//	SOCKS6_REQUEST_TCP_ASSOC  = 0x04,
-//	SOCKS6_REQUEST_DTLS_ASSOC = 0x05,
-//	SOCKS6_REQUEST_TLS_ASSOC  = 0x06,
 };
 
 enum SOCKS6AddressType
@@ -119,7 +114,6 @@ enum SOCKS6Method
 struct SOCKS6OperationReply
 {
 	uint8_t code;
-	uint16_t initialDataOffset;
 	uint16_t bindPort;
 	uint8_t bindAddress[0];
 } __attribute__((packed));
@@ -151,6 +145,9 @@ enum SOCKS6OptionKind
 	SOCKS6_OPTION_AUTH_METHOD = 0x02,
 	SOCKS6_OPTION_AUTH_DATA   = 0x03,
 	SOCKS6_OPTION_IDEMPOTENCE = 0x04,
+
+	SOCKS6_OPTION_VENDOR_MIN  = 0xe0,
+	SOCKS6_OPTION_VENDOR_MAX  = 0xff,
 };
 
 struct SOCKS6StackOption
@@ -190,15 +187,33 @@ enum SOCKS6StackLevel
 enum SOCKS6StackOptionCode
 {
 	/* IP */
+	SOCKS6_STACK_CODE_TOS      = 0x01,
+
 	/* IPv4 */
+
 	/* IPv6 */
+
 	/* TCP */
 	SOCKS6_STACK_CODE_TFO      = 0x01,
 	SOCKS6_STACK_CODE_MPTCP    = 0x02,
 	SOCKS6_STACK_CODE_MP_SCHED = 0x03,
+
 	/* UDP */
-	/* TLS*/
+
+	/* TLS */
 };
+
+struct SOCKS6TOSOption
+{
+	struct SOCKS6StackOption socketOptionHead;
+	uint8_t tos;
+} __attribute__((packed));
+
+struct SOCKS6TFOOption
+{
+	struct SOCKS6StackOption socketOptionHead;
+	uint16_t payloadLen;
+} __attribute__((packed));
 
 struct SOCKS6MPTCPSchedulerOption
 {
@@ -213,11 +228,20 @@ enum SOCKS6MPTCPScheduler
 	SOCKS6_MPTCP_SCHEDULER_REDUNDANT = 0x03,
 };
 
+struct SOCKS6BacklogOption
+{
+	struct SOCKS6StackOption socketOptionHead;
+	uint16_t backlog;
+} __attribute__((packed));
+
 struct SOCKS6AuthMethodOption
 {
 	struct SOCKS6Option optionHead;
+	uint16_t initialDataLen;
 	uint8_t methods[0];
 } __attribute__((packed));
+
+#define SOCKS6_INITIAL_DATA_MAX (1 << 14)
 
 struct SOCKS6AuthDataOption
 {
@@ -276,6 +300,24 @@ enum SOCKS6TokenExpenditureCode
 	SOCKS6_TOK_EXPEND_OUT_OF_WND = 0x03,
 	SOCKS6_TOK_EXPEND_DUPLICATE  = 0x04,
 };
+
+struct SOCKS6AssocInit
+{
+	uint32_t assocID;
+} __attribute__((packed));
+
+struct SOCKS6AssocConfirmation
+{
+	uint8_t status;
+} __attribute__((packed));
+
+struct SOCKS6DatagramHeader
+{
+	struct SOCKS6Version version;
+	uint32_t assocID;
+	uint16_t port;
+	uint8_t address[0];
+} __attribute__((packed));
 
 #ifdef __cplusplus
 }
