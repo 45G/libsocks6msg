@@ -235,7 +235,7 @@ void OptionSet::setBothTOS(uint8_t tos)
 
 void OptionSet::setTFO()
 {
-	enforceMode(M_REQ, M_OP_REP);
+	enforceMode(M_REQ);
 	
 	tfo = true;
 }
