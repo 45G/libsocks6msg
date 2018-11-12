@@ -24,6 +24,12 @@ struct S6M_Address
 
 struct S6M_OptionSet
 {
+	struct
+	{
+		uint8_t clientProxy;
+		uint8_t proxyRemote;
+	} tos;
+
 	int tfo;
 	
 	int mptcp;

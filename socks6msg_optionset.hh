@@ -97,14 +97,14 @@ public:
 	
 	void setClientProxyTOS(uint8_t ipTOS);
 
-	uint8_t getClientProxyTOS()
+	uint8_t getClientProxyTOS() const
 	{
 		return ipTOS.clientProxy;
 	}
 
 	void setProxyRemoteTOS(uint8_t ipTOS);
 
-	uint8_t getProxyRemoteTOS()
+	uint8_t getProxyRemoteTOS() const
 	{
 		return ipTOS.proxyRemote;
 	}

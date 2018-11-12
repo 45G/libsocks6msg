@@ -82,6 +82,9 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 
 static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 {
+	cSet->tos.clientProxy = cppSet->getClientProxyTOS();
+	cSet->tos.proxyRemote = cppSet->getProxyRemoteTOS();
+
 	cSet->tfo = cppSet->getTFO();
 	cSet->mptcp = cppSet->getMPTCP();
 	
@@ -121,6 +124,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 
 static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 {
+	if (cSet->tos.clientProxy > 0)
+		cppSet->setClientProxyTOS(cSet->tos.clientProxy);
+	if (cSet->tos.proxyRemote > 0)
+		cppSet->setProxyRemoteTOS(cSet->tos.proxyRemote);
+
 	if (cSet->tfo)
 		cppSet->setTFO();
 	if (cSet->mptcp)
