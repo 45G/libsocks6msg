@@ -61,7 +61,7 @@ void OptionSet::pack(ByteBuffer *bb) const
 	
 	if (mptcpSched.clientProxy > 0)
 	{
-		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
+		if (mptcpSched.proxyRemote == mptcpSched.clientProxy)
 		{
 			MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy).pack(bb);
 			optsHead->optionCount++;
@@ -73,13 +73,36 @@ void OptionSet::pack(ByteBuffer *bb) const
 			optsHead->optionCount++;
 		}
 	}
-	if (mptcpSched.proxyServer > 0)
+	if (mptcpSched.proxyRemote > 0)
 	{
-		MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyServer).pack(bb);
+		MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote).pack(bb);
 		optsHead->optionCount++;
 	}
 	
 both_sched_done:
+
+	if (ipTOS.clientProxy > 0)
+	{
+		if (ipTOS.proxyRemote == ipTOS.clientProxy)
+		{
+			TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy).pack(bb);
+			optsHead->optionCount++;
+			goto both_tos_done;
+		}
+		else
+		{
+			TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy).pack(bb);
+			optsHead->optionCount++;
+		}
+	}
+	if (ipTOS.proxyRemote > 0)
+	{
+		TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote).pack(bb);
+		optsHead->optionCount++;
+	}
+
+both_tos_done:
+
 	if (idempotence.request > 0)
 	{
 		TokenWindowRequestOption(idempotence.request).pack(bb);
@@ -127,7 +150,7 @@ size_t OptionSet::packedSize()
 	
 	if (mptcpSched.clientProxy > 0)
 	{
-		if (mptcpSched.proxyServer == mptcpSched.clientProxy)
+		if (mptcpSched.proxyRemote == mptcpSched.clientProxy)
 		{
 			size += MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy).packedSize();
 			goto both_sched_done;
@@ -137,10 +160,28 @@ size_t OptionSet::packedSize()
 			size += MPSchedOption(SOCKS6_STACK_LEG_CLIENT_PROXY, mptcpSched.clientProxy).packedSize();
 		}
 	}
-	if (mptcpSched.proxyServer > 0)
-		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyServer).packedSize();
+	if (mptcpSched.proxyRemote > 0)
+		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote).packedSize();
 	
 both_sched_done:
+
+	if (ipTOS.clientProxy > 0)
+	{
+		if (ipTOS.proxyRemote == ipTOS.clientProxy)
+		{
+			size += TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy).packedSize();
+			goto both_tos_done;
+		}
+		else
+		{
+			size += TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy).packedSize();
+		}
+	}
+	if (ipTOS.proxyRemote > 0)
+		size += TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote).packedSize();
+
+both_tos_done:
+
 	if (idempotence.request > 0)
 		size += TokenWindowRequestOption(idempotence.request).packedSize();
 	if (idempotence.spend)
@@ -158,6 +199,38 @@ both_sched_done:
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
 	
 	return size;
+}
+
+void OptionSet::setClientProxyTOS(uint8_t tos)
+{
+	enforceMode(M_REQ, M_OP_REP);
+
+	if (ipTOS.clientProxy != 0 && ipTOS.clientProxy != tos)
+		throw InvalidFieldException();
+	ipTOS.clientProxy = tos;
+}
+
+void OptionSet::setProxyRemoteTOS(uint8_t tos)
+{
+	enforceMode(M_REQ, M_OP_REP);
+
+	if (ipTOS.proxyRemote != 0 && ipTOS.proxyRemote != tos)
+		throw InvalidFieldException();
+	ipTOS.proxyRemote = tos;
+}
+
+void OptionSet::setBothTOS(uint8_t tos)
+{
+	enforceMode(M_REQ, M_OP_REP);
+
+	bool canSetCP = ipTOS.clientProxy == 0 || ipTOS.clientProxy == tos;
+	bool canSetPS = ipTOS.proxyRemote == 0 || ipTOS.proxyRemote == tos;
+
+	if (!(canSetCP && canSetPS))
+		throw InvalidFieldException();
+
+	ipTOS.clientProxy = tos;
+	ipTOS.proxyRemote = tos;
 }
 
 void OptionSet::setTFO()
@@ -184,14 +257,14 @@ void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 	mptcpSched.clientProxy = sched;
 }
 
-void OptionSet::setProxyServerSched(SOCKS6MPTCPScheduler sched)
+void OptionSet::setProxyRemoteSched(SOCKS6MPTCPScheduler sched)
 {
 	enforceMode(M_REQ, M_OP_REP);
 	
-	if (mptcpSched.proxyServer != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyServer != sched)
+	if (mptcpSched.proxyRemote != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyRemote != sched)
 		throw InvalidFieldException();
 	
-	mptcpSched.proxyServer = sched;
+	mptcpSched.proxyRemote = sched;
 }
 
 void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
@@ -199,13 +272,13 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 	enforceMode(M_REQ, M_OP_REP);
 	
 	bool canSetCP = mptcpSched.clientProxy == (SOCKS6MPTCPScheduler)0 || mptcpSched.clientProxy == sched;
-	bool canSetPS = mptcpSched.proxyServer == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyServer == sched;
+	bool canSetPS = mptcpSched.proxyRemote == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyRemote == sched;
 	
 	if (!(canSetCP && canSetPS))
 		throw InvalidFieldException();
 	
 	mptcpSched.clientProxy = sched;
-	mptcpSched.proxyServer = sched;
+	mptcpSched.proxyRemote = sched;
 }
 
 void OptionSet::requestTokenWindow(uint32_t winSize)

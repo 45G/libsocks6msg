@@ -74,6 +74,22 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
+class TOSOption: public StackOption
+{
+	uint8_t tos;
+
+protected:
+	virtual void forcedPack(uint8_t *buf) const;
+
+public:
+	virtual size_t packedSize() const;
+
+	static void parse(void *buf, OptionSet *optionSet);
+
+	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
+		: StackOption(leg, SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS), tos(tos) {}
+};
+
 class TFOOption: public StackOption
 {
 public:

@@ -27,6 +27,12 @@ public:
 private:
 	Mode mode;
 	
+	struct TOS
+	{
+		uint8_t clientProxy;
+		uint8_t proxyRemote;
+	} ipTOS;
+
 	bool tfo;
 	
 	bool mptcp;
@@ -34,10 +40,10 @@ private:
 	struct Scheds
 	{
 		SOCKS6MPTCPScheduler clientProxy;
-		SOCKS6MPTCPScheduler proxyServer;
+		SOCKS6MPTCPScheduler proxyRemote;
 		
 		Scheds()
-			: clientProxy((SOCKS6MPTCPScheduler) 0), proxyServer((SOCKS6MPTCPScheduler) 0) {}
+			: clientProxy((SOCKS6MPTCPScheduler) 0), proxyRemote((SOCKS6MPTCPScheduler) 0) {}
 		
 	} mptcpSched;
 	
@@ -89,6 +95,22 @@ public:
 		return mode;
 	}
 	
+	void setClientProxyTOS(uint8_t ipTOS);
+
+	uint8_t getClientProxyTOS()
+	{
+		return ipTOS.clientProxy;
+	}
+
+	void setProxyRemoteTOS(uint8_t ipTOS);
+
+	uint8_t getProxyRemoteTOS()
+	{
+		return ipTOS.proxyRemote;
+	}
+
+	void setBothTOS(uint8_t ipTOS);
+
 	bool getTFO() const
 	{
 		return tfo;
@@ -110,12 +132,12 @@ public:
 	
 	void setClientProxySched(SOCKS6MPTCPScheduler sched);
 	
-	SOCKS6MPTCPScheduler getProxyServerSched() const
+	SOCKS6MPTCPScheduler getProxyRemoteSched() const
 	{
-		return mptcpSched.proxyServer;
+		return mptcpSched.proxyRemote;
 	}
 	
-	void setProxyServerSched(SOCKS6MPTCPScheduler sched);
+	void setProxyRemoteSched(SOCKS6MPTCPScheduler sched);
 	
 	void setBothScheds(SOCKS6MPTCPScheduler sched);
 	

@@ -69,13 +69,19 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 	
 	switch (opt->level)
 	{
-//	case SOCKS6_SOCKOPT_LEVEL_SOCKET:
+	case SOCKS6_STACK_LEVEL_IP:
+		switch (opt->code)
+		{
+		case SOCKS6_STACK_CODE_TOS:
+			TOSOption::parse(buf, optionSet);
+			break;
+		}
+		break;
+		
+//	case SOCKS6_STACK_LEVEL_IPV4:
 //		break;
 		
-//	case SOCKS6_SOCKOPT_LEVEL_IPV4:
-//		break;
-		
-//	case SOCKS6_SOCKOPT_LEVEL_IPV6:
+//	case SOCKS6_STACK_LEVEL_IPV6:
 //		break;
 		
 	case SOCKS6_STACK_LEVEL_TCP:
@@ -103,6 +109,43 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 		
 	default:
 		throw InvalidFieldException();
+	}
+}
+
+void TOSOption::forcedPack(uint8_t *buf) const
+{
+	StackOption::forcedPack(buf);
+
+	TOSOption *opt = reinterpret_cast<TOSOption *>(buf);
+
+	opt->tos = tos;
+}
+
+size_t TOSOption::packedSize() const
+{
+	return sizeof(SOCKS6TOSOption);
+}
+
+void TOSOption::parse(void *buf, OptionSet *optionSet)
+{
+	SOCKS6TOSOption *opt = (SOCKS6TOSOption *)buf;
+
+	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6TOSOption))
+		throw InvalidFieldException();
+
+	uint8_t tos = opt->tos;
+
+	switch (opt->socketOptionHead.leg)
+	{
+	case SOCKS6_STACK_LEG_CLIENT_PROXY:
+		optionSet->setClientProxyTOS(tos);
+		break;
+	case SOCKS6_STACK_LEG_PROXY_REMOTE:
+		optionSet->setProxyRemoteTOS(tos);
+		break;
+	case SOCKS6_STACK_LEG_BOTH:
+		optionSet->setBothTOS(tos);
+		break;
 	}
 }
 
@@ -168,7 +211,7 @@ void MPSchedOption::parse(void *buf, OptionSet *optionSet)
 		optionSet->setClientProxySched(sched);
 		break;
 	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		optionSet->setProxyServerSched(sched);
+		optionSet->setProxyRemoteSched(sched);
 		break;
 	case SOCKS6_STACK_LEG_BOTH:
 		optionSet->setBothScheds(sched);
