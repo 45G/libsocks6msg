@@ -37,7 +37,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		
 		try
 		{
-			Option::parse(opt, this);
+			Option::incementalParse(opt, this);
 		}
 		catch (InvalidFieldException) {}
 	}

@@ -11,7 +11,7 @@ using namespace boost;
 namespace S6M
 {
 
-void Option::forcedPack(uint8_t *buf) const
+void Option::fill(uint8_t *buf) const
 {
 	SOCKS6Option *opt = reinterpret_cast<SOCKS6Option *>(buf);
 	
@@ -19,25 +19,25 @@ void Option::forcedPack(uint8_t *buf) const
 	opt->len  = packedSize();
 }
 
-void Option::parse(void *buf, OptionSet *optionSet)
+void Option::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6Option *opt = (SOCKS6Option *)buf;
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_STACK:
-		StackOption::parse(buf, optionSet);
+		StackOption::incementalParse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD:
-		AuthMethodOption::parse(buf, optionSet);
+		AuthMethodOption::incementalParse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_DATA:
-		AuthDataOption::parse(buf, optionSet);
+		AuthDataOption::incementalParse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_IDEMPOTENCE:
-		IdempotenceOption::parse(buf, optionSet);
+		IdempotenceOption::incementalParse(buf, optionSet);
 		break;
 		
 	default:
@@ -47,9 +47,9 @@ void Option::parse(void *buf, OptionSet *optionSet)
 
 Option::~Option() {}
 
-void StackOption::forcedPack(uint8_t *buf) const
+void StackOption::fill(uint8_t *buf) const
 {
-	Option::forcedPack(buf);
+	Option::fill(buf);
 	
 	SOCKS6StackOption *opt = reinterpret_cast<SOCKS6StackOption *>(buf);
 	
@@ -58,7 +58,7 @@ void StackOption::forcedPack(uint8_t *buf) const
 	opt->code  = getCode();
 }
 
-void StackOption::parse(void *buf, OptionSet *optionSet)
+void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
@@ -73,7 +73,7 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TOS:
-			TOSOption::parse(buf, optionSet);
+			TOSOption::incementalParse(buf, optionSet);
 			break;
 		}
 		break;
@@ -88,15 +88,15 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TFO:
-			TFOOption::parse(buf, optionSet);
+			TFOOption::incementalParse(buf, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MPTCP:
-			MPTCPOption::parse(buf, optionSet);
+			MPTCPOption::incementalParse(buf, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MP_SCHED:
-			MPSchedOption::parse(buf, optionSet);
+			MPSchedOption::incementalParse(buf, optionSet);
 			break;
 			
 		default:
@@ -112,9 +112,9 @@ void StackOption::parse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void TOSOption::forcedPack(uint8_t *buf) const
+void TOSOption::fill(uint8_t *buf) const
 {
-	StackOption::forcedPack(buf);
+	StackOption::fill(buf);
 
 	TOSOption *opt = reinterpret_cast<TOSOption *>(buf);
 
@@ -126,7 +126,7 @@ size_t TOSOption::packedSize() const
 	return sizeof(SOCKS6TOSOption);
 }
 
-void TOSOption::parse(void *buf, OptionSet *optionSet)
+void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TOSOption *opt = (SOCKS6TOSOption *)buf;
 
@@ -154,7 +154,7 @@ size_t TFOOption::packedSize() const
 	return sizeof(SOCKS6StackOption);
 }
 
-void TFOOption::parse(void *buf, OptionSet *optionSet)
+void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
@@ -169,7 +169,7 @@ size_t MPTCPOption::packedSize() const
 	return sizeof(SOCKS6StackOption);
 }
 
-void MPTCPOption::parse(void *buf, OptionSet *optionSet)
+void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
@@ -187,16 +187,16 @@ size_t MPSchedOption::packedSize() const
 	return sizeof(SOCKS6MPTCPSchedulerOption);
 }
 
-void MPSchedOption::forcedPack(uint8_t *buf) const
+void MPSchedOption::fill(uint8_t *buf) const
 {
-	StackOption::forcedPack(buf);
+	StackOption::fill(buf);
 	
 	SOCKS6MPTCPSchedulerOption *opt = reinterpret_cast<SOCKS6MPTCPSchedulerOption *>(buf);
 	
 	opt->scheduler = sched;
 }
 
-void MPSchedOption::parse(void *buf, OptionSet *optionSet)
+void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
 	
@@ -224,9 +224,9 @@ size_t AuthMethodOption::packedSize() const
 	return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
 }
 
-void AuthMethodOption::forcedPack(uint8_t *buf) const
+void AuthMethodOption::fill(uint8_t *buf) const
 {
-	Option::forcedPack(buf);
+	Option::fill(buf);
 	
 	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
 	
@@ -237,7 +237,7 @@ void AuthMethodOption::forcedPack(uint8_t *buf) const
 	}
 }
 
-void AuthMethodOption::parse(void *buf, OptionSet *optionSet)
+void AuthMethodOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6AuthMethodOption *opt = (SOCKS6AuthMethodOption *)buf;
 	
@@ -259,16 +259,16 @@ AuthMethodOption::AuthMethodOption(std::set<SOCKS6Method> methods)
 		throw InvalidFieldException();
 }
 
-void AuthDataOption::forcedPack(uint8_t *buf) const
+void AuthDataOption::fill(uint8_t *buf) const
 {
-	Option::forcedPack(buf);
+	Option::fill(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
 	
 	opt->method = method;
 }
 
-void AuthDataOption::parse(void *buf, OptionSet *optionSet)
+void AuthDataOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
@@ -283,7 +283,7 @@ void AuthDataOption::parse(void *buf, OptionSet *optionSet)
 //		throw InvalidFieldException();
 		
 	case SOCKS6_METHOD_USRPASSWD:
-		UsernamePasswdOption::parse(buf, optionSet);
+		UsernamePasswdOption::incementalParse(buf, optionSet);
 		break;
 		
 	default:
@@ -296,9 +296,9 @@ size_t UsernamePasswdOption::packedSize() const
 	return sizeof(SOCKS6AuthDataOption) + req.packedSize();
 }
 
-void UsernamePasswdOption::forcedPack(uint8_t *buf) const
+void UsernamePasswdOption::fill(uint8_t *buf) const
 {
-	AuthDataOption::forcedPack(buf);
+	AuthDataOption::fill(buf);
 	
 	SOCKS6AuthDataOption *opt = reinterpret_cast<SOCKS6AuthDataOption *>(buf);
 	
@@ -307,7 +307,7 @@ void UsernamePasswdOption::forcedPack(uint8_t *buf) const
 	req.pack(&bb);
 }
 
-void UsernamePasswdOption::parse(void *buf, OptionSet *optionSet)
+void UsernamePasswdOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
 	
@@ -336,16 +336,16 @@ void UsernamePasswdOption::parse(void *buf, OptionSet *optionSet)
 UsernamePasswdOption::UsernamePasswdOption(boost::shared_ptr<string> username, boost::shared_ptr<string> passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
-void IdempotenceOption::forcedPack(uint8_t *buf) const
+void IdempotenceOption::fill(uint8_t *buf) const
 {
-	Option::forcedPack(buf);
+	Option::fill(buf);
 	
 	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
 	opt->type = type;
 }
 
-void IdempotenceOption::parse(void *buf, OptionSet *optionSet)
+void IdempotenceOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
 	
@@ -355,28 +355,28 @@ void IdempotenceOption::parse(void *buf, OptionSet *optionSet)
 	switch ((SOCKS6IDempotenceType)opt->type)
 	{
 	case SOCKS6_IDEMPOTENCE_WND_REQ:
-		TokenWindowRequestOption::parse(buf, optionSet);
+		TokenWindowRequestOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_WND_ADVERT:
-		TokenWindowAdvertOption::parse(buf, optionSet);
+		TokenWindowAdvertOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND:
-		TokenExpenditureRequestOption::parse(buf, optionSet);
+		TokenExpenditureRequestOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY:
-		TokenExpenditureReplyOption::parse(buf, optionSet);
+		TokenExpenditureReplyOption::incementalParse(buf, optionSet);
 		break;
 	}
 	
 	throw InvalidFieldException();
 }
 
-void TokenWindowRequestOption::forcedPack(uint8_t *buf) const
+void TokenWindowRequestOption::fill(uint8_t *buf) const
 {
-	IdempotenceOption::forcedPack(buf);
+	IdempotenceOption::fill(buf);
 	
 	SOCKS6WindowRequestOption *opt = reinterpret_cast<SOCKS6WindowRequestOption *>(buf);
 	
@@ -388,7 +388,7 @@ size_t TokenWindowRequestOption::packedSize() const
 	return sizeof(SOCKS6WindowRequestOption);
 }
 
-void TokenWindowRequestOption::parse(void *buf, OptionSet *optionSet)
+void TokenWindowRequestOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6WindowRequestOption *opt = reinterpret_cast<SOCKS6WindowRequestOption *>(buf);
 	
@@ -415,9 +415,9 @@ size_t TokenWindowAdvertOption::packedSize() const
 	return sizeof(SOCKS6WindowAdvertOption);
 }
 
-void TokenWindowAdvertOption::forcedPack(uint8_t *buf) const
+void TokenWindowAdvertOption::fill(uint8_t *buf) const
 {
-	IdempotenceOption::forcedPack(buf);
+	IdempotenceOption::fill(buf);
 	
 	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
 	
@@ -425,7 +425,7 @@ void TokenWindowAdvertOption::forcedPack(uint8_t *buf) const
 	opt->windowSize = htonl(winSize);
 }
 
-void TokenWindowAdvertOption::parse(void *buf, OptionSet *optionSet)
+void TokenWindowAdvertOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
 	
@@ -453,16 +453,16 @@ size_t TokenExpenditureRequestOption::packedSize() const
 	return sizeof(SOCKS6TokenExpenditureOption);
 }
 
-void TokenExpenditureRequestOption::forcedPack(uint8_t *buf) const
+void TokenExpenditureRequestOption::fill(uint8_t *buf) const
 {
-	IdempotenceOption::forcedPack(buf);
+	IdempotenceOption::fill(buf);
 	
 	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
 	
 	opt->token = htonl(token);
 }
 
-void TokenExpenditureRequestOption::parse(void *buf, OptionSet *optionSet)
+void TokenExpenditureRequestOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
 	
@@ -477,16 +477,16 @@ size_t TokenExpenditureReplyOption::packedSize() const
 	return sizeof(SOCKS6TokenExpenditureReplyOption);
 }
 
-void TokenExpenditureReplyOption::forcedPack(uint8_t *buf) const
+void TokenExpenditureReplyOption::fill(uint8_t *buf) const
 {
-	IdempotenceOption::forcedPack(buf);
+	IdempotenceOption::fill(buf);
 	
 	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
 	
 	opt->code = code;
 }
 
-void TokenExpenditureReplyOption::parse(void *buf, OptionSet *optionSet)
+void TokenExpenditureReplyOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
 	

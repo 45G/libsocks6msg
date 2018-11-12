@@ -18,7 +18,7 @@ class Option
 	SOCKS6OptionKind kind;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	SOCKS6OptionKind getKind() const
@@ -32,7 +32,7 @@ public:
 	{
 		uint8_t *buf = bb->get<uint8_t>(packedSize());
 		
-		forcedPack(buf);
+		fill(buf);
 	}
 	
 	static void incementalParse(void *buf, OptionSet *optionSet);
@@ -50,7 +50,7 @@ class StackOption: public Option
 	SOCKS6StackOptionCode code;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	SOCKS6StackLeg getLeg() const
@@ -79,7 +79,7 @@ class TOSOption: public StackOption
 	uint8_t tos;
 
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 
 public:
 	virtual size_t packedSize() const;
@@ -117,7 +117,7 @@ class MPSchedOption: public StackOption
 	SOCKS6MPTCPScheduler sched;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -133,7 +133,7 @@ class AuthMethodOption: public Option
 	std::set<SOCKS6Method> methods;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -148,7 +148,7 @@ class AuthDataOption: public Option
 	SOCKS6Method method;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	SOCKS6Method getMethod() const
@@ -167,7 +167,7 @@ class UsernamePasswdOption: public AuthDataOption
 	UserPasswordRequest req;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -182,7 +182,7 @@ class IdempotenceOption: public Option
 	SOCKS6IDempotenceType type;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	static void incementalParse(void *buf, OptionSet *optionSet);
@@ -196,7 +196,7 @@ class TokenWindowRequestOption: public IdempotenceOption
 	uint32_t winSize;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -212,7 +212,7 @@ class TokenWindowAdvertOption: public IdempotenceOption
 	uint32_t winSize;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -227,7 +227,7 @@ class TokenExpenditureRequestOption: public IdempotenceOption
 	uint32_t token;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
@@ -243,7 +243,7 @@ class TokenExpenditureReplyOption: public IdempotenceOption
 	SOCKS6TokenExpenditureCode code;
 	
 protected:
-	virtual void forcedPack(uint8_t *buf) const;
+	virtual void fill(uint8_t *buf) const;
 	
 public:
 	virtual size_t packedSize() const;
