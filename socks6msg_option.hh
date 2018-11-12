@@ -146,6 +146,7 @@ public:
 
 class AuthMethodOption: public Option
 {
+	uint16_t initialDataLen;
 	std::set<SOCKS6Method> methods;
 	
 protected:
@@ -156,7 +157,7 @@ public:
 	
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
-	AuthMethodOption(std::set<SOCKS6Method> methods);
+	AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods);
 };
 
 class AuthDataOption: public Option

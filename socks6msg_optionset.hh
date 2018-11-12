@@ -68,7 +68,14 @@ private:
 			: request(0), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
 	} idempotence;
 	
-	std::set<SOCKS6Method> advertisedMethods;
+	struct Methods
+	{
+		uint16_t initialDataLen;
+		std::set<SOCKS6Method> advertised;
+
+		Methods()
+			: initialDataLen(0) {}
+	} methods;
 	
 	struct
 	{
@@ -194,18 +201,17 @@ public:
 	
 	const std::set<SOCKS6Method> *getAdvertisedMethods() const
 	{
-		return &advertisedMethods;
+		return &methods.advertised;
 	}
 	
-	void advertiseMethod(SOCKS6Method method)
+	void advertiseMethod(SOCKS6Method method);
+
+	uint16_t getInitialDataLen() const
 	{
-		enforceMode(M_REQ);
-		
-		if (method == SOCKS6_METHOD_UNACCEPTABLE)
-			throw InvalidFieldException();
-		
-		advertisedMethods.insert(method);
+		return methods.initialDataLen;
 	}
+
+	void setInitialDataLen(uint16_t initialDataLen);
 	
 	void setUsernamePassword(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd);
 	

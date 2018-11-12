@@ -124,11 +124,11 @@ both_tos_done:
 		optsHead->optionCount++;
 	}
 	
-	set<SOCKS6Method> extraMethods(advertisedMethods);
+	set<SOCKS6Method> extraMethods(methods.advertised);
 	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
 	if (!extraMethods.empty())
 	{
-		AuthMethodOption(extraMethods).pack(bb);
+		AuthMethodOption(methods.initialDataLen, extraMethods).pack(bb);
 		optsHead->optionCount++;
 	}
 	
@@ -191,9 +191,10 @@ both_tos_done:
 	if (idempotence.replyCode > 0)
 		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
 	
-	set<SOCKS6Method> extraMethods(advertisedMethods);
+	set<SOCKS6Method> extraMethods(methods.advertised);
+	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
 	if (!extraMethods.empty())
-		size += AuthMethodOption(extraMethods).packedSize();
+		size += AuthMethodOption(methods.initialDataLen, extraMethods).packedSize();
 	
 	if (!userPasswdAuth.username->empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
@@ -334,6 +335,29 @@ void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
 		throw InvalidFieldException();
 	
 	idempotence.replyCode = code;
+}
+
+void OptionSet::advertiseMethod(SOCKS6Method method)
+{
+	enforceMode(M_REQ);
+
+	if (method == SOCKS6_METHOD_UNACCEPTABLE)
+		throw InvalidFieldException();
+
+	methods.advertised.insert(method);
+}
+
+void OptionSet::setInitialDataLen(uint16_t initialDataLen)
+{
+	enforceMode(M_REQ);
+
+	if (initialDataLen > SOCKS6_INITIAL_DATA_MAX)
+		throw InvalidFieldException();
+
+	if (methods.initialDataLen != 0 && methods.initialDataLen != initialDataLen)
+		throw InvalidFieldException();
+
+	methods.initialDataLen = initialDataLen;
 }
 
 void OptionSet::setUsernamePassword(const boost::shared_ptr<string> user, const boost::shared_ptr<string> passwd)

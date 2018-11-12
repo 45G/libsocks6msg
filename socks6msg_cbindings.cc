@@ -112,6 +112,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 		i++;
 	}
 	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
+	cSet->initialDataLen = cppSet->getInitialDataLen();
 	
 	if (cppSet->getUsername().get() != NULL && cppSet->getUsername()->length() > 0)
 	{
@@ -157,6 +158,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	{
 		for (SOCKS6Method *method = cSet->knownMethods; *method != SOCKS6_METHOD_NOAUTH; method++)
 			cppSet->advertiseMethod(*method);
+		cppSet->setInitialDataLen(cSet->initialDataLen);
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
