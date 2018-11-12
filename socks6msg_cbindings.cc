@@ -173,7 +173,7 @@ ssize_t S6M_Request_packedSize(const S6M_Request *req)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&req->addr);
-		Request cppReq(req->code, addr, req->port, req->initialDataLen);
+		Request cppReq(req->code, addr, req->port);
 		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
 		
 		return cppReq.packedSize();
@@ -192,7 +192,7 @@ ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&req->addr);
-		Request cppReq(req->code, addr, req->port, req->initialDataLen);
+		Request cppReq(req->code, addr, req->port);
 		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
 		cppReq.pack(&bb);
 		
@@ -223,7 +223,6 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 		req->code = cppReq.getCommandCode();
 		S6M_Addr_Fill(&req->addr, cppReq.getAddress());
 		req->port = cppReq.getPort();
-		req->initialDataLen = cppReq.getInitialDataLen();
 		S6M_OptionSet_Fill(&req->optionSet, cppReq.getOptionSet());
 		
 		*preq = req;
@@ -343,7 +342,7 @@ ssize_t S6M_OpReply_packedSize(const S6M_OpReply *opReply)
 	try
 	{
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port);
 		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
 		
 		return cppOpReply.packedSize();
@@ -363,7 +362,7 @@ ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 		ByteBuffer bb(buf, size);
 		
 		Address addr = S6M_Addr_Flush(&opReply->addr);
-		OperationReply cppOpReply(opReply->code, addr, opReply->port, opReply->initDataOff);
+		OperationReply cppOpReply(opReply->code, addr, opReply->port);
 		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
 		cppOpReply.pack(&bb);
 		
@@ -394,7 +393,6 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 		opReply->code = cppOpReply.getCode();
 		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddress());
 		opReply->port = cppOpReply.getPort();
-		opReply->initDataOff = cppOpReply.getInitDataOff();
 		S6M_OptionSet_Fill(&opReply->optionSet, cppOpReply.getOptionSet());
 		
 		*popReply = opReply;

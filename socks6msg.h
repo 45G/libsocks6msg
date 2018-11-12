@@ -64,8 +64,6 @@ struct S6M_Request
 	struct S6M_Address addr;
 	uint16_t port;
 	
-	uint16_t initialDataLen;
-	
 	struct S6M_OptionSet optionSet;
 };
 
@@ -84,8 +82,6 @@ struct S6M_OpReply
 	
 	struct S6M_Address addr;
 	uint16_t port;
-	
-	uint16_t initDataOff;
 	
 	struct S6M_OptionSet optionSet;
 };

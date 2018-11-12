@@ -4,8 +4,8 @@
 namespace S6M
 {
 
-OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port, uint16_t initDataOff)
-	: code(code), address(address), port(port), initDataOff(initDataOff), optionSet(OptionSet::M_OP_REP)
+OperationReply::OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port)
+	: code(code), address(address), port(port), optionSet(OptionSet::M_OP_REP)
 {
 	if (address.getType() == Address::INVALID_TYPE)
 		throw InvalidFieldException();
@@ -18,7 +18,6 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	code = enumCast<SOCKS6OperationReplyCode>(rawOpReply->code);
 	port = ntohs(rawOpReply->bindPort);
-	initDataOff = ntohs(rawOpReply->initialDataOffset);
 	
 	address = Address(bb);
 	
@@ -31,7 +30,6 @@ void OperationReply::pack(ByteBuffer *bb) const
 	
 	rawOpReply->code = code;
 	rawOpReply->bindPort = htons(port);
-	rawOpReply->initialDataOffset = htons(initDataOff);
 	
 	address.pack(bb);
 	

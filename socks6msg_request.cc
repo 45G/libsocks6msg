@@ -5,13 +5,10 @@
 namespace S6M
 {
 
-Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port, uint16_t initialDataLen)
-	: commandCode(commandCode), address(address), port(port), initialDataLen(initialDataLen), optionSet(OptionSet::M_REQ)
+Request::Request(SOCKS6RequestCode commandCode, Address address, uint16_t port)
+	: commandCode(commandCode), address(address), port(port), optionSet(OptionSet::M_REQ)
 {
 	if (address.getType() == Address::INVALID_TYPE)
-		throw InvalidFieldException();
-
-	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
 		throw InvalidFieldException();
 }
 
@@ -22,15 +19,11 @@ Request::Request(ByteBuffer *bb)
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	commandCode = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
-	initialDataLen = ntohs(rawRequest->initialDataLen);
 	port = ntohs(rawRequest->port);
 	
 	address = Address(bb);
 	
 	optionSet = OptionSet(bb, OptionSet::M_REQ);
-
-	if (initialDataLen > 0 && commandCode != SOCKS6_REQUEST_CONNECT)
-		throw InvalidFieldException();
 }
 
 void Request::pack(ByteBuffer *bb) const
@@ -38,7 +31,6 @@ void Request::pack(ByteBuffer *bb) const
 	Version::pack(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	rawRequest->initialDataLen = htons(initialDataLen);
 	rawRequest->commandCode = commandCode;
 	rawRequest->port = htons(port);
 	
