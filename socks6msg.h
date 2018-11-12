@@ -40,6 +40,8 @@ struct S6M_OptionSet
 		enum SOCKS6MPTCPScheduler proxyServer;
 		
 	} mptcpSched;
+
+	uint16_t backlog;
 	
 	struct
 	{

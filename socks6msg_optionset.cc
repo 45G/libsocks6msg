@@ -21,7 +21,7 @@ void OptionSet::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2)
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: mode(mode), tfo(false), mptcp(false)
+	: mode(mode), tfo(false), mptcp(false), backlog(0)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
@@ -279,6 +279,14 @@ void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 	
 	mptcpSched.clientProxy = sched;
 	mptcpSched.proxyRemote = sched;
+}
+
+void OptionSet::setBacklog(uint16_t backlog)
+{
+	if (this->backlog != 0 && this->backlog != backlog)
+		throw InvalidFieldException();
+
+	this->backlog = backlog;
 }
 
 void OptionSet::requestTokenWindow(uint32_t winSize)

@@ -128,6 +128,22 @@ public:
 		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
 };
 
+class BacklogOption: public StackOption
+{
+	uint16_t backlog;
+
+protected:
+	virtual void fill(uint8_t *buf) const;
+
+public:
+	virtual size_t packedSize() const;
+
+	static void incementalParse(void *buf, OptionSet *optionSet);
+
+	BacklogOption(uint16_t backlog)
+		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG), backlog(backlog) {}
+};
+
 class AuthMethodOption: public Option
 {
 	std::set<SOCKS6Method> methods;

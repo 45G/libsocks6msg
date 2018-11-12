@@ -31,6 +31,9 @@ private:
 	{
 		uint8_t clientProxy;
 		uint8_t proxyRemote;
+
+		TOS()
+			: clientProxy(0), proxyRemote(0) {}
 	} ipTOS;
 
 	bool tfo;
@@ -46,6 +49,8 @@ private:
 			: clientProxy((SOCKS6MPTCPScheduler) 0), proxyRemote((SOCKS6MPTCPScheduler) 0) {}
 		
 	} mptcpSched;
+
+	uint16_t backlog;
 	
 	struct Idem
 	{
@@ -82,7 +87,7 @@ private:
 	
 public:
 	OptionSet(Mode mode)
-		: mode(mode), tfo(false), mptcp(false) {}
+		: mode(mode), tfo(false), mptcp(false), backlog(0) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
@@ -140,6 +145,13 @@ public:
 	void setProxyRemoteSched(SOCKS6MPTCPScheduler sched);
 	
 	void setBothScheds(SOCKS6MPTCPScheduler sched);
+
+	void setBacklog(uint16_t backlog);
+
+	uint16_t getBacklog() const
+	{
+		return backlog;
+	}
 	
 	//TODO: rename most of below methods
 	uint32_t requestedTokenWindow() const

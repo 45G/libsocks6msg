@@ -219,6 +219,32 @@ void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
+void BacklogOption::fill(uint8_t *buf) const
+{
+	StackOption::fill(buf);
+
+	SOCKS6BacklogOption *opt = reinterpret_cast<SOCKS6BacklogOption *>(buf);
+
+	opt->backlog = htons(backlog);
+}
+
+size_t BacklogOption::packedSize() const
+{
+	return sizeof(SOCKS6BacklogOption);
+}
+
+void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
+{
+	SOCKS6BacklogOption *opt = (SOCKS6BacklogOption *)buf;
+
+	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6BacklogOption))
+		throw InvalidFieldException();
+
+	uint8_t backlog = ntohs(opt->backlog);
+
+	optionSet->setBacklog(backlog);
+}
+
 size_t AuthMethodOption::packedSize() const
 {
 	return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
