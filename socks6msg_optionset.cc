@@ -75,7 +75,7 @@ void OptionSet::pack(ByteBuffer *bb) const
 	}
 	if (mptcpSched.proxyServer > 0)
 	{
-		MPSchedOption(SOCKS6_STACK_LEG_PROXY_SERVER, mptcpSched.proxyServer).pack(bb);
+		MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyServer).pack(bb);
 		optsHead->optionCount++;
 	}
 	
@@ -138,7 +138,7 @@ size_t OptionSet::packedSize()
 		}
 	}
 	if (mptcpSched.proxyServer > 0)
-		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_SERVER, mptcpSched.proxyServer).packedSize();
+		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyServer).packedSize();
 	
 both_sched_done:
 	if (idempotence.request > 0)

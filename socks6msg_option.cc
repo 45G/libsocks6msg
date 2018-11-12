@@ -115,7 +115,7 @@ void TFOOption::parse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->leg != SOCKS6_STACK_LEG_PROXY_SERVER)
+	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw InvalidFieldException();
 	
 	optionSet->setTFO();
@@ -133,7 +133,7 @@ void MPTCPOption::parse(void *buf, OptionSet *optionSet)
 	if (opt->optionHead.len != sizeof(SOCKS6StackOption))
 		throw InvalidFieldException();
 	
-	if (opt->leg != SOCKS6_STACK_LEG_PROXY_SERVER)
+	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw InvalidFieldException();
 	
 	optionSet->setMPTCP();
@@ -167,7 +167,7 @@ void MPSchedOption::parse(void *buf, OptionSet *optionSet)
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
 		optionSet->setClientProxySched(sched);
 		break;
-	case SOCKS6_STACK_LEG_PROXY_SERVER:
+	case SOCKS6_STACK_LEG_PROXY_REMOTE:
 		optionSet->setProxyServerSched(sched);
 		break;
 	case SOCKS6_STACK_LEG_BOTH:

@@ -29,7 +29,7 @@ SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 	switch (conv)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-	case SOCKS6_STACK_LEG_PROXY_SERVER:
+	case SOCKS6_STACK_LEG_PROXY_REMOTE:
 	case SOCKS6_STACK_LEG_BOTH:
 		return conv;
 	}

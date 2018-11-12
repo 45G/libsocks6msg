@@ -82,7 +82,7 @@ public:
 	static void parse(void *buf, OptionSet *optionSet);
 	
 	TFOOption()
-		: StackOption(SOCKS6_STACK_LEG_PROXY_SERVER, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO) {}
+		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO) {}
 };
 
 class MPTCPOption: public StackOption
@@ -93,7 +93,7 @@ public:
 	static void parse(void *buf, OptionSet *optionSet);
 	
 	MPTCPOption()
-		: StackOption(SOCKS6_STACK_LEG_PROXY_SERVER, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP) {}
+		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP) {}
 };
 
 class MPSchedOption: public StackOption
