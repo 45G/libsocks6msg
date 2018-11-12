@@ -35,7 +35,7 @@ public:
 		forcedPack(buf);
 	}
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}
@@ -68,7 +68,7 @@ public:
 		return code;
 	}
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	StackOption(SOCKS6StackLeg leg, SOCKS6StackLevel level, SOCKS6StackOptionCode code)
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
@@ -84,7 +84,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 
 	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS), tos(tos) {}
@@ -95,7 +95,7 @@ class TFOOption: public StackOption
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TFOOption()
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO) {}
@@ -106,7 +106,7 @@ class MPTCPOption: public StackOption
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	MPTCPOption()
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP) {}
@@ -122,7 +122,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
@@ -138,7 +138,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	AuthMethodOption(std::set<SOCKS6Method> methods);
 };
@@ -156,7 +156,7 @@ public:
 		return method;
 	}
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	AuthDataOption(SOCKS6Method method)
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
@@ -172,7 +172,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	UsernamePasswdOption(boost::shared_ptr<std::string> username, boost::shared_ptr<std::string> passwd);
 };
@@ -185,7 +185,7 @@ protected:
 	virtual void forcedPack(uint8_t *buf) const;
 	
 public:
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
@@ -201,7 +201,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowRequestOption(uint32_t winSize);
 };
@@ -217,7 +217,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
 };
@@ -232,7 +232,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenExpenditureRequestOption(uint32_t token)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
@@ -248,7 +248,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void parse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code) {}
