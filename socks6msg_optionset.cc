@@ -8,6 +8,45 @@ using namespace boost;
 namespace S6M
 {
 
+template <typename T> static bool mayAssign(T field, T value)
+{
+	return (field == (T)0 || field == value);
+}
+
+template <typename T> static bool mayAssign(T field1, T field2, T value)
+{
+	return mayAssign(field1, value) && mayAssign(field2, value);
+}
+
+template <typename T> static void checkedAssignment(T *field, T value)
+{
+	if (!mayAssign(*field, value))
+		throw InvalidFieldException();
+
+	*field = value;
+}
+
+template <typename T> static void checkedAssignment(T *field1, T *field2, T value)
+{
+	if (!mayAssign(*field1, *field2, value))
+		throw InvalidFieldException();
+
+	*field1 = value;
+	*field2 = value;
+}
+
+template <typename T, typename U> static void checkedAssignment(T *field1, T value1, U *field2, U value2)
+{
+	if (!mayAssign(*field1, value1))
+		throw InvalidFieldException();
+	if (!mayAssign(*field2, value2))
+		throw InvalidFieldException();
+
+	*field1 = value1;
+	*field2 = value2;
+}
+
+
 void OptionSet::enforceMode(OptionSet::Mode mode1)
 {
 	if (mode != mode1)
@@ -205,99 +244,60 @@ both_tos_done:
 void OptionSet::setClientProxyTOS(uint8_t tos)
 {
 	enforceMode(M_REQ, M_OP_REP);
-
-	if (ipTOS.clientProxy != 0 && ipTOS.clientProxy != tos)
-		throw InvalidFieldException();
-	ipTOS.clientProxy = tos;
+	checkedAssignment(&ipTOS.clientProxy, tos);
 }
 
 void OptionSet::setProxyRemoteTOS(uint8_t tos)
 {
 	enforceMode(M_REQ, M_OP_REP);
-
-	if (ipTOS.proxyRemote != 0 && ipTOS.proxyRemote != tos)
-		throw InvalidFieldException();
-	ipTOS.proxyRemote = tos;
+	checkedAssignment(&ipTOS.proxyRemote, tos);
 }
 
 void OptionSet::setBothTOS(uint8_t tos)
 {
 	enforceMode(M_REQ, M_OP_REP);
-
-	bool canSetCP = ipTOS.clientProxy == 0 || ipTOS.clientProxy == tos;
-	bool canSetPS = ipTOS.proxyRemote == 0 || ipTOS.proxyRemote == tos;
-
-	if (!(canSetCP && canSetPS))
-		throw InvalidFieldException();
-
-	ipTOS.clientProxy = tos;
-	ipTOS.proxyRemote = tos;
+	checkedAssignment(&ipTOS.clientProxy, &ipTOS.proxyRemote, tos);
 }
 
 void OptionSet::setTFO()
 {
 	enforceMode(M_REQ);
-	
 	tfo = true;
 }
 
 void OptionSet::setMPTCP()
 {
 	enforceMode(M_OP_REP);
-	
 	mptcp = true;
 }
 
 void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
 {
 	enforceMode(M_REQ, M_OP_REP);
-	
-	if (mptcpSched.clientProxy != (SOCKS6MPTCPScheduler)0 && mptcpSched.clientProxy != sched)
-		throw InvalidFieldException();
-	
-	mptcpSched.clientProxy = sched;
+	checkedAssignment(&mptcpSched.clientProxy, sched);
 }
 
 void OptionSet::setProxyRemoteSched(SOCKS6MPTCPScheduler sched)
 {
 	enforceMode(M_REQ, M_OP_REP);
-	
-	if (mptcpSched.proxyRemote != (SOCKS6MPTCPScheduler)0 && mptcpSched.proxyRemote != sched)
-		throw InvalidFieldException();
-	
-	mptcpSched.proxyRemote = sched;
+	checkedAssignment(&mptcpSched.proxyRemote, sched);
 }
 
 void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
 {
 	enforceMode(M_REQ, M_OP_REP);
-	
-	bool canSetCP = mptcpSched.clientProxy == (SOCKS6MPTCPScheduler)0 || mptcpSched.clientProxy == sched;
-	bool canSetPS = mptcpSched.proxyRemote == (SOCKS6MPTCPScheduler)0 || mptcpSched.proxyRemote == sched;
-	
-	if (!(canSetCP && canSetPS))
-		throw InvalidFieldException();
-	
-	mptcpSched.clientProxy = sched;
-	mptcpSched.proxyRemote = sched;
+	checkedAssignment(&mptcpSched.clientProxy, &mptcpSched.proxyRemote, sched);
 }
 
 void OptionSet::setBacklog(uint16_t backlog)
 {
-	if (this->backlog != 0 && this->backlog != backlog)
-		throw InvalidFieldException();
-
-	this->backlog = backlog;
+	checkedAssignment(&this->backlog, backlog);
 }
 
 void OptionSet::requestTokenWindow(uint32_t winSize)
 {
 	enforceMode(M_REQ);
-	
-	if (idempotence.request != 0 && idempotence.request != winSize)
-		throw InvalidFieldException();
-	
-	idempotence.request = winSize;
+	checkedAssignment(&idempotence.request, winSize);
 }
 
 void OptionSet::setTokenWindow(uint32_t base, uint32_t size)
@@ -331,10 +331,7 @@ void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
 	if (code == 0)
 		throw InvalidFieldException();
 	
-	if (idempotence.replyCode != 0 && idempotence.replyCode != code)
-		throw InvalidFieldException();
-	
-	idempotence.replyCode = code;
+	checkedAssignment(&idempotence.replyCode, code);
 }
 
 void OptionSet::advertiseMethod(SOCKS6Method method)
@@ -354,10 +351,7 @@ void OptionSet::setInitialDataLen(uint16_t initialDataLen)
 	if (initialDataLen > SOCKS6_INITIAL_DATA_MAX)
 		throw InvalidFieldException();
 
-	if (methods.initialDataLen != 0 && methods.initialDataLen != initialDataLen)
-		throw InvalidFieldException();
-
-	methods.initialDataLen = initialDataLen;
+	checkedAssignment(&methods.initialDataLen, initialDataLen);
 }
 
 void OptionSet::setUsernamePassword(const boost::shared_ptr<string> user, const boost::shared_ptr<string> passwd)
