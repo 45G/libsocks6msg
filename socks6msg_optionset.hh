@@ -208,6 +208,8 @@ public:
 
 	uint16_t getInitialDataLen() const
 	{
+		if (methods.advertised.empty())
+			return 0;
 		return methods.initialDataLen;
 	}
 

@@ -163,11 +163,9 @@ both_tos_done:
 		optsHead->optionCount++;
 	}
 	
-	set<SOCKS6Method> extraMethods(methods.advertised);
-	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (!extraMethods.empty())
+	if (!methods.advertised.empty())
 	{
-		AuthMethodOption(methods.initialDataLen, extraMethods).pack(bb);
+		AuthMethodOption(methods.initialDataLen, methods.advertised).pack(bb);
 		optsHead->optionCount++;
 	}
 	
@@ -230,10 +228,8 @@ both_tos_done:
 	if (idempotence.replyCode > 0)
 		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
 	
-	set<SOCKS6Method> extraMethods(methods.advertised);
-	extraMethods.erase(SOCKS6_METHOD_NOAUTH);
-	if (!extraMethods.empty())
-		size += AuthMethodOption(methods.initialDataLen, extraMethods).packedSize();
+	if (!methods.advertised.empty())
+		size += AuthMethodOption(methods.initialDataLen, methods.advertised).packedSize();
 	
 	if (!userPasswdAuth.username->empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
@@ -338,6 +334,8 @@ void OptionSet::advertiseMethod(SOCKS6Method method)
 {
 	enforceMode(M_REQ);
 
+	if (method == SOCKS6_METHOD_NOAUTH)
+		return;
 	if (method == SOCKS6_METHOD_UNACCEPTABLE)
 		throw InvalidFieldException();
 
