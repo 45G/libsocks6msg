@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <unistd.h>
-#include "socks6msg_exception.hh"
+#include "util/exception.hh"
 
 namespace S6M
 {

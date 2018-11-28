@@ -1,4 +1,4 @@
-#include "socks6msg_exception.hh"
+#include "exception.hh"
 
 namespace S6M
 {

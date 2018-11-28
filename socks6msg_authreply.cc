@@ -1,6 +1,6 @@
 #include "socks6msg_authreply.hh"
 #include "socks6msg_version.hh"
-#include "socks6msg_sanity.hh"
+#include "util/sanity.hh"
 
 namespace S6M
 {

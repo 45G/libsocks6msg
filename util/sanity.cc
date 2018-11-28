@@ -1,4 +1,4 @@
-#include "socks6msg_sanity.hh"
+#include "util/sanity.hh"
 
 #pragma GCC diagnostic error "-Wswitch"
 

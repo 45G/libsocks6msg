@@ -14,10 +14,14 @@ SOURCES += \
     socks6msg_version.cc \
     socks6msg_authreply.cc \
     socks6msg_opreply.cc \
-    socks6msg_exception.cc \
-    socks6msg_sanity.cc \
     socks6msg_cbindings.cc \
-    options/socks6msg_option.cc
+    options/option.cc \
+    options/stackoption.cc \
+    util/sanity.cc \
+    util/exception.cc \
+    options/idempotenceoption.cc \
+    options/authmethodoption.cc \
+    options/authdataoption.cc
 
 HEADERS += \
     socks6.h \
@@ -29,12 +33,16 @@ HEADERS += \
     socks6msg_request.hh \
     socks6msg_version.hh \
     socks6msg_authreply.hh \
-    socks6msg_bytebuffer.hh \
-    socks6msg_exception.hh \
     socks6msg_opreply.hh \
     socks6msg.hh \
-    socks6msg_sanity.hh \
-    options/socks6msg_option.hh
+    options/option.hh \
+    options/stackoption.hh \
+    util/sanity.hh \
+    util/exception.hh \
+    options/idempotenceoption.hh \
+    options/authmethodoption.hh \
+    util/bytebuffer.hh \
+    options/authdataoption.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg

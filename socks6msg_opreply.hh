@@ -1,7 +1,7 @@
 #ifndef SOCKS6MSG_OPREPLY_HH
 #define SOCKS6MSG_OPREPLY_HH
 
-#include "socks6msg_bytebuffer.hh"
+#include "util/bytebuffer.hh"
 #include "socks6msg_address.hh"
 #include "socks6msg_optionset.hh"
 

@@ -1,6 +1,10 @@
 #include <boost/foreach.hpp>
 #include "socks6msg_optionset.hh"
-#include "options/socks6msg_option.hh"
+#include "options/option.hh"
+#include "options/stackoption.hh"
+#include "options/idempotenceoption.hh"
+#include "options/authmethodoption.hh"
+#include "options/authdataoption.hh"
 
 using namespace std;
 using namespace boost;
