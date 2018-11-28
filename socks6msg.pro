@@ -6,7 +6,6 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    socks6msg_option.cc \
     socks6msg_optionset.cc \
     socks6msg_usrpasswd.cc \
     socks6msg_address.cc \
@@ -17,12 +16,12 @@ SOURCES += \
     socks6msg_opreply.cc \
     socks6msg_exception.cc \
     socks6msg_sanity.cc \
-    socks6msg_cbindings.cc
+    socks6msg_cbindings.cc \
+    options/socks6msg_option.cc
 
 HEADERS += \
     socks6.h \
     socks6msg.h \
-    socks6msg_option.hh \
     socks6msg_optionset.hh \
     socks6msg_usrpasswd.hh \
     socks6msg_address.hh \
@@ -34,7 +33,8 @@ HEADERS += \
     socks6msg_exception.hh \
     socks6msg_opreply.hh \
     socks6msg.hh \
-    socks6msg_sanity.hh
+    socks6msg_sanity.hh \
+    options/socks6msg_option.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg
