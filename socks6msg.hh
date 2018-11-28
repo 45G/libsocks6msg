@@ -2,9 +2,9 @@
 #define SOCKS6MSG_HH
 
 #include "socks6.h"
-#include "socks6msg_request.hh"
-#include "socks6msg_authreply.hh"
-#include "socks6msg_opreply.hh"
-#include "socks6msg_usrpasswd.hh"
+#include "messages/request.hh"
+#include "messages/authreply.hh"
+#include "messages/opreply.hh"
+#include "messages/usrpasswd.hh"
 
 #endif // SOCKS6MSG_HH

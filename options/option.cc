@@ -6,7 +6,7 @@
 #include "idempotenceoption.hh"
 #include "authmethodoption.hh"
 #include "authdataoption.hh"
-#include "../socks6msg_optionset.hh"
+#include "optionset.hh"
 #include "../util/sanity.hh"
 
 using namespace std;

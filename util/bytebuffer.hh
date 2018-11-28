@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <unistd.h>
-#include "util/exception.hh"
+#include "exception.hh"
 
 namespace S6M
 {

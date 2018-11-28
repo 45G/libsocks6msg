@@ -6,7 +6,7 @@
 #include <string>
 #include "../socks6.h"
 #include "../util/bytebuffer.hh"
-#include "../socks6msg_usrpasswd.hh"
+#include "../messages/usrpasswd.hh"
 
 namespace S6M
 {

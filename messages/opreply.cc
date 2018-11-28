@@ -1,5 +1,5 @@
-#include "socks6msg_opreply.hh"
-#include "util/sanity.hh"
+#include "opreply.hh"
+#include "../util/sanity.hh"
 
 namespace S6M
 {

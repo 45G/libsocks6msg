@@ -1,6 +1,6 @@
 #include <string>
 #include "authdataoption.hh"
-#include "../socks6msg_optionset.hh"
+#include "optionset.hh"
 
 using namespace std;
 

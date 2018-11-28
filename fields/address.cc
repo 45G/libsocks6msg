@@ -1,4 +1,4 @@
-#include "socks6msg_address.hh"
+#include "address.hh"
 
 using namespace std;
 

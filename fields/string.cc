@@ -1,5 +1,5 @@
 #include <string.h>
-#include "socks6msg_string.hh"
+#include "string.hh"
 
 using namespace std;
 

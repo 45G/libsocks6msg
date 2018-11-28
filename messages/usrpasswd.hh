@@ -2,8 +2,8 @@
 #define SOCKS6MSG_USRPASSWD_HH
 
 #include <string>
-#include "util/bytebuffer.hh"
-#include "socks6msg_string.hh"
+#include "../util/bytebuffer.hh"
+#include "../fields/string.hh"
 
 namespace S6M
 {

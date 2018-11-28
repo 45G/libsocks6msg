@@ -8,8 +8,8 @@
 #include <set>
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
-#include "socks6.h"
-#include "util/bytebuffer.hh"
+#include "../socks6.h"
+#include "../util/bytebuffer.hh"
 
 namespace S6M
 {

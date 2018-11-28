@@ -1,7 +1,7 @@
 #include <arpa/inet.h>
 #include <boost/foreach.hpp>
 #include "authmethodoption.hh"
-#include "../socks6msg_optionset.hh"
+#include "optionset.hh"
 
 namespace S6M
 {

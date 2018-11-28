@@ -1,6 +1,6 @@
-#include "socks6msg_request.hh"
-#include "socks6msg_version.hh"
-#include "util/sanity.hh"
+#include "request.hh"
+#include "version.hh"
+#include "../util/sanity.hh"
 
 namespace S6M
 {

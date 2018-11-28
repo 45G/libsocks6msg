@@ -1,5 +1,5 @@
 #include <boost/shared_ptr.hpp>
-#include "socks6msg_usrpasswd.hh"
+#include "usrpasswd.hh"
 
 using namespace std;
 using namespace boost;

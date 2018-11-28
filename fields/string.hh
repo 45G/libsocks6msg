@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "util/bytebuffer.hh"
+#include "../util/bytebuffer.hh"
 
 namespace S6M
 {

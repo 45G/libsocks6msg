@@ -1,4 +1,4 @@
-#include "socks6msg_version.hh"
+#include "version.hh"
 
 namespace S6M
 {

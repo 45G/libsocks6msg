@@ -1,6 +1,6 @@
 #include <arpa/inet.h>
 #include "idempotenceoption.hh"
-#include "../socks6msg_optionset.hh"
+#include "optionset.hh"
 #include "../util/sanity.hh"
 
 namespace S6M

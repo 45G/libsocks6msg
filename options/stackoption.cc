@@ -1,7 +1,7 @@
 #include <arpa/inet.h>
 #include "stackoption.hh"
 #include "../util/sanity.hh"
-#include "../socks6msg_optionset.hh"
+#include "optionset.hh"
 
 namespace S6M
 {

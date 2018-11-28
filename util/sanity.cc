@@ -1,4 +1,4 @@
-#include "util/sanity.hh"
+#include "sanity.hh"
 
 #pragma GCC diagnostic error "-Wswitch"
 
