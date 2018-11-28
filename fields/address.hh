@@ -20,15 +20,23 @@ class Address
 	String domain;
 	
 public:
-	static const SOCKS6AddressType INVALID_TYPE = (SOCKS6AddressType)0;
-	
 	size_t packedSize();
 	
 	void pack(ByteBuffer *bb) const;
 	
-	//TODO: get rid of this
-	Address()
-		: type(INVALID_TYPE) {}
+	Address(SOCKS6AddressType type = SOCKS6_ADDR_IPV4)
+		: type(type)
+	{
+		if (type == SOCKS6_ADDR_IPV4)
+		{
+			ipv4.s_addr = 0;
+		}
+		else if (type == SOCKS6_ADDR_IPV6)
+		{
+			for (int i = 0; i < 4; i++)
+				ipv6.__in6_u.__u6_addr32[i] = 0;
+		}
+	}
 	
 	Address(in_addr ipv4)
 		: type(SOCKS6_ADDR_IPV4), ipv4(ipv4) {}

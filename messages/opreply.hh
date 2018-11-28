@@ -18,7 +18,8 @@ class OperationReply
 	OptionSet optionSet;
 	
 public:
-	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port);
+	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port)
+		: code(code), address(address), port(port), optionSet(OptionSet::M_OP_REP) {}
 	
 	OperationReply(ByteBuffer *bb);
 	

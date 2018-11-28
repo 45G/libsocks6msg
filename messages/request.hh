@@ -18,7 +18,8 @@ class Request
 	OptionSet optionSet;
 	
 public:
-	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port);
+	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port)
+		: commandCode(commandCode), address(address), port(port), optionSet(OptionSet::M_REQ) {}
 	
 	Request(ByteBuffer *bb);
 	

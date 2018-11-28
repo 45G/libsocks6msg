@@ -20,8 +20,6 @@ struct S6M_Address
 	char *domain;
 };
 
-#define S6M_ADDRESS_INVALID_TYPE 0
-
 struct S6M_OptionSet
 {
 	struct
