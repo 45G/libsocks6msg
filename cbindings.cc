@@ -52,7 +52,7 @@ static void S6M_Addr_Fill(S6M_Address *cAddr, const Address *cppAddr)
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		cAddr->domain = const_cast<char *>(cppAddr->getDomain()->c_str());
+		cAddr->domain = cppAddr->getDomain()->c_str();
 		if (cAddr->domain == NULL)
 			throw bad_alloc();
 		break;
@@ -116,10 +116,10 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	
 	if (cppSet->getUsername().get() != NULL && cppSet->getUsername()->length() > 0)
 	{
-		cSet->userPasswdAuth.username = const_cast<char *>(cppSet->getUsername()->c_str());
+		cSet->userPasswdAuth.username = cppSet->getUsername()->c_str();
 		if (cSet->userPasswdAuth.username == NULL)
 			throw bad_alloc();
-		cSet->userPasswdAuth.username = const_cast<char *>(cppSet->getPassword()->c_str());
+		cSet->userPasswdAuth.username = cppSet->getPassword()->c_str();
 		if (cSet->userPasswdAuth.passwd == NULL)
 			throw bad_alloc();
 	}
@@ -481,8 +481,8 @@ ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 		ByteBuffer bb(buf, size);
 		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended(&bb);
 		
-		pwReq->username = const_cast<char *>(pwReq->cppReq.getUsername()->c_str());
-		pwReq->passwd = const_cast<char *>(pwReq->cppReq.getPassword()->c_str());
+		pwReq->username = pwReq->cppReq.getUsername()->c_str();
+		pwReq->passwd = pwReq->cppReq.getPassword()->c_str();
 		
 		*ppwReq = pwReq;
 		return bb.getUsed();
