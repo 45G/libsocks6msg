@@ -45,10 +45,11 @@ void AuthMethodOption::incementalParse(void *buf, OptionSet *optionSet)
 AuthMethodOption::AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods)
 	: Option(SOCKS6_OPTION_AUTH_METHOD), initialDataLen(initialDataLen), methods(methods)
 {
-//	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())
-//		throw InvalidFieldException();
-//	if (methods.empty())
-//		throw InvalidFieldException();
+	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())
+		throw InvalidFieldException();
+	methods.erase(SOCKS6_METHOD_NOAUTH);
+	if (methods.empty())
+		throw InvalidFieldException();
 }
 
 }

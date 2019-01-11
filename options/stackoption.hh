@@ -120,8 +120,7 @@ public:
 
 	static void incementalParse(void *buf, OptionSet *optionSet);
 
-	BacklogOption(uint16_t backlog)
-		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG), backlog(backlog) {}
+	BacklogOption(uint16_t backlog);
 
 	uint16_t getBacklog() const
 	{

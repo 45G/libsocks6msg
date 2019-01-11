@@ -209,4 +209,11 @@ void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setBacklog(backlog);
 }
 
+BacklogOption::BacklogOption(uint16_t backlog)
+	: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG), backlog(backlog)
+{
+	if (backlog < SOCKS6_BACKLOG_MIN)
+		throw InvalidFieldException();
+}
+
 }
