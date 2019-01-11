@@ -132,8 +132,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->tos.proxyRemote > 0)
 		cppSet->setProxyRemoteTOS(cSet->tos.proxyRemote);
 
-	if (cSet->tfo)
-		cppSet->setTFO();
+	if (cSet->tfo > 0)
+		cppSet->setTFO(cSet->tfo);
 	if (cSet->mptcp)
 		cppSet->setMPTCP();
 	

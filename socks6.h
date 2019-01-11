@@ -206,19 +206,19 @@ enum SOCKS6StackOptionCode
 
 struct SOCKS6TOSOption
 {
-	struct SOCKS6StackOption socketOptionHead;
+	struct SOCKS6StackOption stackOptionHead;
 	uint8_t tos;
 } __attribute__((packed));
 
 struct SOCKS6TFOOption
 {
-	struct SOCKS6StackOption socketOptionHead;
+	struct SOCKS6StackOption stackOptionHead;
 	uint16_t payloadLen;
 } __attribute__((packed));
 
 struct SOCKS6MPTCPSchedulerOption
 {
-	struct SOCKS6StackOption socketOptionHead;
+	struct SOCKS6StackOption stackOptionHead;
 	uint8_t scheduler;
 } __attribute__((packed));
 
@@ -231,7 +231,7 @@ enum SOCKS6MPTCPScheduler
 
 struct SOCKS6BacklogOption
 {
-	struct SOCKS6StackOption socketOptionHead;
+	struct SOCKS6StackOption stackOptionHead;
 	uint16_t backlog;
 } __attribute__((packed));
 

@@ -28,7 +28,7 @@ struct S6M_OptionSet
 		uint8_t proxyRemote;
 	} tos;
 
-	int tfo;
+	uint16_t tfo;
 	
 	int mptcp;
 	

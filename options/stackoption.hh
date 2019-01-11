@@ -55,13 +55,15 @@ public:
 
 class TFOOption: public StackOption
 {
+	uint16_t payloadSize;
+
 public:
 	virtual size_t packedSize() const;
 	
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
-	TFOOption()
-		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO) {}
+	TFOOption(uint16_t payloadSize)
+		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO), payloadSize(payloadSize) {}
 };
 
 class MPTCPOption: public StackOption

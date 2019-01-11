@@ -36,7 +36,7 @@ private:
 			: clientProxy(0), proxyRemote(0) {}
 	} ipTOS;
 
-	bool tfo;
+	uint16_t tfo;
 	
 	bool mptcp;
 	
@@ -94,7 +94,7 @@ private:
 	
 public:
 	OptionSet(Mode mode)
-		: mode(mode), tfo(false), mptcp(false), backlog(0) {}
+		: mode(mode), tfo(0), mptcp(false), backlog(0) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
@@ -123,12 +123,12 @@ public:
 
 	void setBothTOS(uint8_t ipTOS);
 
-	bool getTFO() const
+	uint16_t getTFO() const
 	{
 		return tfo;
 	}
 	
-	void setTFO();
+	void setTFO(uint16_t payloadSize);
 	
 	bool getMPTCP() const
 	{

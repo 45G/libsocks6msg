@@ -89,12 +89,12 @@ void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TOSOption *opt = (SOCKS6TOSOption *)buf;
 
-	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6TOSOption))
+	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6TOSOption))
 		throw InvalidFieldException();
 
 	uint8_t tos = opt->tos;
 
-	switch (opt->socketOptionHead.leg)
+	switch (opt->stackOptionHead.leg)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
 		optionSet->setClientProxyTOS(tos);
@@ -115,12 +115,17 @@ size_t TFOOption::packedSize() const
 
 void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
-	
-	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
+	SOCKS6TFOOption *opt = (SOCKS6TFOOption *)buf;
+
+	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6TFOOption))
 		throw InvalidFieldException();
 	
-	optionSet->setTFO();
+	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
+		throw InvalidFieldException();
+
+	uint16_t payloadSize = ntohs(opt->payloadLen);
+	
+	optionSet->setTFO(payloadSize);
 }
 
 size_t MPTCPOption::packedSize() const
@@ -159,12 +164,12 @@ void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
 	
-	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
+	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
 		throw InvalidFieldException();
 	
 	SOCKS6MPTCPScheduler sched = enumCast<SOCKS6MPTCPScheduler>(opt->scheduler);
 	
-	switch (opt->socketOptionHead.leg)
+	switch (opt->stackOptionHead.leg)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
 		optionSet->setClientProxySched(sched);
@@ -196,7 +201,7 @@ void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6BacklogOption *opt = (SOCKS6BacklogOption *)buf;
 
-	if (opt->socketOptionHead.optionHead.len != sizeof(SOCKS6BacklogOption))
+	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6BacklogOption))
 		throw InvalidFieldException();
 
 	uint8_t backlog = ntohs(opt->backlog);

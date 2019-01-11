@@ -91,9 +91,9 @@ void OptionSet::pack(ByteBuffer *bb) const
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	optsHead->optionCount = 0;
 	
-	if (tfo)
+	if (tfo > 0)
 	{
-		TFOOption().pack(bb);
+		TFOOption(tfo).pack(bb);
 		optsHead->optionCount++;
 	}
 	if (mptcp)
@@ -184,8 +184,8 @@ size_t OptionSet::packedSize()
 {
 	size_t size = sizeof(SOCKS6Options);
 	
-	if (tfo)
-		size += TFOOption().packedSize();
+	if (tfo > 0)
+		size += TFOOption(tfo).packedSize();
 	if (mptcp)
 		size += MPTCPOption().packedSize();
 	
@@ -259,10 +259,10 @@ void OptionSet::setBothTOS(uint8_t tos)
 	checkedAssignment(&ipTOS.clientProxy, &ipTOS.proxyRemote, tos);
 }
 
-void OptionSet::setTFO()
+void OptionSet::setTFO(uint16_t payloadSize)
 {
 	enforceMode(M_REQ);
-	tfo = true;
+	checkedAssignment(&tfo, payloadSize);
 }
 
 void OptionSet::setMPTCP()
