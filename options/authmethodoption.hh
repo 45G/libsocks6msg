@@ -20,6 +20,16 @@ public:
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods);
+
+	uint16_t getInitialDataLen() const
+	{
+		return initialDataLen;
+	}
+
+	const std::set<SOCKS6Method> *getMethods() const
+	{
+		return &methods;
+	}
 };
 
 }

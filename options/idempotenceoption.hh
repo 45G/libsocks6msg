@@ -18,6 +18,11 @@ public:
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
+
+	SOCKS6IDempotenceType getType() const
+	{
+		return type;
+	}
 };
 
 class TokenWindowRequestOption: public IdempotenceOption
@@ -33,6 +38,11 @@ public:
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowRequestOption(uint32_t winSize);
+
+	uint32_t getWinSize() const
+	{
+		return winSize;
+	}
 };
 
 class TokenWindowAdvertOption: public IdempotenceOption
@@ -49,6 +59,16 @@ public:
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
+
+	uint32_t getWinBase() const
+	{
+		return winBase;
+	}
+
+	uint32_t getWinSize() const
+	{
+		return winSize;
+	}
 };
 
 class TokenExpenditureRequestOption: public IdempotenceOption
@@ -65,6 +85,11 @@ public:
 	
 	TokenExpenditureRequestOption(uint32_t token)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
+
+	uint32_t getToken() const
+	{
+		return token;
+	}
 };
 
 class TokenExpenditureReplyOption: public IdempotenceOption
@@ -81,6 +106,11 @@ public:
 	
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code) {}
+
+	SOCKS6TokenExpenditureCode getCode() const
+	{
+		return code;
+	}
 };
 
 }
