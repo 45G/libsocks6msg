@@ -70,7 +70,7 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(std::shared_ptr<string>(new string(cAddr->domain)));
+		return Address(make_shared<string>(cAddr->domain));
 	}
 	
 	throw InvalidFieldException();
@@ -162,7 +162,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
-		cppSet->setUsernamePassword(std::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), std::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
+		cppSet->setUsernamePassword(make_shared<string>(cSet->userPasswdAuth.username), make_shared<string>(cSet->userPasswdAuth.passwd));
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
@@ -445,7 +445,7 @@ ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(std::shared_ptr<string>(new string(pwReq->username)), std::shared_ptr<string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(make_shared<string>(pwReq->username), make_shared<string>(pwReq->passwd));
 		
 		return req.packedSize();
 	}
@@ -462,7 +462,7 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(std::shared_ptr<string> (new string(pwReq->username)), std::shared_ptr<string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(make_shared<string>(pwReq->username), make_shared<string>(pwReq->passwd));
 		req.pack(&bb);
 		
 		return bb.getUsed();
