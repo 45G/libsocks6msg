@@ -28,7 +28,7 @@ String::String(ByteBuffer *bb)
 	
 	uint8_t *rawStr = bb->get<uint8_t>(*len);
 	
-	str = std::make_shared<string>(reinterpret_cast<const char *>(rawStr), (size_t)*len);
+	str = make_shared<string>(reinterpret_cast<const char *>(rawStr), (size_t)*len);
 	
 	if (str->find_first_of('\0') != string::npos)
 		throw InvalidFieldException();
