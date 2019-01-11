@@ -16,9 +16,9 @@ extern "C"
  * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
  * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
  * 255: no particular draft revision
- * currently: post-draft-04 (204)
+ * currently: post-draft-05 (205)
  */
-#define SOCKS6_VERSION_MINOR 204
+#define SOCKS6_VERSION_MINOR 205
 
 #define SOCKS6_PWAUTH_VERSION 0x01
 
@@ -30,9 +30,9 @@ struct SOCKS6Version
 
 struct SOCKS6Request
 {
-	uint8_t commandCode;
+	uint8_t  commandCode;
 	uint16_t port;
-	uint8_t address[0];
+	uint8_t  address[0];
 } __attribute__((packed));
 
 struct SOCKS6Address
@@ -43,7 +43,7 @@ struct SOCKS6Address
 
 struct SOCKS6IPv4Address
 {
-	uint8_t type;
+	uint8_t  type;
 	uint32_t ipv4Address;
 } __attribute__((packed));
 
@@ -78,7 +78,7 @@ enum SOCKS6AddressType
 struct SOCKS6Options
 {
 	uint16_t optionsLength;
-	uint8_t options[0];
+	uint8_t  options[0];
 } __attribute__((packed));
 
 #define SOCKS6_OPTIONS_LENGTH_MAX (1 << 14)
@@ -115,9 +115,9 @@ enum SOCKS6Method
 
 struct SOCKS6OperationReply
 {
-	uint8_t code;
+	uint8_t  code;
 	uint16_t bindPort;
-	uint8_t bindAddress[0];
+	uint8_t  bindAddress[0];
 } __attribute__((packed));
 
 enum SOCKS6OperationReplyCode
@@ -136,9 +136,9 @@ enum SOCKS6OperationReplyCode
 
 struct SOCKS6Option
 {
-	uint8_t kind;
+	uint8_t  kind;
 	uint16_t len;
-	uint8_t data[0];
+	uint8_t  data[0];
 } __attribute__((packed));
 
 enum SOCKS6OptionKind
@@ -156,16 +156,16 @@ struct SOCKS6StackOption
 {
 	struct SOCKS6Option optionHead;
 #if BYTE_ORDER == LITTLE_ENDIAN
-	uint8_t level: 6,
-		leg: 2;
+	uint8_t             level: 6,
+			    leg: 2;
 #elif BYTE_ORDER == BIG_ENDIAN
-	uint8_t leg: 2,
-		level: 6;
+	uint8_t             leg: 2,
+			    level: 6;
 #else
 #error Fix BYTE_ORDER
 #endif
-	uint8_t code;
-	uint8_t data[0];
+	uint8_t             code;
+	uint8_t             data[0];
 } __attribute__((packed));
 
 enum SOCKS6StackLeg
@@ -209,19 +209,19 @@ enum SOCKS6StackOptionCode
 struct SOCKS6TOSOption
 {
 	struct SOCKS6StackOption stackOptionHead;
-	uint8_t tos;
+	uint8_t                  tos;
 } __attribute__((packed));
 
 struct SOCKS6TFOOption
 {
 	struct SOCKS6StackOption stackOptionHead;
-	uint16_t payloadLen;
+	uint16_t                 payloadLen;
 } __attribute__((packed));
 
 struct SOCKS6MPTCPSchedulerOption
 {
 	struct SOCKS6StackOption stackOptionHead;
-	uint8_t scheduler;
+	uint8_t                  scheduler;
 } __attribute__((packed));
 
 enum SOCKS6MPTCPScheduler
@@ -234,7 +234,7 @@ enum SOCKS6MPTCPScheduler
 struct SOCKS6BacklogOption
 {
 	struct SOCKS6StackOption stackOptionHead;
-	uint16_t backlog;
+	uint16_t                 backlog;
 } __attribute__((packed));
 
 #define SOCKS6_BACKLOG_MIN 1
@@ -242,8 +242,8 @@ struct SOCKS6BacklogOption
 struct SOCKS6AuthMethodOption
 {
 	struct SOCKS6Option optionHead;
-	uint16_t initialDataLen;
-	uint8_t methods[0];
+	uint16_t            initialDataLen;
+	uint8_t             methods[0];
 } __attribute__((packed));
 
 #define SOCKS6_INITIAL_DATA_MAX (1 << 14)
@@ -251,15 +251,15 @@ struct SOCKS6AuthMethodOption
 struct SOCKS6AuthDataOption
 {
 	struct SOCKS6Option optionHead;
-	uint8_t method;
-	uint8_t methodData[0];
+	uint8_t             method;
+	uint8_t             methodData[0];
 } __attribute__((packed));
 
 struct SOCKS6IdempotenceOption
 {
 	struct SOCKS6Option optionHead;
-	uint8_t type;
-	uint8_t idempotenceData[0];
+	uint8_t             type;
+	uint8_t             idempotenceData[0];
 } __attribute__((packed));
 
 enum SOCKS6IDempotenceType
@@ -273,14 +273,14 @@ enum SOCKS6IDempotenceType
 struct SOCKS6WindowRequestOption
 {
 	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t windowSize;
+	uint32_t                       windowSize;
 } __attribute__((packed));
 
 struct SOCKS6WindowAdvertOption
 {
 	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t windowBase;
-	uint32_t windowSize;
+	uint32_t                       windowBase;
+	uint32_t                       windowSize;
 } __attribute__((packed));
 
 #define SOCKS6_TOKEN_WINDOW_MIN 1
@@ -289,13 +289,13 @@ struct SOCKS6WindowAdvertOption
 struct SOCKS6TokenExpenditureOption
 {
 	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t token;
+	uint32_t                       token;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureReplyOption
 {
 	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint8_t code;
+	uint8_t                        code;
 } __attribute__((packed));
 
 enum SOCKS6TokenExpenditureCode
@@ -319,9 +319,9 @@ struct SOCKS6AssocConfirmation
 struct SOCKS6DatagramHeader
 {
 	struct SOCKS6Version version;
-	uint32_t assocID;
-	uint16_t port;
-	uint8_t address[0];
+	uint32_t             assocID;
+	uint16_t             port;
+	uint8_t              address[0];
 } __attribute__((packed));
 
 #ifdef __cplusplus
