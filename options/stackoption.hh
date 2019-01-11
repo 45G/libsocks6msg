@@ -51,6 +51,11 @@ public:
 
 	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS), tos(tos) {}
+
+	uint8_t getTOS() const
+	{
+		return tos;
+	}
 };
 
 class TFOOption: public StackOption
@@ -64,6 +69,11 @@ public:
 	
 	TFOOption(uint16_t payloadSize)
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO), payloadSize(payloadSize) {}
+
+	uint16_t getPayloadSize() const
+	{
+		return payloadSize;
+	}
 };
 
 class MPTCPOption: public StackOption
@@ -91,6 +101,11 @@ public:
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
+
+	SOCKS6MPTCPScheduler getScheduler() const
+	{
+		return sched;
+	}
 };
 
 class BacklogOption: public StackOption
@@ -107,6 +122,11 @@ public:
 
 	BacklogOption(uint16_t backlog)
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG), backlog(backlog) {}
+
+	uint16_t getBacklog() const
+	{
+		return backlog;
+	}
 };
 
 }
