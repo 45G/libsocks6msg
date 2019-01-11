@@ -12,19 +12,23 @@ using namespace boost;
 using namespace S6M;
 
 #define S6M_CATCH(err) \
-	catch (InvalidFieldException) \
+	catch (InvalidFieldException &) \
 	{ \
 		(err) = S6M_ERR_INVALID; \
 	} \
-	catch (EndOfBufferException) \
+	catch (invalid_argument &) \
+	{ \
+		(err) = S6M_ERR_INVALID; \
+	} \
+	catch (EndOfBufferException &) \
 	{ \
 		(err) = S6M_ERR_BUFFER; \
 	} \
-	catch (BadVersionException) \
+	catch (BadVersionException &) \
 	{ \
 		(err) = S6M_ERR_OTHERVER; \
 	} \
-	catch (bad_alloc) \
+	catch (bad_alloc &) \
 	{ \
 		(err) = S6M_ERR_ALLOC; \
 	} \
