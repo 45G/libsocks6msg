@@ -35,7 +35,7 @@ public:
 		fill(buf);
 	}
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
 	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}

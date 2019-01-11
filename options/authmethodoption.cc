@@ -27,16 +27,16 @@ void AuthMethodOption::fill(uint8_t *buf) const
 	}
 }
 
-void AuthMethodOption::incementalParse(void *buf, OptionSet *optionSet)
+void AuthMethodOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6AuthMethodOption *opt = (SOCKS6AuthMethodOption *)buf;
 	
-	if (opt->optionHead.len < sizeof(SOCKS6AuthMethodOption))
+	if (optionLen < sizeof(SOCKS6AuthMethodOption))
 		throw InvalidFieldException();
 
 	optionSet->setInitialDataLen(ntohs(opt->initialDataLen));
 	
-	int methodCount = opt->optionHead.len - sizeof(SOCKS6AuthMethodOption);
+	int methodCount = optionLen - sizeof(SOCKS6AuthMethodOption);
 	
 	for (int i = 0; i < methodCount; i++)
 		optionSet->advertiseMethod((SOCKS6Method)opt->methods[i]);

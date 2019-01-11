@@ -76,16 +76,18 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 	while (optsBB.getUsed() < optsBB.getTotalSize())
 	{
 		SOCKS6Option *opt;
+		size_t optLen;
 
 		try
 		{
 			opt = bb->get<SOCKS6Option>();
 
 			/* bad option length wrecks remaining options */
-			if (opt->len < sizeof(SOCKS6Option))
+			optLen = ntohs(opt->len);
+			if (optLen < sizeof(SOCKS6Option))
 				break;
 
-			bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
+			bb->get<uint8_t>(optLen - sizeof(SOCKS6Option));
 		}
 		catch (EndOfBufferException &)
 		{
@@ -94,7 +96,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		
 		try
 		{
-			Option::incementalParse(opt, this);
+			Option::incementalParse(opt, optLen, this);
 		}
 		catch (InvalidFieldException &) {}
 	}

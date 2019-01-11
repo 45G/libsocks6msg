@@ -137,7 +137,7 @@ enum SOCKS6OperationReplyCode
 struct SOCKS6Option
 {
 	uint8_t kind;
-	uint8_t len;
+	uint16_t len;
 	uint8_t data[0];
 } __attribute__((packed));
 

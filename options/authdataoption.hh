@@ -19,7 +19,7 @@ public:
 		return method;
 	}
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
 	
 	AuthDataOption(SOCKS6Method method)
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
@@ -35,7 +35,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
 	
 	UsernamePasswdOption(std::shared_ptr<std::string> username, std::shared_ptr<std::string> passwd);
 

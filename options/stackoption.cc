@@ -17,11 +17,11 @@ void StackOption::fill(uint8_t *buf) const
 	opt->code  = getCode();
 }
 
-void StackOption::incementalParse(void *buf, OptionSet *optionSet)
+void StackOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->optionHead.len < sizeof(SOCKS6StackOption))
+	if (optionLen < sizeof(SOCKS6StackOption))
 		throw InvalidFieldException();
 	
 	enumCast<SOCKS6StackLeg>(opt->leg);
@@ -32,7 +32,7 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TOS:
-			TOSOption::incementalParse(buf, optionSet);
+			TOSOption::incementalParse(buf, optionLen, optionSet);
 			break;
 		}
 		break;
@@ -47,15 +47,15 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TFO:
-			TFOOption::incementalParse(buf, optionSet);
+			TFOOption::incementalParse(buf, optionLen, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MPTCP:
-			MPTCPOption::incementalParse(buf, optionSet);
+			MPTCPOption::incementalParse(buf, optionLen, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MP_SCHED:
-			MPSchedOption::incementalParse(buf, optionSet);
+			MPSchedOption::incementalParse(buf, optionLen, optionSet);
 			break;
 			
 		default:
@@ -85,11 +85,11 @@ size_t TOSOption::packedSize() const
 	return sizeof(SOCKS6TOSOption);
 }
 
-void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
+void TOSOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6TOSOption *opt = (SOCKS6TOSOption *)buf;
 
-	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6TOSOption))
+	if (optionLen != sizeof(SOCKS6TOSOption))
 		throw InvalidFieldException();
 
 	uint8_t tos = opt->tos;
@@ -113,11 +113,11 @@ size_t TFOOption::packedSize() const
 	return sizeof(SOCKS6StackOption);
 }
 
-void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
+void TFOOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6TFOOption *opt = (SOCKS6TFOOption *)buf;
 
-	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6TFOOption))
+	if (optionLen != sizeof(SOCKS6TFOOption))
 		throw InvalidFieldException();
 	
 	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
@@ -133,11 +133,11 @@ size_t MPTCPOption::packedSize() const
 	return sizeof(SOCKS6StackOption);
 }
 
-void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
+void MPTCPOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = (SOCKS6StackOption *)buf;
 	
-	if (opt->optionHead.len != sizeof(SOCKS6StackOption))
+	if (optionLen != sizeof(SOCKS6StackOption))
 		throw InvalidFieldException();
 	
 	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
@@ -160,11 +160,11 @@ void MPSchedOption::fill(uint8_t *buf) const
 	opt->scheduler = sched;
 }
 
-void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
+void MPSchedOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = (SOCKS6MPTCPSchedulerOption *)buf;
 	
-	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6MPTCPSchedulerOption))
+	if (optionLen != sizeof(SOCKS6MPTCPSchedulerOption))
 		throw InvalidFieldException();
 	
 	SOCKS6MPTCPScheduler sched = enumCast<SOCKS6MPTCPScheduler>(opt->scheduler);
@@ -197,11 +197,11 @@ size_t BacklogOption::packedSize() const
 	return sizeof(SOCKS6BacklogOption);
 }
 
-void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
+void BacklogOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6BacklogOption *opt = (SOCKS6BacklogOption *)buf;
 
-	if (opt->stackOptionHead.optionHead.len != sizeof(SOCKS6BacklogOption))
+	if (optionLen != sizeof(SOCKS6BacklogOption))
 		throw InvalidFieldException();
 
 	uint8_t backlog = ntohs(opt->backlog);
