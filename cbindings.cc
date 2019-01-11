@@ -89,7 +89,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->tos.clientProxy = cppSet->getClientProxyTOS();
 	cSet->tos.proxyRemote = cppSet->getProxyRemoteTOS();
 
-	cSet->tfo = cppSet->getTFO();
+	cSet->tfoPayload = cppSet->getTFOPayload();
+	cSet->acceptTFO = cppSet->tfoIsAccepted();
 	cSet->mptcp = cppSet->getMPTCP();
 	
 	cSet->mptcpSched.clientProxy = cppSet->getClientProxySched();
@@ -136,8 +137,10 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->tos.proxyRemote > 0)
 		cppSet->setProxyRemoteTOS(cSet->tos.proxyRemote);
 
-	if (cSet->tfo > 0)
-		cppSet->setTFO(cSet->tfo);
+	if (cSet->tfoPayload > 0)
+		cppSet->setTFOPayload(cSet->tfoPayload);
+	if (cSet->acceptTFO)
+		cppSet->acceptTFO();
 	if (cSet->mptcp)
 		cppSet->setMPTCP();
 	

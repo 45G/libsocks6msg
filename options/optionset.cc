@@ -64,7 +64,7 @@ void OptionSet::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2)
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: mode(mode), tfo(false), mptcp(false), backlog(0)
+	: mode(mode), tfoPayload(false), mptcp(false), backlog(0)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	
@@ -91,9 +91,9 @@ void OptionSet::pack(ByteBuffer *bb) const
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	optsHead->optionCount = 0;
 	
-	if (tfo > 0)
+	if (tfoPayload > 0 || tfoAccepted)
 	{
-		TFOOption(tfo).pack(bb);
+		TFOOption(tfoPayload).pack(bb);
 		optsHead->optionCount++;
 	}
 	if (mptcp)
@@ -184,8 +184,8 @@ size_t OptionSet::packedSize()
 {
 	size_t size = sizeof(SOCKS6Options);
 	
-	if (tfo > 0)
-		size += TFOOption(tfo).packedSize();
+	if (tfoPayload > 0 || tfoAccepted)
+		size += TFOOption(tfoPayload).packedSize();
 	if (mptcp)
 		size += MPTCPOption().packedSize();
 	
@@ -259,10 +259,20 @@ void OptionSet::setBothTOS(uint8_t tos)
 	checkedAssignment(&ipTOS.clientProxy, &ipTOS.proxyRemote, tos);
 }
 
-void OptionSet::setTFO(uint16_t payloadSize)
+void OptionSet::setTFOPayload(uint16_t payloadSize)
 {
 	enforceMode(M_REQ);
-	checkedAssignment(&tfo, payloadSize);
+	if (tfoAccepted)
+		throw InvalidFieldException();
+	checkedAssignment(&tfoPayload, payloadSize);
+}
+
+void OptionSet::acceptTFO()
+{
+	enforceMode(M_REQ);
+	if (tfoPayload > 0)
+		throw InvalidFieldException();
+	tfoAccepted = true;
 }
 
 void OptionSet::setMPTCP()

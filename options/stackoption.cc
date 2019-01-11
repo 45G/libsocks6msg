@@ -125,7 +125,7 @@ void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 
 	uint16_t payloadSize = ntohs(opt->payloadLen);
 	
-	optionSet->setTFO(payloadSize);
+	optionSet->setTFOPayload(payloadSize);
 }
 
 size_t MPTCPOption::packedSize() const
