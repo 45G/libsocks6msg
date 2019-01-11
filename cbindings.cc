@@ -475,16 +475,14 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 {
 	S6M_Error err;
-	char *username = NULL;
-	char *passwd = NULL;
 	
 	try
 	{
 		ByteBuffer bb(buf, size);
 		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended(&bb);
 		
-		pwReq->username = username;
-		pwReq->passwd = passwd;
+		pwReq->username = const_cast<char *>(pwReq->cppReq.getUsername()->c_str());
+		pwReq->passwd = const_cast<char *>(pwReq->cppReq.getPassword()->c_str());
 		
 		*ppwReq = pwReq;
 		return bb.getUsed();
