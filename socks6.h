@@ -77,9 +77,11 @@ enum SOCKS6AddressType
 
 struct SOCKS6Options
 {
-	uint8_t optionCount;
+	uint16_t optionsLength;
 	uint8_t options[0];
 } __attribute__((packed));
+
+#define SOCKS6_OPTIONS_LENGTH_MAX (1 << 14)
 
 struct SOCKS6AuthReply
 {

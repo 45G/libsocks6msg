@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <boost/foreach.hpp>
 #include "optionset.hh"
 #include "option.hh"
@@ -67,60 +68,68 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 	: mode(mode), tfoPayload(false), mptcp(false), backlog(0)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
+	uint16_t optsLen = ntohs(optsHead->optionsLength);
+	if (optsLen > SOCKS6_OPTIONS_LENGTH_MAX)
+		throw InvalidFieldException();
+	ByteBuffer optsBB(bb->get<uint8_t>(optsLen), optsLen);
 	
-	for (int i = 0; i < optsHead->optionCount; i++)
+	while (optsBB.getUsed() < optsBB.getTotalSize())
 	{
-		SOCKS6Option *opt = bb->get<SOCKS6Option>();
-		
-		/* bad option length wrecks everything */
-		if (opt->len < 2)
-			throw InvalidFieldException();
-	
-		bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
+		SOCKS6Option *opt;
+
+		try
+		{
+			opt = bb->get<SOCKS6Option>();
+
+			/* bad option length wrecks remaining options */
+			if (opt->len < sizeof(SOCKS6Option))
+				break;
+
+			bb->get<uint8_t>(opt->len - sizeof(SOCKS6Option));
+		}
+		catch (EndOfBufferException &)
+		{
+			break;
+		}
 		
 		try
 		{
 			Option::incementalParse(opt, this);
 		}
-		catch (InvalidFieldException) {}
+		catch (InvalidFieldException &) {}
 	}
+}
+
+static void cram(const Option &option, SOCKS6Options *optionsHead, ByteBuffer *bb)
+{
+	option.pack(bb);
+	optionsHead->optionsLength += option.packedSize();
 }
 
 void OptionSet::pack(ByteBuffer *bb) const
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
-	optsHead->optionCount = 0;
+	optsHead->optionsLength = 0;
 	
 	if (tfoPayload > 0 || tfoAccepted)
-	{
-		TFOOption(tfoPayload).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TFOOption(tfoPayload), optsHead, bb);
 	if (mptcp)
-	{
-		MPTCPOption().pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(MPTCPOption(), optsHead, bb);
 	
 	if (mptcpSched.clientProxy > 0)
 	{
 		if (mptcpSched.proxyRemote == mptcpSched.clientProxy)
 		{
-			MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy).pack(bb);
-			optsHead->optionCount++;
+			cram(MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy), optsHead, bb);
 			goto both_sched_done;
 		}
 		else
 		{
-			MPSchedOption(SOCKS6_STACK_LEG_CLIENT_PROXY, mptcpSched.clientProxy).pack(bb);
-			optsHead->optionCount++;
+			cram(MPSchedOption(SOCKS6_STACK_LEG_CLIENT_PROXY, mptcpSched.clientProxy), optsHead, bb);
 		}
 	}
 	if (mptcpSched.proxyRemote > 0)
-	{
-		MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote), optsHead, bb);
 	
 both_sched_done:
 
@@ -128,56 +137,33 @@ both_sched_done:
 	{
 		if (ipTOS.proxyRemote == ipTOS.clientProxy)
 		{
-			TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy).pack(bb);
-			optsHead->optionCount++;
+			cram(TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy), optsHead, bb);
 			goto both_tos_done;
 		}
 		else
 		{
-			TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy).pack(bb);
-			optsHead->optionCount++;
+			cram(TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy), optsHead, bb);
 		}
 	}
 	if (ipTOS.proxyRemote > 0)
-	{
-		TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote), optsHead, bb);
 
 both_tos_done:
 
 	if (idempotence.request > 0)
-	{
-		TokenWindowRequestOption(idempotence.request).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TokenWindowRequestOption(idempotence.request), optsHead, bb);
 	if (idempotence.spend)
-	{
-		TokenExpenditureRequestOption(idempotence.token).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TokenExpenditureRequestOption(idempotence.token), optsHead, bb);
 	if (idempotence.windowSize > 0)
-	{
-		TokenWindowAdvertOption(idempotence.base, idempotence.windowSize).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TokenWindowAdvertOption(idempotence.base, idempotence.windowSize), optsHead, bb);
 	if (idempotence.replyCode > 0)
-	{
-		TokenExpenditureReplyOption(idempotence.replyCode).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(TokenExpenditureReplyOption(idempotence.replyCode), optsHead, bb);
 	
 	if (!methods.advertised.empty())
-	{
-		AuthMethodOption(methods.initialDataLen, methods.advertised).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(AuthMethodOption(methods.initialDataLen, methods.advertised), optsHead, bb);
 	
 	if (userPasswdAuth.username.get() != NULL && !userPasswdAuth.username->empty())
-	{
-		UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).pack(bb);
-		optsHead->optionCount++;
-	}
+		cram(UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd), optsHead, bb);
 }
 
 size_t OptionSet::packedSize()
