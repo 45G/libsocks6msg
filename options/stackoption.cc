@@ -75,7 +75,7 @@ void TOSOption::fill(uint8_t *buf) const
 {
 	StackOption::fill(buf);
 
-	TOSOption *opt = reinterpret_cast<TOSOption *>(buf);
+	SOCKS6TOSOption *opt = reinterpret_cast<SOCKS6TOSOption *>(buf);
 
 	opt->tos = tos;
 }
