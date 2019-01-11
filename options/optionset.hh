@@ -7,7 +7,7 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "../socks6.h"
 #include "../util/bytebuffer.hh"
 
@@ -79,8 +79,8 @@ private:
 	
 	struct
 	{
-		boost::shared_ptr<std::string> username;
-		boost::shared_ptr<std::string> passwd;
+		std::shared_ptr<std::string> username;
+		std::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
 	
 	void enforceMode(Mode mode1);
@@ -215,14 +215,14 @@ public:
 
 	void setInitialDataLen(uint16_t initialDataLen);
 	
-	void setUsernamePassword(const boost::shared_ptr<std::string> user, const boost::shared_ptr<std::string> passwd);
+	void setUsernamePassword(const std::shared_ptr<std::string> user, const std::shared_ptr<std::string> passwd);
 	
-	const boost::shared_ptr<std::string> getUsername() const
+	const std::shared_ptr<std::string> getUsername() const
 	{
 		return userPasswdAuth.username;
 	}
 	
-	const boost::shared_ptr<std::string> getPassword() const
+	const std::shared_ptr<std::string> getPassword() const
 	{
 		return userPasswdAuth.passwd;
 	}

@@ -81,7 +81,7 @@ void UsernamePasswdOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-UsernamePasswdOption::UsernamePasswdOption(boost::shared_ptr<string> username, boost::shared_ptr<string> passwd)
+UsernamePasswdOption::UsernamePasswdOption(std::shared_ptr<string> username, std::shared_ptr<string> passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
 }

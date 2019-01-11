@@ -37,14 +37,14 @@ public:
 	
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
-	UsernamePasswdOption(boost::shared_ptr<std::string> username, boost::shared_ptr<std::string> passwd);
+	UsernamePasswdOption(std::shared_ptr<std::string> username, std::shared_ptr<std::string> passwd);
 
-	const boost::shared_ptr<std::string> getUsername() const
+	const std::shared_ptr<std::string> getUsername() const
 	{
 		return req.getUsername();
 	}
 
-	const boost::shared_ptr<std::string> getPassword() const
+	const std::shared_ptr<std::string> getPassword() const
 	{
 		return req.getPassword();
 	}

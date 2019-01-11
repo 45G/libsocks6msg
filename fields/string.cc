@@ -6,7 +6,7 @@ using namespace std;
 namespace S6M
 {
 
-String::String(const boost::shared_ptr<string> str)
+String::String(const std::shared_ptr<string> str)
 	: str(str)
 {
 	if (str->length() == 0)
@@ -28,7 +28,7 @@ String::String(ByteBuffer *bb)
 	
 	uint8_t *rawStr = bb->get<uint8_t>(*len);
 	
-	str = boost::shared_ptr<string>(new string(reinterpret_cast<const char *>(rawStr), (size_t)*len));
+	str = std::shared_ptr<string>(new string(reinterpret_cast<const char *>(rawStr), (size_t)*len));
 	
 	if (str->find_first_of('\0') != string::npos)
 		throw InvalidFieldException();

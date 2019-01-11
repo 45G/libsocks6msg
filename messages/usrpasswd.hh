@@ -20,7 +20,7 @@ class UserPasswordRequest: public UserPasswordBase
 	String password;
 	
 public:
-	UserPasswordRequest(const boost::shared_ptr<std::string> username, const boost::shared_ptr<std::string> password)
+	UserPasswordRequest(const std::shared_ptr<std::string> username, const std::shared_ptr<std::string> password)
 		: username(username), password(password) {}
 	
 	UserPasswordRequest(const String &username, const String &password)
@@ -37,12 +37,12 @@ public:
 		return 1 + username.packedSize() + password.packedSize();
 	}
 	
-	const boost::shared_ptr<std::string> getUsername() const
+	const std::shared_ptr<std::string> getUsername() const
 	{
 		return username.getStr();
 	}
 	
-	const boost::shared_ptr<std::string> getPassword() const
+	const std::shared_ptr<std::string> getPassword() const
 	{
 		return password.getStr();
 	}

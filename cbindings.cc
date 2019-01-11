@@ -3,7 +3,7 @@
 #include <list>
 #include <set>
 #include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "socks6msg.h"
 #include "socks6msg.hh"
 
@@ -70,7 +70,7 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(boost::shared_ptr<string>(new string(cAddr->domain)));
+		return Address(std::shared_ptr<string>(new string(cAddr->domain)));
 	}
 	
 	throw InvalidFieldException();
@@ -162,7 +162,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
-		cppSet->setUsernamePassword(boost::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), boost::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
+		cppSet->setUsernamePassword(std::shared_ptr<string>(new string(cSet->userPasswdAuth.username)), std::shared_ptr<string>(new string(cSet->userPasswdAuth.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
@@ -177,8 +177,8 @@ static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
 struct S6M_RequestExtended: public S6M_Request
 {
 	Address cppAddr;
-	boost::shared_ptr<string> cppUsername;
-	boost::shared_ptr<string> cppPasswd;
+	std::shared_ptr<string> cppUsername;
+	std::shared_ptr<string> cppPasswd;
 };
 
 ssize_t S6M_Request_packedSize(const S6M_Request *req)
@@ -262,8 +262,8 @@ void S6M_Request_free(S6M_Request *req)
 
 struct S6M_AuthReplyExtended: public S6M_AuthReply
 {
-	boost::shared_ptr<string> cppUsername;
-	boost::shared_ptr<string> cppPasswd;
+	std::shared_ptr<string> cppUsername;
+	std::shared_ptr<string> cppPasswd;
 };
 
 ssize_t S6M_AuthReply_packedSize(const S6M_AuthReply *authReply)
@@ -346,8 +346,8 @@ void S6M_AuthReply_free(S6M_AuthReply *authReply)
 struct S6M_OpReplyExtended: public S6M_OpReply
 {
 	Address cppAddr;
-	boost::shared_ptr<string> cppUsername;
-	boost::shared_ptr<string> cppPasswd;
+	std::shared_ptr<string> cppUsername;
+	std::shared_ptr<string> cppPasswd;
 };
 
 ssize_t S6M_OpReply_packedSize(const S6M_OpReply *opReply)
@@ -445,7 +445,7 @@ ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(boost::shared_ptr<string>(new string(pwReq->username)), boost::shared_ptr<string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(std::shared_ptr<string>(new string(pwReq->username)), std::shared_ptr<string>(new string(pwReq->passwd)));
 		
 		return req.packedSize();
 	}
@@ -462,7 +462,7 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(boost::shared_ptr<string> (new string(pwReq->username)), boost::shared_ptr<string>(new string(pwReq->passwd)));
+		UserPasswordRequest req(std::shared_ptr<string> (new string(pwReq->username)), std::shared_ptr<string>(new string(pwReq->passwd)));
 		req.pack(&bb);
 		
 		return bb.getUsed();

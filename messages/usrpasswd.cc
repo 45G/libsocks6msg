@@ -1,8 +1,6 @@
-#include <boost/shared_ptr.hpp>
 #include "usrpasswd.hh"
 
 using namespace std;
-using namespace boost;
 
 namespace S6M
 {

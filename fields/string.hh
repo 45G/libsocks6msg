@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "../util/bytebuffer.hh"
 
 namespace S6M
@@ -11,13 +11,13 @@ namespace S6M
 
 class String
 {
-	boost::shared_ptr<std::string> str;
+	std::shared_ptr<std::string> str;
 	
 public:
 	//TODO: get rid of this constructor
 	String() {}
 	
-	String(const boost::shared_ptr<std::string> str);
+	String(const std::shared_ptr<std::string> str);
 	
 	String(ByteBuffer *bb);
 	
@@ -28,7 +28,7 @@ public:
 	
 	void pack(ByteBuffer *bb) const;
 	
-	const boost::shared_ptr<std::string> getStr() const
+	const std::shared_ptr<std::string> getStr() const
 	{
 		return str;
 	}
