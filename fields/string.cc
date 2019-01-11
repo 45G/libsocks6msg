@@ -6,10 +6,10 @@ using namespace std;
 namespace S6M
 {
 
-String::String(const boost::shared_ptr<string> str, bool nonEmpty)
+String::String(const boost::shared_ptr<string> str)
 	: str(str)
 {
-	if (nonEmpty && str->length() == 0)
+	if (str->length() == 0)
 		throw InvalidFieldException();
 	
 	if (str->length() > 255)
@@ -19,11 +19,11 @@ String::String(const boost::shared_ptr<string> str, bool nonEmpty)
 		throw InvalidFieldException();
 }
 
-String::String(ByteBuffer *bb, bool nonEmpty)
+String::String(ByteBuffer *bb)
 {
 	uint8_t *len = bb->get<uint8_t>();
 	
-	if (nonEmpty && *len == 0)
+	if (*len == 0)
 		throw InvalidFieldException();
 	
 	uint8_t *rawStr = bb->get<uint8_t>(*len);

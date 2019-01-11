@@ -17,9 +17,9 @@ public:
 	//TODO: get rid of this constructor
 	String() {}
 	
-	String(const boost::shared_ptr<std::string> str, bool nonEmpty = true);
+	String(const boost::shared_ptr<std::string> str);
 	
-	String(ByteBuffer *bb, bool nonEmpty = true);
+	String(ByteBuffer *bb);
 	
 	size_t packedSize() const
 	{
