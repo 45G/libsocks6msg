@@ -1,8 +1,8 @@
 #ifndef SOCKS6MSG_AUTHREPLY_HH
 #define SOCKS6MSG_AUTHREPLY_HH
 
-#include "../util/bytebuffer.hh"
-#include "../options/optionset.hh"
+#include "bytebuffer.hh"
+#include "optionset.hh"
 
 namespace S6M
 {

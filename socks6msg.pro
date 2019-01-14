@@ -5,6 +5,8 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
+INCLUDEPATH += fields messages options util
+
 SOURCES += \
     options/option.cc \
     options/stackoption.cc \

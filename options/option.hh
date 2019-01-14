@@ -4,9 +4,9 @@
 #include <set>
 #include <vector>
 #include <string>
-#include "../socks6.h"
-#include "../util/bytebuffer.hh"
-#include "../messages/usrpasswd.hh"
+#include "socks6.h"
+#include "bytebuffer.hh"
+#include "usrpasswd.hh"
 
 namespace S6M
 {

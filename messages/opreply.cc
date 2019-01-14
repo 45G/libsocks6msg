@@ -1,5 +1,5 @@
 #include "opreply.hh"
-#include "../util/sanity.hh"
+#include "sanity.hh"
 
 namespace S6M
 {

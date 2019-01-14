@@ -1,6 +1,6 @@
 #include <arpa/inet.h>
 #include "stackoption.hh"
-#include "../util/sanity.hh"
+#include "sanity.hh"
 #include "optionset.hh"
 
 namespace S6M

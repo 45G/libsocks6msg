@@ -1,7 +1,7 @@
 #include <arpa/inet.h>
 #include "idempotenceoption.hh"
 #include "optionset.hh"
-#include "../util/sanity.hh"
+#include "sanity.hh"
 
 namespace S6M
 {

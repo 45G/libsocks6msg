@@ -4,8 +4,8 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <vector>
-#include "../socks6.h"
-#include "../util/bytebuffer.hh"
+#include "socks6.h"
+#include "bytebuffer.hh"
 #include "string.hh"
 
 namespace S6M

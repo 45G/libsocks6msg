@@ -8,8 +8,8 @@
 #include <set>
 #include <algorithm>
 #include <memory>
-#include "../socks6.h"
-#include "../util/bytebuffer.hh"
+#include "socks6.h"
+#include "bytebuffer.hh"
 
 namespace S6M
 {

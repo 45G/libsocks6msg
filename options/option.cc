@@ -7,7 +7,7 @@
 #include "authmethodoption.hh"
 #include "authdataoption.hh"
 #include "optionset.hh"
-#include "../util/sanity.hh"
+#include "sanity.hh"
 
 using namespace std;
 using namespace boost;

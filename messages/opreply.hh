@@ -1,9 +1,9 @@
 #ifndef SOCKS6MSG_OPREPLY_HH
 #define SOCKS6MSG_OPREPLY_HH
 
-#include "../util/bytebuffer.hh"
-#include "../fields/address.hh"
-#include "../options/optionset.hh"
+#include "bytebuffer.hh"
+#include "address.hh"
+#include "optionset.hh"
 
 namespace S6M
 {

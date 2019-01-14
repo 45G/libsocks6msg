@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "../util/bytebuffer.hh"
+#include "bytebuffer.hh"
 
 namespace S6M
 {
