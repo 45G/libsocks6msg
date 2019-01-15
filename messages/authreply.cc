@@ -39,7 +39,7 @@ size_t AuthenticationReply::pack(uint8_t *buf, size_t bufSize) const
 	return bb.getUsed();
 }
 
-size_t AuthenticationReply::packedSize()
+size_t AuthenticationReply::packedSize() const
 {
 	return Version::packedSize() + sizeof (SOCKS6AuthReply) + optionSet.packedSize();
 }

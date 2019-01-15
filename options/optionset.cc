@@ -168,7 +168,7 @@ both_tos_done:
 		cram(UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd), optsHead, bb);
 }
 
-size_t OptionSet::packedSize()
+size_t OptionSet::packedSize() const
 {
 	size_t size = sizeof(SOCKS6Options);
 	

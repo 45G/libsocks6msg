@@ -24,7 +24,7 @@ public:
 	
 	size_t pack(uint8_t *buf, size_t bufSize) const;
 	
-	size_t packedSize();
+	size_t packedSize() const;
 	
 	SOCKS6AuthReplyCode getReplyCode() const
 	{
@@ -41,6 +41,10 @@ public:
 		return &optionSet;
 	}
 	
+	const OptionSet *getOptionSet() const
+	{
+		return &optionSet;
+	}
 };
 
 }

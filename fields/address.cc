@@ -5,7 +5,7 @@ using namespace std;
 namespace S6M
 {
 
-size_t Address::packedSize()
+size_t Address::packedSize() const
 {
 	size_t size = 1;
 	

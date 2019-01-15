@@ -20,7 +20,7 @@ class Address
 	String domain;
 	
 public:
-	size_t packedSize();
+	size_t packedSize() const;
 	
 	void pack(ByteBuffer *bb) const;
 	

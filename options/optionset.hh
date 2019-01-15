@@ -101,7 +101,7 @@ public:
 	
 	void pack(ByteBuffer *bb) const;
 	
-	size_t packedSize();
+	size_t packedSize() const;
 	
 	Mode getMode() const
 	{

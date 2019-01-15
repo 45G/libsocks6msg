@@ -39,7 +39,7 @@ size_t Request::pack(uint8_t *buf, size_t bufSize) const
 	return bb.getUsed();
 }
 
-size_t Request::packedSize()
+size_t Request::packedSize() const
 {
 	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + optionSet.packedSize();
 }

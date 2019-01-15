@@ -36,7 +36,7 @@ size_t OperationReply::pack(uint8_t *buf, size_t bufSize) const
 	return bb.getUsed();
 }
 
-size_t OperationReply::packedSize()
+size_t OperationReply::packedSize() const
 {
 	return sizeof(SOCKS6OperationReply) + address.packedSize() + optionSet.packedSize();
 }
