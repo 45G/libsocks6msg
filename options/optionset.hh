@@ -36,46 +36,37 @@ private:
 			: clientProxy(0), proxyRemote(0) {}
 	} ipTOS;
 
-	bool tfo;
-	uint16_t tfoPayload;
+	bool tfo = false;
+	uint16_t tfoPayload = 0;
 	
 	bool mptcp;
 	
-	struct Scheds
+	struct
 	{
-		SOCKS6MPTCPScheduler clientProxy;
-		SOCKS6MPTCPScheduler proxyRemote;
-		
-		Scheds()
-			: clientProxy((SOCKS6MPTCPScheduler) 0), proxyRemote((SOCKS6MPTCPScheduler) 0) {}
+		SOCKS6MPTCPScheduler clientProxy = (SOCKS6MPTCPScheduler)0;
+		SOCKS6MPTCPScheduler proxyRemote = (SOCKS6MPTCPScheduler)0;
 		
 	} mptcpSched;
 
-	uint16_t backlog;
+	uint16_t backlog = 0;
 	
-	struct Idem
+	struct
 	{
-		uint32_t request;
+		uint32_t request = 0;
 		
-		bool spend;
-		uint32_t token;
+		bool spend = false;
+		uint32_t token = 0;
 		
 		uint32_t base;
-		uint32_t windowSize;
+		uint32_t windowSize = 0;
 		
-		SOCKS6TokenExpenditureCode replyCode;
-		
-		Idem()
-			: request(0), spend(false), token(0), base(0), windowSize(0), replyCode((SOCKS6TokenExpenditureCode)0) {}
+		SOCKS6TokenExpenditureCode replyCode = (SOCKS6TokenExpenditureCode)0;
 	} idempotence;
 	
-	struct Methods
+	struct
 	{
-		uint16_t initialDataLen;
+		uint16_t initialDataLen = 0;
 		std::set<SOCKS6Method> advertised;
-
-		Methods()
-			: initialDataLen(0) {}
 	} methods;
 	
 	struct
@@ -95,7 +86,7 @@ private:
 	
 public:
 	OptionSet(Mode mode)
-		: mode(mode), tfo(false), tfoPayload(0), mptcp(false), backlog(0) {}
+		: mode(mode) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
