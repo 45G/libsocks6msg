@@ -146,6 +146,7 @@ enum SOCKS6OptionKind
 	SOCKS6_OPTION_STACK       = 0x01,
 	SOCKS6_OPTION_AUTH_METHOD = 0x02,
 	SOCKS6_OPTION_AUTH_DATA   = 0x03,
+	SOCKS6_OPTION_SESSION     = 0x04,
 	SOCKS6_OPTION_IDEMPOTENCE = 0x05,
 
 	SOCKS6_OPTION_VENDOR_MIN  = 0xe0,
@@ -254,6 +255,22 @@ struct SOCKS6AuthDataOption
 	uint8_t             method;
 	uint8_t             methodData[0];
 } __attribute__((packed));
+
+struct SOCKS6SessionOption
+{
+	struct SOCKS6Option optionHead;
+	uint8_t             type;
+	uint8_t             sessionData[0];
+} __attribute__((packed));
+
+enum SOCKS6SessionType
+{
+	SOCKS6_SESSION_REQUEST      = 0x01,
+	SOCKS6_SESSION_TOKEN_UPDATE = 0x02,
+	SOCKS6_SESSION_STATUS       = 0x03,
+	SOCKS6_SESSION_TOKEN        = 0x04,
+	SOCKS6_SESSION_TEARDOWN     = 0x05,
+};
 
 struct SOCKS6IdempotenceOption
 {
