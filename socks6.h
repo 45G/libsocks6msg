@@ -271,6 +271,31 @@ enum SOCKS6SessionType
 	SOCKS6_SESSION_TEARDOWN      = 0x05,
 };
 
+struct SOCKS6SessionTicketUpdateOption
+{
+	struct SOCKS6SessionOption sessionOptionHead;
+	uint16_t                   version;
+	uint8_t                    ticket[0];
+};
+
+struct SOCKS6SessionStatusOption
+{
+	struct SOCKS6SessionOption sessionOptionHead;
+	uint8_t                    status;
+};
+
+enum SOCKS6SessionStatus
+{
+	SOCKS6_SESSION_OK         = 0x01,
+	SOCKS6_SESSION_INEXISTENT = 0x02,
+};
+
+struct SOCKS6SessionTicketOption
+{
+	struct SOCKS6SessionOption sessionOptionHead;
+	uint8_t                    ticket[0];
+};
+
 struct SOCKS6IdempotenceOption
 {
 	struct SOCKS6Option optionHead;
