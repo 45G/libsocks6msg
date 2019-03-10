@@ -130,4 +130,10 @@ SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
 	throw invalid_argument("Bad session option type");
 }
 
+void tokenWindowSanity(uint32_t winSize)
+{
+	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
+		throw invalid_argument("Bad window size");
+}
+
 }

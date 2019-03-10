@@ -62,9 +62,7 @@ void TokenWindowRequestOption::incementalParse(void *buf, size_t optionLen, Opti
 	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(buf, optionLen, false);
 	
 	uint32_t winSize = ntohl(opt->windowSize);
-	
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw invalid_argument("Bad window size");
+	tokenWindowSanity(winSize);
 	
 	optionSet->requestTokenWindow(winSize);
 }
@@ -72,8 +70,7 @@ void TokenWindowRequestOption::incementalParse(void *buf, size_t optionLen, Opti
 TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ), winSize(winSize)
 {
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw invalid_argument("Bad window size");
+	tokenWindowSanity(winSize);
 }
 
 size_t TokenWindowAdvertOption::packedSize() const
@@ -98,8 +95,7 @@ void TokenWindowAdvertOption::incementalParse(void *buf, size_t optionLen, Optio
 	uint32_t winBase = ntohl(opt->windowBase);
 	uint32_t winSize = ntohl(opt->windowSize);
 	
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw InvalidFieldException();
+	tokenWindowSanity(winSize);
 	
 	optionSet->setTokenWindow(winBase, winSize);
 }
@@ -107,8 +103,7 @@ void TokenWindowAdvertOption::incementalParse(void *buf, size_t optionLen, Optio
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_ADVERT), winBase(winBase), winSize(winSize)
 {
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw InvalidFieldException();
+	tokenWindowSanity(winSize);
 }
 
 size_t TokenExpenditureRequestOption::packedSize() const
