@@ -37,6 +37,9 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val);
 template <>
 SOCKS6SessionType enumCast<SOCKS6SessionType>(int val);
 
+template <>
+SOCKS6AddressType enumCast<SOCKS6AddressType>(int val);
+
 void tokenWindowSanity(uint32_t winSize);
 
 }

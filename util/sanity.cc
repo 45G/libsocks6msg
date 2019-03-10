@@ -122,13 +122,30 @@ SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
 	case SOCKS6_SESSION_TEARDOWN:
 	case SOCKS6_SESSION_TICKET:
 	case SOCKS6_SESSION_OK:
-	case SOCKS6_SESSION_INEXISTENT:
-	case SOCKS6_SESSION_TICKET_UPDATE:
+	case SOCKS6_SESSION_REJECT:
+	case SOCKS6_SESSION_UPDATE:
 		return conv;
 	}
 	
 	throw invalid_argument("Bad session option type");
 }
+
+template<>
+SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
+{
+	SOCKS6AddressType conv = (SOCKS6AddressType)val;
+	
+	switch (conv)
+	{
+	case SOCKS6_ADDR_IPV4:
+	case SOCKS6_ADDR_IPV6:
+	case SOCKS6_ADDR_DOMAIN:
+		return conv;
+	}
+	
+	throw invalid_argument("Bad address type");
+}
+
 
 void tokenWindowSanity(uint32_t winSize)
 {

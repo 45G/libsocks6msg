@@ -1,6 +1,7 @@
 #ifndef SOCKS6MSG_SESSIONOPTION_HH
 #define SOCKS6MSG_SESSIONOPTION_HH
 
+#include <vector>
 #include "option.hh"
 
 namespace S6M
@@ -22,7 +23,7 @@ public:
 		return type;
 	}
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
 class SessionRequestOption: public SessionOption
@@ -33,7 +34,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionTeardownOption: public SessionOption
@@ -44,21 +45,27 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionTicketOption: public SessionOption
 {
+	std::vector<uint8_t> ticket;
+	
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	SessionTicketOption()
-		: SessionOption(SOCKS6_SESSION_TICKET) {}
+	SessionTicketOption(const std::vector<uint8_t> &ticket);
+	
+	const std::vector<uint8_t> *getTicket() const
+	{
+		return &ticket;
+	}
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet);
 };
 
 class SessionOKOption: public SessionOption
@@ -69,32 +76,44 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
-class SessionInexistentOption: public SessionOption
+class SessionRejectOption: public SessionOption
 {
 public:
-	SessionInexistentOption()
-		: SessionOption(SOCKS6_SESSION_INEXISTENT) {}
+	SessionRejectOption()
+		: SessionOption(SOCKS6_SESSION_REJECT) {}
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
-class SessionTicketUpdateOption: public SessionOption
+class SessionUpdateOption: public SessionOption
 {
+	std::vector<uint8_t> ticket;
+	uint16_t version;
+	
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	SessionTicketUpdateOption()
-		: SessionOption(SOCKS6_SESSION_TICKET_UPDATE) {}
+	SessionUpdateOption(const std::vector<uint8_t> &ticket, uint16_t version);
+	
+	const std::vector<uint8_t> *getTicket() const
+	{
+		return &ticket;
+	}
+	
+	uint16_t getVersion() const
+	{
+		return version;
+	}
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 }

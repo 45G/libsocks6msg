@@ -31,7 +31,7 @@ public:
 		return code;
 	}
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	StackOption(SOCKS6StackLeg leg, SOCKS6StackLevel level, SOCKS6StackOptionCode code)
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
@@ -47,7 +47,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 
 	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS), tos(tos) {}
@@ -65,7 +65,7 @@ class TFOOption: public StackOption
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TFOOption(uint16_t payloadSize)
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO), payloadSize(payloadSize) {}
@@ -81,7 +81,7 @@ class MPTCPOption: public StackOption
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	MPTCPOption()
 		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP) {}
@@ -97,7 +97,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
 		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
@@ -118,7 +118,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incementalParse(void *buf, OptionSet *optionSet);
 
 	BacklogOption(uint16_t backlog);
 

@@ -2,7 +2,7 @@
 #define SOCKS6MSG_EXCEPTION_HH
 
 #include <stdint.h>
-#include <exception>
+#include <stdexcept>
 
 namespace S6M
 {
@@ -35,11 +35,12 @@ public:
 	}
 };
 
-//TODO: replace with std::invalid_argument
-class InvalidFieldException: public Exception
+//TODO: get rid of this
+class InvalidFieldException: public std::invalid_argument
 {
 public:
-	const char *what() const throw ();
+	InvalidFieldException()
+		: std::invalid_argument("") {}
 };
 
 class EndOfBufferException: public Exception

@@ -18,7 +18,7 @@ void AuthDataOption::fill(uint8_t *buf) const
 
 void AuthDataOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(buf, optionLen);
+	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(buf);
 	
 	switch (opt->method)
 	{

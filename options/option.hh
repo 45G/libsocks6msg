@@ -1,6 +1,7 @@
 ﻿#ifndef SOCKS6MSG_OPTION_HH
 #define SOCKS6MSG_OPTION_HH
 
+#include <arpa/inet.h>
 #include <set>
 #include <vector>
 #include <string>
@@ -21,8 +22,10 @@ class Option
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
-	template <typename T> static T *rawOptCast(void *buf, size_t len, bool allowPayload = true)
+	template <typename T> static T *rawOptCast(void *buf, bool allowPayload = true)
 	{
+		size_t len = ntohs(((SOCKS6Option *)buf)->len);
+		
 		if (len < sizeof(T))
 			throw std::invalid_argument("Truncated option");
 		if (!allowPayload && len != sizeof(T))

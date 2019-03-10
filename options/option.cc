@@ -25,11 +25,11 @@ void Option::fill(uint8_t *buf) const
 
 void Option::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf, optionLen);
+	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf);
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_STACK:
-		StackOption::incementalParse(buf, optionLen, optionSet);
+		StackOption::incementalParse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD:
@@ -40,12 +40,16 @@ void Option::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 		AuthDataOption::incementalParse(buf, optionLen, optionSet);
 		break;
 		
+	case SOCKS6_OPTION_SESSION:
+		SessionOption::incementalParse(opt, optionSet);
+		break;
+		
 	case SOCKS6_OPTION_IDEMPOTENCE:
-		IdempotenceOption::incementalParse(buf, optionLen, optionSet);
+		IdempotenceOption::incementalParse(buf, optionSet);
 		break;
 		
 	default:
-		throw InvalidFieldException();
+		throw invalid_argument("Unknown kind");
 	}
 }
 

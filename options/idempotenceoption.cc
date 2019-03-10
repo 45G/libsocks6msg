@@ -17,30 +17,31 @@ void IdempotenceOption::fill(uint8_t *buf) const
 	opt->type = type;
 }
 
-void IdempotenceOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void IdempotenceOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6IdempotenceOption *opt = rawOptCast<SOCKS6IdempotenceOption>(buf, optionLen);
+	SOCKS6IdempotenceOption *opt = rawOptCast<SOCKS6IdempotenceOption>(buf);
 	
 	switch ((SOCKS6IDempotenceType)opt->type)
 	{
 	case SOCKS6_IDEMPOTENCE_WND_REQ:
-		TokenWindowRequestOption::incementalParse(buf, optionLen, optionSet);
+		TokenWindowRequestOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_WND_ADVERT:
-		TokenWindowAdvertOption::incementalParse(buf, optionLen, optionSet);
+		TokenWindowAdvertOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND:
-		TokenExpenditureRequestOption::incementalParse(buf, optionLen, optionSet);
+		TokenExpenditureRequestOption::incementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY:
-		TokenExpenditureReplyOption::incementalParse(buf, optionLen, optionSet);
+		TokenExpenditureReplyOption::incementalParse(buf, optionSet);
 		break;
+		
+	default:
+		throw invalid_argument("Unknown type");
 	}
-	
-	throw InvalidFieldException();
 }
 
 void TokenWindowRequestOption::fill(uint8_t *buf) const
@@ -57,9 +58,9 @@ size_t TokenWindowRequestOption::packedSize() const
 	return sizeof(SOCKS6WindowRequestOption);
 }
 
-void TokenWindowRequestOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void TokenWindowRequestOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(buf, optionLen, false);
+	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(buf, false);
 	
 	uint32_t winSize = ntohl(opt->windowSize);
 	tokenWindowSanity(winSize);
@@ -88,9 +89,9 @@ void TokenWindowAdvertOption::fill(uint8_t *buf) const
 	opt->windowSize = htonl(winSize);
 }
 
-void TokenWindowAdvertOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void TokenWindowAdvertOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6WindowAdvertOption *opt = rawOptCast<SOCKS6WindowAdvertOption>(buf, optionLen, false);
+	SOCKS6WindowAdvertOption *opt = rawOptCast<SOCKS6WindowAdvertOption>(buf, false);
 	
 	uint32_t winBase = ntohl(opt->windowBase);
 	uint32_t winSize = ntohl(opt->windowSize);
@@ -120,9 +121,9 @@ void TokenExpenditureRequestOption::fill(uint8_t *buf) const
 	opt->token = htonl(token);
 }
 
-void TokenExpenditureRequestOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void TokenExpenditureRequestOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(buf, optionLen, false);
+	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(buf, false);
 	
 	optionSet->setToken(ntohl(opt->token));
 }
@@ -141,9 +142,9 @@ void TokenExpenditureReplyOption::fill(uint8_t *buf) const
 	opt->code = code;
 }
 
-void TokenExpenditureReplyOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void TokenExpenditureReplyOption::incementalParse(void *buf, OptionSet *optionSet)
 {
-	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(buf, optionLen, false);
+	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(buf, false);
 	
 	optionSet->setExpenditureReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
 }

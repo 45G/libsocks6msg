@@ -3,6 +3,8 @@
 #include "authmethodoption.hh"
 #include "optionset.hh"
 
+using namespace std;
+
 namespace S6M
 {
 
@@ -29,7 +31,7 @@ void AuthMethodOption::fill(uint8_t *buf) const
 
 void AuthMethodOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(buf, optionLen);
+	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(buf);
 
 	optionSet->setInitialDataLen(ntohs(opt->initialDataLen));
 	
@@ -43,10 +45,10 @@ AuthMethodOption::AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Metho
 	: Option(SOCKS6_OPTION_AUTH_METHOD), initialDataLen(initialDataLen), methods(methods)
 {
 	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())
-		throw InvalidFieldException();
+		throw invalid_argument("Bad method");
 	methods.erase(SOCKS6_METHOD_NOAUTH);
 	if (methods.empty())
-		throw InvalidFieldException();
+		throw invalid_argument("No methods");
 }
 
 }

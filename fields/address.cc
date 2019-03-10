@@ -1,3 +1,4 @@
+#include "sanity.hh"
 #include "address.hh"
 
 using namespace std;
@@ -54,34 +55,10 @@ void Address::pack(ByteBuffer *bb)  const
 	}
 }
 
-in_addr Address::getIPv4() const
-{
-	if (type != SOCKS6_ADDR_IPV4)
-		throw InvalidFieldException();
-	
-	return ipv4;
-}
-
-in6_addr Address::getIPv6() const
-{
-	if (type != SOCKS6_ADDR_IPV6)
-		throw InvalidFieldException();
-	
-	return ipv6;
-}
-
-const std::shared_ptr<string> Address::getDomain() const
-{
-	if (type != SOCKS6_ADDR_DOMAIN)
-		throw InvalidFieldException();
-	
-	return domain.getStr();
-}
-
 Address::Address(ByteBuffer *bb)
 {
 	uint8_t *rawType = bb->get<uint8_t>();
-	type = (SOCKS6AddressType)(*rawType);
+	type = enumCast<SOCKS6AddressType>(*rawType);
 	
 	switch (type)
 	{
@@ -102,9 +79,6 @@ Address::Address(ByteBuffer *bb)
 	case SOCKS6_ADDR_DOMAIN:
 		domain = String(bb);
 		break;
-		
-	default:
-		throw InvalidFieldException();
 	}
 }
 

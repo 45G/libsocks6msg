@@ -48,20 +48,20 @@ template <typename T, typename U> static void checkedAssignment(T *field1, T val
 }
 
 
-void OptionSet::enforceMode(OptionSet::Mode mode1)
+void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
 {
 	if (mode != mode1)
-		throw InvalidFieldException();
+		throw invalid_argument("Option not available");
 }
 
-void OptionSet::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2)
+void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) const
 {
 	if (mode != mode1 && mode != mode2)
-		throw InvalidFieldException();
+		throw invalid_argument("Option not available");
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: mode(mode), tfo(false), tfoPayload(0), mptcp(false), backlog(0)
+	: OptionSetBase(mode), sessionSet(this)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	uint16_t optsLen = ntohs(optsHead->optionsLength);
@@ -341,7 +341,7 @@ void OptionSet::advertiseMethod(SOCKS6Method method)
 	if (method == SOCKS6_METHOD_NOAUTH)
 		return;
 	if (method == SOCKS6_METHOD_UNACCEPTABLE)
-		throw InvalidFieldException();
+		throw invalid_argument("Bad method");
 
 	methods.advertised.insert(method);
 }
@@ -351,7 +351,7 @@ void OptionSet::setInitialDataLen(uint16_t initialDataLen)
 	enforceMode(M_REQ);
 
 	if (initialDataLen > SOCKS6_INITIAL_DATA_MAX)
-		throw InvalidFieldException();
+		throw invalid_argument("Bad initial data length");
 
 	checkedAssignment(&methods.initialDataLen, initialDataLen);
 }
@@ -368,6 +368,51 @@ void OptionSet::setUsernamePassword(const std::shared_ptr<string> user, const st
 	
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
+}
+
+#define COMMIT(FIELD, WHAT) \
+	if ((FIELD).get() != nullptr) \
+		throw invalid_argument("Option already in place"); \
+	(FIELD).reset(WHAT); \
+	owner->registerOption((FIELD).get());
+
+SessionOptionSet::SessionOptionSet(OptionSet *owner)
+	: OptionSetBase(owner->mode), owner(owner) {}
+
+void SessionOptionSet::request()
+{
+	enforceMode(M_REQ);
+	COMMIT(sessionOption, new SessionRequestOption());
+}
+
+void SessionOptionSet::tearDown()
+{
+	enforceMode(M_REQ);
+	COMMIT(sessionOption, new SessionTeardownOption());
+}
+
+void SessionOptionSet::echoTicket(const std::vector<uint8_t> &ticket)
+{
+	enforceMode(M_REQ);
+	COMMIT(sessionOption, new SessionTicketOption(ticket));
+}
+
+void SessionOptionSet::updateTicket(const std::vector<uint8_t> &ticket, uint16_t version)
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(sessionOption, new SessionUpdateOption(ticket, version));
+}
+
+void SessionOptionSet::signalOK()
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(sessionOption, new SessionOKOption());
+}
+
+void SessionOptionSet::signalReject()
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(sessionOption, new SessionRejectOption());
 }
 
 }

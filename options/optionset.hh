@@ -18,7 +18,9 @@
 namespace S6M
 {
 
-class OptionSet
+//TODO: this is waaaaaay too bloated
+
+class OptionSetBase
 {
 public:
 	enum Mode
@@ -28,9 +30,95 @@ public:
 		M_OP_REP,
 	};
 	
-private:
+protected:
 	Mode mode;
 	
+	void enforceMode(Mode mode1) const;
+	
+	void enforceMode(Mode mode1, Mode mode2) const;
+	
+	void enforceMode(Mode mode1, Mode mode2, Mode mode3) const
+	{
+		(void)mode1; (void)mode2; (void)mode3;
+	}
+	
+public:
+	OptionSetBase(Mode mode)
+		: mode(mode) {}
+};
+
+class OptionSet;
+
+class SessionOptionSet: public OptionSetBase
+{
+	OptionSet *owner;
+	std::unique_ptr<SessionOption> sessionOption;
+	
+public:
+	SessionOptionSet(OptionSet *owner);
+	
+	void request();
+	
+	bool requested() const
+	{
+		return dynamic_cast<SessionRequestOption *>(sessionOption.get()) != nullptr;
+	}
+	
+	void tearDown();
+	
+	bool tornDown() const
+	{
+		return dynamic_cast<SessionTeardownOption *>(sessionOption.get()) != nullptr;
+	}
+	
+	void echoTicket(const std::vector<uint8_t> &ticket);
+	
+	void updateTicket(const std::vector<uint8_t> &ticket, uint16_t version);
+	
+	const std::vector<uint8_t> *getTicket() const
+	{
+		enforceMode(M_REQ, M_AUTH_REP);
+		
+		if (mode == M_REQ)
+		{
+			SessionTicketOption *opt = dynamic_cast<SessionTicketOption *>(sessionOption.get());
+			if (opt == nullptr)
+				return nullptr;
+			return opt->getTicket();
+		}
+		else
+		{
+			SessionUpdateOption *opt = dynamic_cast<SessionUpdateOption *>(sessionOption.get());
+			if (opt == nullptr)
+				return nullptr;
+			return opt->getTicket();
+		}
+	}
+	
+	uint16_t getTicketVersion() const
+	{
+		SessionUpdateOption *opt = dynamic_cast<SessionUpdateOption *>(sessionOption.get());
+		return opt->getVersion();
+		
+	}
+	
+	void signalOK();
+	
+	bool isOK()
+	{
+		return dynamic_cast<SessionOKOption *>(sessionOption.get()) != nullptr;
+	}
+	
+	void signalReject();
+	
+	bool rejected() const
+	{
+		return dynamic_cast<SessionRejectOption *>(sessionOption.get()) != nullptr;
+	}
+};
+
+class OptionSet: public OptionSetBase
+{
 	struct TOS
 	{
 		uint8_t clientProxy;
@@ -43,7 +131,7 @@ private:
 	bool tfo = false;
 	uint16_t tfoPayload = 0;
 	
-	bool mptcp;
+	bool mptcp = false;
 	
 	struct
 	{
@@ -79,23 +167,20 @@ private:
 		std::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
 	
-	std::unique_ptr<SessionOption> sessionOption;
+	SessionOptionSet sessionSet;
 	
 	std::list<Option *> options;
 	size_t optionsSize = 0;
 	
-	void enforceMode(Mode mode1);
-	
-	void enforceMode(Mode mode1, Mode mode2);
-	
-	void enforceMode(Mode mode1, Mode mode2, Mode mode3)
+	void registerOption(Option *option)
 	{
-		(void)mode1; (void)mode2; (void)mode3;
+		options.push_back(option);
+		optionsSize += option->packedSize();
 	}
 	
 public:
 	OptionSet(Mode mode)
-		: mode(mode) {}
+		: OptionSetBase(mode), sessionSet(this) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
@@ -232,6 +317,18 @@ public:
 	{
 		return userPasswdAuth.passwd;
 	}
+	
+	SessionOptionSet *session()
+	{
+		return &sessionSet;
+	}
+	
+	const SessionOptionSet *session() const
+	{
+		return &sessionSet;
+	}
+	
+	friend class SessionOptionSet;
 };
 
 }

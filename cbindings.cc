@@ -13,10 +13,6 @@ using namespace boost;
 using namespace S6M;
 
 #define S6M_CATCH(err) \
-	catch (InvalidFieldException &) \
-	{ \
-		(err) = S6M_ERR_INVALID; \
-	} \
 	catch (invalid_argument &) \
 	{ \
 		(err) = S6M_ERR_INVALID; \
