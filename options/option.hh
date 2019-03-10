@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <stdexcept>
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "usrpasswd.hh"
@@ -19,6 +20,16 @@ class Option
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
+	
+	template <typename T> static T *rawOptCast(void *buf, size_t len, bool allowPayload = true)
+	{
+		if (len < sizeof(T))
+			throw std::invalid_argument("Truncated option");
+		if (!allowPayload && len != sizeof(T))
+			throw std::invalid_argument("Spurious bytes at the end of the option");
+		
+		return (T *)buf;
+	}
 	
 public:
 	SOCKS6OptionKind getKind() const

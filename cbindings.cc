@@ -4,6 +4,7 @@
 #include <set>
 #include <boost/foreach.hpp>
 #include <memory>
+#include <stdexcept>
 #include "socks6msg.h"
 #include "socks6msg.hh"
 
@@ -77,7 +78,7 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 		return Address(make_shared<string>(cAddr->domain));
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad address type");
 }
 
 /*

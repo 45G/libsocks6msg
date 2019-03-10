@@ -1,6 +1,9 @@
+#include <stdexcept>
 #include "sanity.hh"
 
 #pragma GCC diagnostic error "-Wswitch"
+
+using namespace std;
 
 namespace S6M
 {
@@ -17,7 +20,7 @@ SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad MPTCP Scheduler");
 }
 
 template <>
@@ -33,7 +36,7 @@ SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad leg");
 }
 
 template <>
@@ -50,7 +53,7 @@ SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad token expenditure code");
 }
 
 template <>
@@ -67,7 +70,7 @@ SOCKS6RequestCode enumCast<SOCKS6RequestCode>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad request code");
 }
 
 template <>
@@ -90,7 +93,7 @@ SOCKS6OperationReplyCode enumCast<SOCKS6OperationReplyCode>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad operation reply code");
 }
 
 template <>
@@ -105,7 +108,7 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad authentication reply code");
 }
 
 template<>
@@ -124,7 +127,7 @@ SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
 		return conv;
 	}
 	
-	throw InvalidFieldException();
+	throw invalid_argument("Bad session option type");
 }
 
 }

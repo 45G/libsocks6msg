@@ -25,7 +25,7 @@ void Option::fill(uint8_t *buf) const
 
 void Option::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6Option *opt = (SOCKS6Option *)buf;
+	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf, optionLen);
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_STACK:

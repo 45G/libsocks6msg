@@ -3,6 +3,8 @@
 #include "optionset.hh"
 #include "sanity.hh"
 
+using namespace std;
+
 namespace S6M
 {
 
@@ -17,10 +19,7 @@ void IdempotenceOption::fill(uint8_t *buf) const
 
 void IdempotenceOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6IdempotenceOption *opt = reinterpret_cast<SOCKS6IdempotenceOption *>(buf);
-	
-	if (optionLen < sizeof (SOCKS6IdempotenceOption))
-		throw InvalidFieldException();
+	SOCKS6IdempotenceOption *opt = rawOptCast<SOCKS6IdempotenceOption>(buf, optionLen);
 	
 	switch ((SOCKS6IDempotenceType)opt->type)
 	{
@@ -60,15 +59,12 @@ size_t TokenWindowRequestOption::packedSize() const
 
 void TokenWindowRequestOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6WindowRequestOption *opt = reinterpret_cast<SOCKS6WindowRequestOption *>(buf);
-	
-	if (optionLen != sizeof(SOCKS6WindowRequestOption))
-		throw InvalidFieldException();
+	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(buf, optionLen, false);
 	
 	uint32_t winSize = ntohl(opt->windowSize);
 	
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw InvalidFieldException();
+		throw invalid_argument("Bad window size");
 	
 	optionSet->requestTokenWindow(winSize);
 }
@@ -77,7 +73,7 @@ TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
 	: IdempotenceOption(SOCKS6_IDEMPOTENCE_WND_REQ), winSize(winSize)
 {
 	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw InvalidFieldException();
+		throw invalid_argument("Bad window size");
 }
 
 size_t TokenWindowAdvertOption::packedSize() const
@@ -97,10 +93,7 @@ void TokenWindowAdvertOption::fill(uint8_t *buf) const
 
 void TokenWindowAdvertOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6WindowAdvertOption *opt = reinterpret_cast<SOCKS6WindowAdvertOption *>(buf);
-	
-	if (optionLen != sizeof(SOCKS6WindowAdvertOption))
-		throw InvalidFieldException();
+	SOCKS6WindowAdvertOption *opt = rawOptCast<SOCKS6WindowAdvertOption>(buf, optionLen, false);
 	
 	uint32_t winBase = ntohl(opt->windowBase);
 	uint32_t winSize = ntohl(opt->windowSize);
@@ -134,10 +127,7 @@ void TokenExpenditureRequestOption::fill(uint8_t *buf) const
 
 void TokenExpenditureRequestOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6TokenExpenditureOption *opt = reinterpret_cast<SOCKS6TokenExpenditureOption *>(buf);
-	
-	if (optionLen != sizeof(SOCKS6TokenExpenditureOption))
-		throw InvalidFieldException();
+	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(buf, optionLen, false);
 	
 	optionSet->setToken(ntohl(opt->token));
 }
@@ -158,10 +148,7 @@ void TokenExpenditureReplyOption::fill(uint8_t *buf) const
 
 void TokenExpenditureReplyOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
-	
-	if (optionLen != sizeof(SOCKS6TokenExpenditureReplyOption))
-		throw InvalidFieldException();
+	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(buf, optionLen, false);
 	
 	optionSet->setExpenditureReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
 }

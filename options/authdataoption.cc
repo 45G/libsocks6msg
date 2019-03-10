@@ -18,10 +18,7 @@ void AuthDataOption::fill(uint8_t *buf) const
 
 void AuthDataOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
-	
-	if (optionLen < sizeof(SOCKS6AuthDataOption))
-		throw InvalidFieldException();
+	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(buf, optionLen);
 	
 	switch (opt->method)
 	{
@@ -35,7 +32,7 @@ void AuthDataOption::incementalParse(void *buf, size_t optionLen, OptionSet *opt
 		break;
 		
 	default:
-		throw InvalidFieldException();
+		throw invalid_argument("Unsupported method");
 	}	
 }
 
@@ -67,17 +64,17 @@ void UsernamePasswdOption::incementalParse(void *buf, size_t optionLen, OptionSe
 		UserPasswordRequest req(&bb);
 		
 		if (bb.getUsed() != expectedDataSize)
-			throw InvalidFieldException();
+			throw invalid_argument("Spurious bytes at the end of the option");
 		
 		optionSet->setUsernamePassword(req.getUsername(), req.getPassword());
 	}
 	catch (EndOfBufferException)
 	{
-		throw InvalidFieldException();
+		throw invalid_argument("Truncated payload");
 	}
 	catch (BadVersionException)
 	{
-		throw InvalidFieldException();
+		throw invalid_argument("Unsupported version");
 	}
 }
 

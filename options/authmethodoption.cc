@@ -29,10 +29,7 @@ void AuthMethodOption::fill(uint8_t *buf) const
 
 void AuthMethodOption::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthMethodOption *opt = (SOCKS6AuthMethodOption *)buf;
-	
-	if (optionLen < sizeof(SOCKS6AuthMethodOption))
-		throw InvalidFieldException();
+	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(buf, optionLen);
 
 	optionSet->setInitialDataLen(ntohs(opt->initialDataLen));
 	
