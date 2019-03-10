@@ -264,11 +264,16 @@ struct SOCKS6SessionOption
 
 enum SOCKS6SessionType
 {
+	/* client-issued */
 	SOCKS6_SESSION_REQUEST       = 0x01,
-	SOCKS6_SESSION_TICKET_UPDATE = 0x02,
-	SOCKS6_SESSION_STATUS        = 0x03,
-	SOCKS6_SESSION_TICKET        = 0x04,
-	SOCKS6_SESSION_TEARDOWN      = 0x05,
+	SOCKS6_SESSION_TEARDOWN      = 0x02,
+	SOCKS6_SESSION_TICKET        = 0x03,
+	
+	/* proxy-issued */
+	SOCKS6_SESSION_OK            = 0x04,
+	SOCKS6_SESSION_INEXISTENT    = 0x05,
+	SOCKS6_SESSION_TICKET_UPDATE = 0x06,
+	
 };
 
 struct SOCKS6SessionTicketUpdateOption
@@ -276,18 +281,6 @@ struct SOCKS6SessionTicketUpdateOption
 	struct SOCKS6SessionOption sessionOptionHead;
 	uint16_t                   version;
 	uint8_t                    ticket[0];
-};
-
-struct SOCKS6SessionStatusOption
-{
-	struct SOCKS6SessionOption sessionOptionHead;
-	uint8_t                    status;
-};
-
-enum SOCKS6SessionStatus
-{
-	SOCKS6_SESSION_OK         = 0x01,
-	SOCKS6_SESSION_INEXISTENT = 0x02,
 };
 
 struct SOCKS6SessionTicketOption

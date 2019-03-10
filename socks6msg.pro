@@ -23,7 +23,8 @@ SOURCES += \
     messages/opreply.cc \
     messages/request.cc \
     messages/usrpasswd.cc \
-    messages/version.cc
+    messages/version.cc \
+    options/sessionoption.cc
 
 HEADERS += \
     socks6.h \
@@ -44,7 +45,8 @@ HEADERS += \
     messages/opreply.hh \
     messages/request.hh \
     messages/usrpasswd.hh \
-    messages/version.hh
+    messages/version.hh \
+    options/sessionoption.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg

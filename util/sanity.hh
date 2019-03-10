@@ -34,6 +34,9 @@ SOCKS6OperationReplyCode enumCast<SOCKS6OperationReplyCode>(int val);
 template <>
 SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val);
 
+template <>
+SOCKS6SessionType enumCast<SOCKS6SessionType>(int val);
+
 }
 
 #endif // SOCKS6MSG_SANITY_HH

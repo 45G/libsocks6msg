@@ -75,6 +75,14 @@ private:
 		std::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
 	
+	struct
+	{
+		bool request = false;
+		
+		bool teardown = false;
+		
+	} session;
+	
 	void enforceMode(Mode mode1);
 	
 	void enforceMode(Mode mode1, Mode mode2);
