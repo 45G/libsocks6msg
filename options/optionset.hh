@@ -8,8 +8,12 @@
 #include <set>
 #include <algorithm>
 #include <memory>
-#include "socks6.h"
-#include "bytebuffer.hh"
+#include "option.hh"
+#include "stackoption.hh"
+#include "idempotenceoption.hh"
+#include "authmethodoption.hh"
+#include "authdataoption.hh"
+#include "sessionoption.hh"
 
 namespace S6M
 {
@@ -75,13 +79,10 @@ private:
 		std::shared_ptr<std::string> passwd;
 	} userPasswdAuth;
 	
-	struct
-	{
-		bool request = false;
-		
-		bool teardown = false;
-		
-	} session;
+	std::unique_ptr<SessionOption> sessionOption;
+	
+	std::list<Option *> options;
+	size_t optionsSize = 0;
 	
 	void enforceMode(Mode mode1);
 	

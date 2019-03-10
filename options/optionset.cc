@@ -1,11 +1,7 @@
 #include <arpa/inet.h>
 #include <boost/foreach.hpp>
 #include "optionset.hh"
-#include "option.hh"
-#include "stackoption.hh"
-#include "idempotenceoption.hh"
-#include "authmethodoption.hh"
-#include "authdataoption.hh"
+
 
 using namespace std;
 using namespace boost;
@@ -166,6 +162,11 @@ both_tos_done:
 	
 	if (userPasswdAuth.username.get() != NULL && !userPasswdAuth.username->empty())
 		cram(UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd), optsHead, bb);
+	
+	BOOST_FOREACH(Option *option, options)
+	{
+		cram(*option, optsHead, bb);
+	}
 }
 
 size_t OptionSet::packedSize() const
@@ -225,6 +226,8 @@ both_tos_done:
 	
 	if (!userPasswdAuth.username->empty())
 		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
+	
+	size += optionsSize;
 	
 	return size;
 }
