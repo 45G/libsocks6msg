@@ -46,7 +46,8 @@ HEADERS += \
     messages/request.hh \
     messages/usrpasswd.hh \
     messages/version.hh \
-    options/sessionoption.hh
+    options/sessionoption.hh \
+    util/byteorder.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg

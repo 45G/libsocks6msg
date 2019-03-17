@@ -72,20 +72,6 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void TOSOption::fill(uint8_t *buf) const
-{
-	StackOption::fill(buf);
-
-	SOCKS6TOSOption *opt = reinterpret_cast<SOCKS6TOSOption *>(buf);
-
-	opt->tos = tos;
-}
-
-size_t TOSOption::packedSize() const
-{
-	return sizeof(SOCKS6TOSOption);
-}
-
 void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(buf, false);
@@ -108,7 +94,7 @@ void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 
 size_t TFOOption::packedSize() const
 {
-	return sizeof(SOCKS6StackOption);
+	return sizeof(SOCKS6StackOption) + sizeof(uint16_t);
 }
 
 void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
@@ -121,11 +107,6 @@ void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 	uint16_t payloadSize = ntohs(opt->payloadLen);
 	
 	optionSet->setTFOPayload(payloadSize);
-}
-
-size_t MPTCPOption::packedSize() const
-{
-	return sizeof(SOCKS6StackOption);
 }
 
 void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
