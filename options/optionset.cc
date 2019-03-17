@@ -51,17 +51,17 @@ template <typename T, typename U> static void checkedAssignment(T *field1, T val
 void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
 {
 	if (mode != mode1)
-		throw invalid_argument("Option not available");
+		throw logic_error("Option not available");
 }
 
 void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) const
 {
 	if (mode != mode1 && mode != mode2)
-		throw invalid_argument("Option not available");
+		throw logic_error("Option not available");
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: OptionSetBase(mode), sessionSet(this)
+	: OptionSetBase(nullptr, mode), sessionSet(this)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	uint16_t optsLen = ntohs(optsHead->optionsLength);
@@ -371,42 +371,43 @@ void OptionSet::setUsernamePassword(const std::shared_ptr<string> user, const st
 }
 
 #define COMMIT(FIELD, WHAT) \
-	if ((FIELD).get() != nullptr) \
-		throw invalid_argument("Option already in place"); \
+	ensureVacant(FIELD); \
 	(FIELD).reset(WHAT); \
 	owner->registerOption((FIELD).get());
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
-	: OptionSetBase(owner->mode), owner(owner) {}
+	: OptionSetBase(owner, owner->mode) {}
 
 void SessionOptionSet::request()
 {
 	enforceMode(M_REQ);
-	COMMIT(sessionOption, new SessionRequestOption());
+	COMMIT(mandatoryOpt, new SessionRequestOption());
 }
 
 void SessionOptionSet::tearDown()
 {
 	enforceMode(M_REQ);
-	COMMIT(sessionOption, new SessionTeardownOption());
+	if (mandatoryOpt == nullptr)
+		throw logic_error("Request must be part of session");
+	COMMIT(teardownOpt, new SessionTeardownOption());
 }
 
 void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
 {
-	enforceMode(M_REQ);
-	COMMIT(sessionOption, new SessionIDOption(ticket));
+	enforceMode(M_REQ, M_AUTH_REP);
+	COMMIT(mandatoryOpt, new SessionIDOption(ticket));
 }
 
 void SessionOptionSet::signalOK()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(sessionOption, new SessionOKOption());
+	COMMIT(mandatoryOpt, new SessionOKOption());
 }
 
 void SessionOptionSet::signalReject()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(sessionOption, new SessionInvalidOption());
+	COMMIT(mandatoryOpt, new SessionInvalidOption());
 }
 
 }

@@ -20,6 +20,8 @@ namespace S6M
 
 //TODO: this is waaaaaay too bloated
 
+class OptionSet;
+
 class OptionSetBase
 {
 public:
@@ -31,48 +33,54 @@ public:
 	};
 	
 protected:
+	OptionSet *owner;
 	Mode mode;
 	
 	void enforceMode(Mode mode1) const;
 	
 	void enforceMode(Mode mode1, Mode mode2) const;
 	
+	template <typename T> void ensureVacant(const std::unique_ptr<T> &ptr)
+	{
+		if (ptr.get() != nullptr)
+			throw std::logic_error("Option already in place");
+	}
+	
 public:
-	OptionSetBase(Mode mode)
-		: mode(mode) {}
+	OptionSetBase(OptionSet *owner, Mode mode)
+		: owner(owner), mode(mode) {}
 };
-
-class OptionSet;
 
 class SessionOptionSet: public OptionSetBase
 {
-	OptionSet *owner;
-	std::unique_ptr<SessionOption> sessionOption;
+	std::unique_ptr<SessionOption>          mandatoryOpt;
+	std::unique_ptr<SessionTeardownOption>  teardownOpt;
+	std::unique_ptr<SessionUntrustedOption> untrustedOpt;
 	
 public:
 	SessionOptionSet(OptionSet *owner);
 	
 	void request();
 	
-	bool requested() const
+	bool requested()
 	{
-		return dynamic_cast<SessionRequestOption *>(sessionOption.get()) != nullptr;
+		return dynamic_cast<SessionRequestOption *>(mandatoryOpt.get()) != nullptr;
 	}
 	
 	void tearDown();
 	
 	bool tornDown() const
 	{
-		return dynamic_cast<SessionTeardownOption *>(sessionOption.get()) != nullptr;
+		return teardownOpt.get() != nullptr;
 	}
 	
 	void setID(const std::vector<uint8_t> &ticket);
 	
-	const std::vector<uint8_t> *getTicket() const
+	const std::vector<uint8_t> *getID() const
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
 		
-		SessionIDOption *opt = dynamic_cast<SessionIDOption *>(sessionOption.get());
+		SessionIDOption *opt = dynamic_cast<SessionIDOption *>(mandatoryOpt.get());
 		if (opt == nullptr)
 			return nullptr;
 		return opt->getTicket();
@@ -82,14 +90,14 @@ public:
 	
 	bool isOK()
 	{
-		return dynamic_cast<SessionOKOption *>(sessionOption.get()) != nullptr;
+		return dynamic_cast<SessionOKOption *>(mandatoryOpt.get()) != nullptr;
 	}
 	
 	void signalReject();
 	
 	bool rejected() const
 	{
-		return dynamic_cast<SessionInvalidOption *>(sessionOption.get()) != nullptr;
+		return dynamic_cast<SessionInvalidOption *>(mandatoryOpt.get()) != nullptr;
 	}
 	
 	void setUntrusted();
@@ -160,7 +168,7 @@ class OptionSet: public OptionSetBase
 	
 public:
 	OptionSet(Mode mode)
-		: OptionSetBase(mode), sessionSet(this) {}
+		: OptionSetBase(nullptr, mode), sessionSet(this) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	

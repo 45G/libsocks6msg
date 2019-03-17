@@ -7,13 +7,7 @@
 namespace S6M
 {
 
-class Exception: public std::exception
-{
-public:
-	const char *what() const throw () = 0;
-};
-
-class BadVersionException: public Exception
+class BadVersionException: public std::exception
 {
 	uint8_t maj;
 	uint8_t min;
@@ -33,20 +27,6 @@ public:
 	{
 		return min;
 	}
-};
-
-//TODO: get rid of this
-class InvalidFieldException: public std::invalid_argument
-{
-public:
-	InvalidFieldException()
-		: std::invalid_argument("") {}
-};
-
-class EndOfBufferException: public Exception
-{
-public:
-	const char *what() const throw ();
 };
 
 }

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <unistd.h>
-#include "exception.hh"
+#include <stdexcept>
 
 namespace S6M
 {
@@ -42,7 +42,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw EndOfBufferException();
+			throw std::length_error("End of buffer");
 		
 		T *ret = reinterpret_cast<T *>(buf + used);
 		used += req;
@@ -54,7 +54,7 @@ public:
 		size_t req = sizeof(T) * count;
 		
 		if (req + used > totalSize)
-			throw EndOfBufferException();
+			throw std::length_error("End of buffer");
 		
 		memcpy(buf + used, what, req);
 		used += req;
