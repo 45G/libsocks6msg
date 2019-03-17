@@ -290,19 +290,19 @@ public:
 
 	void setInitialDataLen(uint16_t initialDataLen);
 	
-	void setUsernamePassword(const std::shared_ptr<std::string> user, const std::shared_ptr<std::string> passwd);
+	void setUsernamePassword(const std::string &user, const std::string &passwd);
 	
-	const std::shared_ptr<std::string> getUsername() const
+	const std::string *getUsername() const
 	{
 		if (userPasswd.get() == nullptr)
-			return { nullptr };
+			return nullptr;
 		return userPasswd->getUsername();
 	}
 	
-	const std::shared_ptr<std::string> getPassword() const
+	const std::string *getPassword() const
 	{
 		if (userPasswd.get() == nullptr)
-			return { nullptr };
+			return nullptr;
 		return userPasswd->getPassword();
 	}
 	

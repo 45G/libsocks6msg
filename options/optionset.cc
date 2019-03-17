@@ -355,7 +355,7 @@ void OptionSet::setInitialDataLen(uint16_t initialDataLen)
 	checkedAssignment(&methods.initialDataLen, initialDataLen);
 }
 
-void OptionSet::setUsernamePassword(const std::shared_ptr<string> user, const std::shared_ptr<string> passwd)
+void OptionSet::setUsernamePassword(const string &user, const string &passwd)
 {
 	enforceMode(M_REQ);
 	COMMIT(userPasswd, new UsernamePasswdOption(user, passwd));

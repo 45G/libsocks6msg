@@ -67,7 +67,7 @@ void UsernamePasswdOption::incementalParse(void *buf, size_t optionLen, OptionSe
 		if (bb.getUsed() != expectedDataSize)
 			throw invalid_argument("Spurious bytes at the end of the option");
 		
-		optionSet->setUsernamePassword(req.getUsername(), req.getPassword());
+		optionSet->setUsernamePassword(*req.getUsername(), *req.getPassword());
 	}
 	catch (length_error &)
 	{
@@ -79,7 +79,7 @@ void UsernamePasswdOption::incementalParse(void *buf, size_t optionLen, OptionSe
 	}
 }
 
-UsernamePasswdOption::UsernamePasswdOption(std::shared_ptr<string> username, std::shared_ptr<string> passwd)
+UsernamePasswdOption::UsernamePasswdOption(const string &username, const string &passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
 }
