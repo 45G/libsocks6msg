@@ -149,11 +149,7 @@ class OptionSet: public OptionSetBase
 		std::set<SOCKS6Method> advertised;
 	} methods;
 	
-	struct
-	{
-		std::shared_ptr<std::string> username;
-		std::shared_ptr<std::string> passwd;
-	} userPasswdAuth;
+	std::unique_ptr<UsernamePasswdOption> userPasswd;
 	
 	SessionOptionSet sessionSet;
 	
@@ -298,12 +294,16 @@ public:
 	
 	const std::shared_ptr<std::string> getUsername() const
 	{
-		return userPasswdAuth.username;
+		if (userPasswd.get() == nullptr)
+			return { nullptr };
+		return userPasswd->getUsername();
 	}
 	
 	const std::shared_ptr<std::string> getPassword() const
 	{
-		return userPasswdAuth.passwd;
+		if (userPasswd.get() == nullptr)
+			return { nullptr };
+		return userPasswd->getPassword();
 	}
 	
 	SessionOptionSet *session()

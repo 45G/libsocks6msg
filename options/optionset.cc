@@ -165,9 +165,6 @@ both_tos_done:
 	if (!methods.advertised.empty())
 		cram(AuthMethodOption(methods.initialDataLen, methods.advertised), optsHead, bb);
 	
-	if (userPasswdAuth.username.get() != NULL && !userPasswdAuth.username->empty())
-		cram(UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd), optsHead, bb);
-	
 	BOOST_FOREACH(Option *option, options)
 	{
 		cram(*option, optsHead, bb);
@@ -228,9 +225,6 @@ both_tos_done:
 	
 	if (!methods.advertised.empty())
 		size += AuthMethodOption(methods.initialDataLen, methods.advertised).packedSize();
-	
-	if (!userPasswdAuth.username->empty())
-		size += UsernamePasswdOption(userPasswdAuth.username, userPasswdAuth.passwd).packedSize();
 	
 	size += optionsSize;
 	
@@ -364,15 +358,7 @@ void OptionSet::setInitialDataLen(uint16_t initialDataLen)
 void OptionSet::setUsernamePassword(const std::shared_ptr<string> user, const std::shared_ptr<string> passwd)
 {
 	enforceMode(M_REQ);
-	
-	if (user->size() == 0 || passwd->size() == 0)
-		throw invalid_argument("");
-	
-	if (userPasswdAuth.username.get() != NULL && (*user != *userPasswdAuth.username || *passwd != *userPasswdAuth.passwd))
-		throw invalid_argument("");
-	
-	userPasswdAuth.username = user;
-	userPasswdAuth.passwd = passwd;
+	COMMIT(userPasswd, new UsernamePasswdOption(user, passwd));
 }
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
