@@ -391,16 +391,10 @@ void SessionOptionSet::tearDown()
 	COMMIT(sessionOption, new SessionTeardownOption());
 }
 
-void SessionOptionSet::echoTicket(const std::vector<uint8_t> &ticket)
+void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
 {
 	enforceMode(M_REQ);
-	COMMIT(sessionOption, new SessionTicketOption(ticket));
-}
-
-void SessionOptionSet::updateTicket(const std::vector<uint8_t> &ticket, uint16_t version)
-{
-	enforceMode(M_AUTH_REP);
-	COMMIT(sessionOption, new SessionUpdateOption(ticket, version));
+	COMMIT(sessionOption, new SessionIDOption(ticket));
 }
 
 void SessionOptionSet::signalOK()
@@ -412,7 +406,7 @@ void SessionOptionSet::signalOK()
 void SessionOptionSet::signalReject()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(sessionOption, new SessionRejectOption());
+	COMMIT(sessionOption, new SessionInvalidOption());
 }
 
 }

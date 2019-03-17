@@ -16,7 +16,7 @@ extern "C"
  * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
  * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
  * 255: no particular draft revision
- * currently: post-draft-05 (205)
+ * currently: draft-06 (106)
  */
 #define SOCKS6_VERSION_MINOR 205
 
@@ -264,32 +264,22 @@ struct SOCKS6SessionOption
 
 enum SOCKS6SessionType
 {
-	/* client-issued */
-	SOCKS6_SESSION_REQUEST  = 0x01,
-	SOCKS6_SESSION_TEARDOWN = 0x02,
-	SOCKS6_SESSION_TICKET   = 0x03,
-	
-	/* proxy-issued */
-	SOCKS6_SESSION_OK       = 0x04,
-	SOCKS6_SESSION_REJECT   = 0x05,
-	SOCKS6_SESSION_UPDATE   = 0x06,
+	SOCKS6_SESSION_REQUEST   = 0x01,
+	SOCKS6_SESSION_ID        = 0x02,
+	SOCKS6_SESSION_TEARDOWN  = 0x03,
+	SOCKS6_SESSION_OK        = 0x04,
+	SOCKS6_SESSION_INVALID   = 0x05,
+	SOCKS6_SESSION_UNTRUSTED = 0x06,
 	
 };
 
-struct SOCKS6SessionTicketUpdateOption
-{
-	struct SOCKS6SessionOption sessionOptionHead;
-	uint16_t                   version;
-	uint8_t                    ticket[0];
-};
-
-struct SOCKS6SessionTicketOption
+struct SOCKS6SessionIDOption
 {
 	struct SOCKS6SessionOption sessionOptionHead;
 	uint8_t                    ticket[0];
 };
 
-#define SOCKS6_TICKET_LENGTH_MAX (SOCKS6_OPTIONS_LENGTH_MAX - sizeof(struct SOCKS6SessionTicketUpdateOption))
+#define SOCKS6_ID_LENGTH_MAX (SOCKS6_OPTIONS_LENGTH_MAX - sizeof(struct SOCKS6SessionIDOption))
 
 struct SOCKS6IdempotenceOption
 {

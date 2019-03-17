@@ -71,35 +71,16 @@ public:
 		return dynamic_cast<SessionTeardownOption *>(sessionOption.get()) != nullptr;
 	}
 	
-	void echoTicket(const std::vector<uint8_t> &ticket);
-	
-	void updateTicket(const std::vector<uint8_t> &ticket, uint16_t version);
+	void setID(const std::vector<uint8_t> &ticket);
 	
 	const std::vector<uint8_t> *getTicket() const
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
 		
-		if (mode == M_REQ)
-		{
-			SessionTicketOption *opt = dynamic_cast<SessionTicketOption *>(sessionOption.get());
-			if (opt == nullptr)
-				return nullptr;
-			return opt->getTicket();
-		}
-		else
-		{
-			SessionUpdateOption *opt = dynamic_cast<SessionUpdateOption *>(sessionOption.get());
-			if (opt == nullptr)
-				return nullptr;
-			return opt->getTicket();
-		}
-	}
-	
-	uint16_t getTicketVersion() const
-	{
-		SessionUpdateOption *opt = dynamic_cast<SessionUpdateOption *>(sessionOption.get());
-		return opt->getVersion();
-		
+		SessionIDOption *opt = dynamic_cast<SessionIDOption *>(sessionOption.get());
+		if (opt == nullptr)
+			return nullptr;
+		return opt->getTicket();
 	}
 	
 	void signalOK();
@@ -113,8 +94,12 @@ public:
 	
 	bool rejected() const
 	{
-		return dynamic_cast<SessionRejectOption *>(sessionOption.get()) != nullptr;
+		return dynamic_cast<SessionInvalidOption *>(sessionOption.get()) != nullptr;
 	}
+	
+	void setUntrusted();
+	
+	bool isUntrusted();
 };
 
 class OptionSet: public OptionSetBase

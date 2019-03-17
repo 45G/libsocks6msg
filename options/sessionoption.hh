@@ -37,18 +37,7 @@ public:
 	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
-class SessionTeardownOption: public SessionOption
-{
-public:
-	SessionTeardownOption()
-		: SessionOption(SOCKS6_SESSION_TEARDOWN) {}
-	
-	virtual size_t packedSize() const;
-	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
-};
-
-class SessionTicketOption: public SessionOption
+class SessionIDOption: public SessionOption
 {
 	std::vector<uint8_t> ticket;
 	
@@ -56,7 +45,7 @@ protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	SessionTicketOption(const std::vector<uint8_t> &ticket);
+	SessionIDOption(const std::vector<uint8_t> &ticket);
 	
 	const std::vector<uint8_t> *getTicket() const
 	{
@@ -66,6 +55,17 @@ public:
 	virtual size_t packedSize() const;
 	
 	static void incementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet);
+};
+
+class SessionTeardownOption: public SessionOption
+{
+public:
+	SessionTeardownOption()
+		: SessionOption(SOCKS6_SESSION_TEARDOWN) {}
+	
+	virtual size_t packedSize() const;
+	
+	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionOKOption: public SessionOption
@@ -79,37 +79,22 @@ public:
 	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
-class SessionRejectOption: public SessionOption
+class SessionInvalidOption: public SessionOption
 {
 public:
-	SessionRejectOption()
-		: SessionOption(SOCKS6_SESSION_REJECT) {}
+	SessionInvalidOption()
+		: SessionOption(SOCKS6_SESSION_INVALID) {}
 	
 	virtual size_t packedSize() const;
 	
 	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
-class SessionUpdateOption: public SessionOption
+class SessionUntrustedOption: public SessionOption
 {
-	std::vector<uint8_t> ticket;
-	uint16_t version;
-	
-protected:
-	virtual void fill(uint8_t *buf) const;
-	
 public:
-	SessionUpdateOption(const std::vector<uint8_t> &ticket, uint16_t version);
-	
-	const std::vector<uint8_t> *getTicket() const
-	{
-		return &ticket;
-	}
-	
-	uint16_t getVersion() const
-	{
-		return version;
-	}
+	SessionUntrustedOption()
+		: SessionOption(SOCKS6_SESSION_UNTRUSTED) {}
 	
 	virtual size_t packedSize() const;
 	
