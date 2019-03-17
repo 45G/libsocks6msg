@@ -37,11 +37,6 @@ protected:
 	
 	void enforceMode(Mode mode1, Mode mode2) const;
 	
-	void enforceMode(Mode mode1, Mode mode2, Mode mode3) const
-	{
-		(void)mode1; (void)mode2; (void)mode3;
-	}
-	
 public:
 	OptionSetBase(Mode mode)
 		: mode(mode) {}
