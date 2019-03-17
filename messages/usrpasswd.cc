@@ -1,4 +1,5 @@
 #include "usrpasswd.hh"
+#include "exception.hh"
 
 using namespace std;
 

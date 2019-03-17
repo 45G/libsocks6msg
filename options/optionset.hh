@@ -168,7 +168,7 @@ class OptionSet: public OptionSetBase
 	
 public:
 	OptionSet(Mode mode)
-		: OptionSetBase(nullptr, mode), sessionSet(this) {}
+		: OptionSetBase(this, mode), sessionSet(this) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	

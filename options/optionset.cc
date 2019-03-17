@@ -9,6 +9,11 @@ using namespace boost;
 namespace S6M
 {
 
+#define COMMIT(FIELD, WHAT) \
+	ensureVacant(FIELD); \
+	(FIELD).reset(WHAT); \
+	owner->registerOption((FIELD).get());
+
 template <typename T> static bool mayAssign(T field, T value)
 {
 	return (field == (T)0 || field == value);
@@ -22,7 +27,7 @@ template <typename T> static bool mayAssign(T field1, T field2, T value)
 template <typename T> static void checkedAssignment(T *field, T value)
 {
 	if (!mayAssign(*field, value))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 
 	*field = value;
 }
@@ -30,7 +35,7 @@ template <typename T> static void checkedAssignment(T *field, T value)
 template <typename T> static void checkedAssignment(T *field1, T *field2, T value)
 {
 	if (!mayAssign(*field1, *field2, value))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 
 	*field1 = value;
 	*field2 = value;
@@ -39,9 +44,9 @@ template <typename T> static void checkedAssignment(T *field1, T *field2, T valu
 template <typename T, typename U> static void checkedAssignment(T *field1, T value1, U *field2, U value2)
 {
 	if (!mayAssign(*field1, value1))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	if (!mayAssign(*field2, value2))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 
 	*field1 = value1;
 	*field2 = value2;
@@ -61,12 +66,12 @@ void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) co
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: OptionSetBase(nullptr, mode), sessionSet(this)
+	: OptionSetBase(this, mode), sessionSet(this)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	uint16_t optsLen = ntohs(optsHead->optionsLength);
 	if (optsLen > SOCKS6_OPTIONS_LENGTH_MAX)
-		throw InvalidFieldException();
+		throw invalid_argument("Bad options length");
 	ByteBuffer optsBB(bb->get<uint8_t>(optsLen), optsLen);
 	
 	while (optsBB.getUsed() < optsBB.getTotalSize())
@@ -85,7 +90,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 
 			bb->get<uint8_t>(optLen - sizeof(SOCKS6Option));
 		}
-		catch (EndOfBufferException &)
+		catch (length_error &)
 		{
 			break;
 		}
@@ -94,7 +99,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		{
 			Option::incementalParse(opt, optLen, this);
 		}
-		catch (InvalidFieldException &) {}
+		catch (invalid_argument &) {}
 	}
 }
 
@@ -256,7 +261,7 @@ void OptionSet::setTFOPayload(uint16_t payloadSize)
 	if (tfo)
 	{
 		if (payloadSize != tfoPayload)
-			throw InvalidFieldException();
+			throw invalid_argument("");
 	}
 	else
 	{
@@ -305,9 +310,9 @@ void OptionSet::setTokenWindow(uint32_t base, uint32_t size)
 	enforceMode(M_AUTH_REP);
 	
 	if (size == 0)
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	if (idempotence.windowSize > 0 && (idempotence.base != base || idempotence.windowSize != size))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	
 	idempotence.base = base;
 	idempotence.windowSize = size;
@@ -318,7 +323,7 @@ void OptionSet::setToken(uint32_t token)
 	enforceMode(M_REQ);
 	
 	if (idempotence.spend && idempotence.token != token)
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	
 	idempotence.spend = true;
 	idempotence.token = token;
@@ -329,7 +334,7 @@ void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
 	enforceMode(M_AUTH_REP);
 	
 	if (code == 0)
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	
 	checkedAssignment(&idempotence.replyCode, code);
 }
@@ -361,19 +366,14 @@ void OptionSet::setUsernamePassword(const std::shared_ptr<string> user, const st
 	enforceMode(M_REQ);
 	
 	if (user->size() == 0 || passwd->size() == 0)
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	
 	if (userPasswdAuth.username.get() != NULL && (*user != *userPasswdAuth.username || *passwd != *userPasswdAuth.passwd))
-		throw InvalidFieldException();
+		throw invalid_argument("");
 	
 	userPasswdAuth.username = user;
 	userPasswdAuth.passwd = passwd;
 }
-
-#define COMMIT(FIELD, WHAT) \
-	ensureVacant(FIELD); \
-	(FIELD).reset(WHAT); \
-	owner->registerOption((FIELD).get());
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}

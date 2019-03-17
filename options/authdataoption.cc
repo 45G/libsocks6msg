@@ -1,6 +1,7 @@
 #include <string>
 #include "authdataoption.hh"
 #include "optionset.hh"
+#include "exception.hh"
 
 using namespace std;
 
@@ -68,11 +69,11 @@ void UsernamePasswdOption::incementalParse(void *buf, size_t optionLen, OptionSe
 		
 		optionSet->setUsernamePassword(req.getUsername(), req.getPassword());
 	}
-	catch (EndOfBufferException)
+	catch (length_error &)
 	{
 		throw invalid_argument("Truncated payload");
 	}
-	catch (BadVersionException)
+	catch (BadVersionException &)
 	{
 		throw invalid_argument("Unsupported version");
 	}
