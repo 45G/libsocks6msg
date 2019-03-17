@@ -92,11 +92,6 @@ void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-size_t TFOOption::packedSize() const
-{
-	return sizeof(SOCKS6StackOption) + sizeof(uint16_t);
-}
-
 void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(buf, false);
@@ -119,20 +114,6 @@ void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setMPTCP();
 }
 
-size_t MPSchedOption::packedSize() const
-{
-	return sizeof(SOCKS6MPTCPSchedulerOption);
-}
-
-void MPSchedOption::fill(uint8_t *buf) const
-{
-	StackOption::fill(buf);
-	
-	SOCKS6MPTCPSchedulerOption *opt = reinterpret_cast<SOCKS6MPTCPSchedulerOption *>(buf);
-	
-	opt->scheduler = sched;
-}
-
 void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = rawOptCast<SOCKS6MPTCPSchedulerOption>(buf, false);
@@ -153,23 +134,12 @@ void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void BacklogOption::fill(uint8_t *buf) const
-{
-	StackOption::fill(buf);
-
-	SOCKS6BacklogOption *opt = reinterpret_cast<SOCKS6BacklogOption *>(buf);
-
-	opt->backlog = htons(backlog);
-}
-
-size_t BacklogOption::packedSize() const
-{
-	return sizeof(SOCKS6BacklogOption);
-}
-
 void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(buf, false);
+	
+	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
+		throw invalid_argument("Bad leg");
 
 	uint8_t backlog = ntohs(opt->backlog);
 
@@ -177,7 +147,7 @@ void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
 }
 
 BacklogOption::BacklogOption(uint16_t backlog)
-	: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG), backlog(backlog)
+	: IntStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE, backlog)
 {
 	if (backlog < SOCKS6_BACKLOG_MIN)
 		throw invalid_argument("Bad backlog size");

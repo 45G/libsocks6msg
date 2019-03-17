@@ -97,21 +97,17 @@ public:
 	}
 };
 
-class TFOOption: public StackOption
+class TFOOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t>
 {
-	uint16_t payloadSize;
-
 public:
-	virtual size_t packedSize() const;
-	
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	TFOOption(uint16_t payloadSize)
-		: StackOption(SOCKS6_STACK_LEG_PROXY_REMOTE, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO), payloadSize(payloadSize) {}
+		: IntStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE, payloadSize) {}
 
 	uint16_t getPayloadSize() const
 	{
-		return payloadSize;
+		return getValue();
 	}
 };
 
@@ -124,44 +120,32 @@ public:
 		: SimpleStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE) {}
 };
 
-class MPSchedOption: public StackOption
+class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED, uint8_t>
 {
 	SOCKS6MPTCPScheduler sched;
 	
-protected:
-	virtual void fill(uint8_t *buf) const;
-	
 public:
-	virtual size_t packedSize() const;
-	
 	static void incementalParse(void *buf, OptionSet *optionSet);
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
-		: StackOption(leg, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED), sched(sched) {}
+		: IntStackOptionBase(leg, sched) {}
 
 	SOCKS6MPTCPScheduler getScheduler() const
 	{
-		return sched;
+		return (SOCKS6MPTCPScheduler)getValue();
 	}
 };
 
-class BacklogOption: public StackOption
+class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t>
 {
-	uint16_t backlog;
-
-protected:
-	virtual void fill(uint8_t *buf) const;
-
 public:
-	virtual size_t packedSize() const;
-
 	static void incementalParse(void *buf, OptionSet *optionSet);
 
 	BacklogOption(uint16_t backlog);
 
 	uint16_t getBacklog() const
 	{
-		return backlog;
+		return getValue();
 	}
 };
 
