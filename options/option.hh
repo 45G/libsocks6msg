@@ -49,7 +49,7 @@ public:
 		fill(buf);
 	}
 	
-	static void incementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
+	static void incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet);
 	
 	Option(SOCKS6OptionKind kind)
 		: kind(kind) {}

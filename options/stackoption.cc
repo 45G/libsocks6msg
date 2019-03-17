@@ -19,7 +19,7 @@ void StackOption::fill(uint8_t *buf) const
 	opt->code  = getCode();
 }
 
-void StackOption::incementalParse(void *buf, OptionSet *optionSet)
+void StackOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(buf);
 	
@@ -31,7 +31,7 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TOS:
-			TOSOption::incementalParse(buf, optionSet);
+			TOSOption::incrementalParse(opt, optionSet);
 			break;
 		default:
 			throw invalid_argument("Unknown code");
@@ -48,15 +48,15 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TFO:
-			TFOOption::incementalParse(buf, optionSet);
+			TFOOption::incrementalParse(buf, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MPTCP:
-			MPTCPOption::incementalParse(buf, optionSet);
+			MPTCPOption::incrementalParse(buf, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MP_SCHED:
-			MPSchedOption::incementalParse(buf, optionSet);
+			MPSchedOption::incrementalParse(buf, optionSet);
 			break;
 			
 		default:
@@ -72,9 +72,9 @@ void StackOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
+void TOSOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(buf, false);
+	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(optBase, false);
 
 	uint8_t tos = opt->tos;
 
@@ -92,7 +92,7 @@ void TOSOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
+void TFOOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(buf, false);
 	
@@ -104,7 +104,7 @@ void TFOOption::incementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setTFOPayload(payloadSize);
 }
 
-void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
+void MPTCPOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(buf, false);
 	
@@ -114,7 +114,7 @@ void MPTCPOption::incementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setMPTCP();
 }
 
-void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
+void MPSchedOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6MPTCPSchedulerOption *opt = rawOptCast<SOCKS6MPTCPSchedulerOption>(buf, false);
 	
@@ -134,7 +134,7 @@ void MPSchedOption::incementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void BacklogOption::incementalParse(void *buf, OptionSet *optionSet)
+void BacklogOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(buf, false);
 	

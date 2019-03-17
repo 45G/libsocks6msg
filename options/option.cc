@@ -23,29 +23,29 @@ void Option::fill(uint8_t *buf) const
 	opt->len  = htons(packedSize());
 }
 
-void Option::incementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf);
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_STACK:
-		StackOption::incementalParse(buf, optionSet);
+		StackOption::incrementalParse(buf, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD:
-		AuthMethodOption::incementalParse(buf, optionLen, optionSet);
+		AuthMethodOption::incrementalParse(buf, optionLen, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_DATA:
-		AuthDataOption::incementalParse(buf, optionLen, optionSet);
+		AuthDataOption::incrementalParse(buf, optionLen, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_SESSION:
-		SessionOption::incementalParse(opt, optionSet);
+		SessionOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_IDEMPOTENCE:
-		IdempotenceOption::incementalParse(buf, optionSet);
+		IdempotenceOption::incrementalParse(buf, optionSet);
 		break;
 		
 	default:

@@ -23,7 +23,7 @@ public:
 		return type;
 	}
 	
-	static void incementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
 class SessionRequestOption: public SessionOption
@@ -34,7 +34,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionIDOption: public SessionOption
@@ -54,7 +54,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet);
 };
 
 class SessionTeardownOption: public SessionOption
@@ -65,7 +65,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionOKOption: public SessionOption
@@ -76,7 +76,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionInvalidOption: public SessionOption
@@ -87,7 +87,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 class SessionUntrustedOption: public SessionOption
@@ -98,7 +98,7 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
 };
 
 }

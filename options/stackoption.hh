@@ -32,7 +32,7 @@ public:
 		return code;
 	}
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	StackOption(SOCKS6StackLeg leg, SOCKS6StackLevel level, SOCKS6StackOptionCode code)
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
@@ -86,7 +86,7 @@ public:
 class TOSOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t>
 {
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
 	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
 		: IntStackOptionBase(leg, tos) {}
@@ -100,7 +100,7 @@ public:
 class TFOOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t>
 {
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	TFOOption(uint16_t payloadSize)
 		: IntStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE, payloadSize) {}
@@ -114,7 +114,7 @@ public:
 class MPTCPOption: public SimpleStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP>
 {
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	MPTCPOption()
 		: SimpleStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE) {}
@@ -125,7 +125,7 @@ class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_ST
 	SOCKS6MPTCPScheduler sched;
 	
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
 		: IntStackOptionBase(leg, sched) {}
@@ -139,7 +139,7 @@ public:
 class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t>
 {
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 
 	BacklogOption(uint16_t backlog);
 

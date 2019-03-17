@@ -15,34 +15,34 @@ void S6M::SessionOption::fill(uint8_t *buf) const
 	opt->type = getType();
 }
 
-void SessionOption::incementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+void SessionOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 {
 	SOCKS6SessionOption *opt = rawOptCast<SOCKS6SessionOption>(optBase);
 	
 	switch (opt->type)
 	{
 	case SOCKS6_SESSION_REQUEST:
-		SessionRequestOption::incementalParse(opt, optionSet);
+		SessionRequestOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_SESSION_TEARDOWN:
-		SessionTeardownOption::incementalParse(opt, optionSet);
+		SessionTeardownOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_SESSION_ID:
-		SessionIDOption::incementalParse(opt, optionSet);
+		SessionIDOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_SESSION_OK:
-		SessionOKOption::incementalParse(opt, optionSet);
+		SessionOKOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_SESSION_INVALID:
-		SessionInvalidOption::incementalParse(opt, optionSet);
+		SessionInvalidOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_SESSION_UNTRUSTED:
-		SessionUntrustedOption::incementalParse(opt, optionSet);
+		SessionUntrustedOption::incrementalParse(opt, optionSet);
 		break;
 		
 	default:
@@ -55,7 +55,7 @@ size_t SessionRequestOption::packedSize() const
 	return sizeof(SOCKS6SessionOption);
 }
 
-void SessionRequestOption::incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
+void SessionRequestOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
 	optionSet->session()->request();
@@ -85,7 +85,7 @@ size_t SessionIDOption::packedSize() const
 	return sizeof(SOCKS6SessionIDOption) + ticket.size();
 }
 
-void SessionIDOption::incementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet)
+void SessionIDOption::incrementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet)
 {
 	SOCKS6SessionIDOption *opt = rawOptCast<SOCKS6SessionIDOption>(buf);
 	
@@ -99,7 +99,7 @@ size_t SessionTeardownOption::packedSize() const
 	return sizeof(SOCKS6SessionOption);
 }
 
-void SessionTeardownOption::incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
+void SessionTeardownOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
 	optionSet->session()->tearDown();
@@ -110,7 +110,7 @@ size_t SessionOKOption::packedSize() const
 	return sizeof(SOCKS6SessionOption);
 }
 
-void SessionOKOption::incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
+void SessionOKOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
 	optionSet->session()->signalOK();
@@ -121,7 +121,7 @@ size_t SessionInvalidOption::packedSize() const
 	return sizeof(SOCKS6SessionOption);
 }
 
-void SessionInvalidOption::incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
+void SessionInvalidOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
 	optionSet->session()->signalReject();
@@ -132,7 +132,7 @@ size_t SessionUntrustedOption::packedSize() const
 	return sizeof(SOCKS6SessionOption);
 }
 
-void SessionUntrustedOption::incementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
+void SessionUntrustedOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
 	optionSet->session()->setUntrusted();

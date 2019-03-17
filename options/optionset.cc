@@ -97,7 +97,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 		
 		try
 		{
-			Option::incementalParse(opt, optLen, this);
+			Option::incrementalParse(opt, optLen, this);
 		}
 		catch (invalid_argument &) {}
 	}

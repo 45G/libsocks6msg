@@ -14,7 +14,7 @@ protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	IdempotenceOption(SOCKS6IDempotenceType type)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
@@ -35,7 +35,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowRequestOption(uint32_t winSize);
 
@@ -56,7 +56,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
 
@@ -81,7 +81,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenExpenditureRequestOption(uint32_t token)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
@@ -102,7 +102,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incementalParse(void *buf, OptionSet *optionSet);
+	static void incrementalParse(void *buf, OptionSet *optionSet);
 	
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
 		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code) {}

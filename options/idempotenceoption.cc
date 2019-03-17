@@ -17,26 +17,26 @@ void IdempotenceOption::fill(uint8_t *buf) const
 	opt->type = type;
 }
 
-void IdempotenceOption::incementalParse(void *buf, OptionSet *optionSet)
+void IdempotenceOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6IdempotenceOption *opt = rawOptCast<SOCKS6IdempotenceOption>(buf);
 	
 	switch ((SOCKS6IDempotenceType)opt->type)
 	{
 	case SOCKS6_IDEMPOTENCE_WND_REQ:
-		TokenWindowRequestOption::incementalParse(buf, optionSet);
+		TokenWindowRequestOption::incrementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_WND_ADVERT:
-		TokenWindowAdvertOption::incementalParse(buf, optionSet);
+		TokenWindowAdvertOption::incrementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND:
-		TokenExpenditureRequestOption::incementalParse(buf, optionSet);
+		TokenExpenditureRequestOption::incrementalParse(buf, optionSet);
 		break;
 	
 	case SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY:
-		TokenExpenditureReplyOption::incementalParse(buf, optionSet);
+		TokenExpenditureReplyOption::incrementalParse(buf, optionSet);
 		break;
 		
 	default:
@@ -58,7 +58,7 @@ size_t TokenWindowRequestOption::packedSize() const
 	return sizeof(SOCKS6WindowRequestOption);
 }
 
-void TokenWindowRequestOption::incementalParse(void *buf, OptionSet *optionSet)
+void TokenWindowRequestOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(buf, false);
 	
@@ -89,7 +89,7 @@ void TokenWindowAdvertOption::fill(uint8_t *buf) const
 	opt->windowSize = htonl(winSize);
 }
 
-void TokenWindowAdvertOption::incementalParse(void *buf, OptionSet *optionSet)
+void TokenWindowAdvertOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6WindowAdvertOption *opt = rawOptCast<SOCKS6WindowAdvertOption>(buf, false);
 	
@@ -121,7 +121,7 @@ void TokenExpenditureRequestOption::fill(uint8_t *buf) const
 	opt->token = htonl(token);
 }
 
-void TokenExpenditureRequestOption::incementalParse(void *buf, OptionSet *optionSet)
+void TokenExpenditureRequestOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(buf, false);
 	
@@ -142,7 +142,7 @@ void TokenExpenditureReplyOption::fill(uint8_t *buf) const
 	opt->code = code;
 }
 
-void TokenExpenditureReplyOption::incementalParse(void *buf, OptionSet *optionSet)
+void TokenExpenditureReplyOption::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(buf, false);
 	
