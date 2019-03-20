@@ -29,9 +29,9 @@ void AuthMethodOption::fill(uint8_t *buf) const
 	}
 }
 
-void AuthMethodOption::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void AuthMethodOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(buf);
+	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(optBase);
 
 	optionSet->setInitialDataLen(ntohs(opt->initialDataLen));
 	

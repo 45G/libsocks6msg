@@ -29,15 +29,15 @@ void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 	
 	switch (opt->kind) {
 	case SOCKS6_OPTION_STACK:
-		StackOption::incrementalParse(buf, optionSet);
+		StackOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD:
-		AuthMethodOption::incrementalParse(buf, optionLen, optionSet);
+		AuthMethodOption::incrementalParse(opt, optionLen, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_DATA:
-		AuthDataOption::incrementalParse(buf, optionLen, optionSet);
+		AuthDataOption::incrementalParse(opt, optionLen, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_SESSION:
@@ -45,7 +45,7 @@ void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 		break;
 		
 	case SOCKS6_OPTION_IDEMPOTENCE:
-		IdempotenceOption::incrementalParse(buf, optionSet);
+		IdempotenceOption::incrementalParse(opt, optionSet);
 		break;
 		
 	default:

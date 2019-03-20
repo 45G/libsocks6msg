@@ -17,9 +17,9 @@ void AuthDataOption::fill(uint8_t *buf) const
 	opt->method = method;
 }
 
-void AuthDataOption::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void AuthDataOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(buf);
+	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(optBase);
 	
 	switch (opt->method)
 	{
@@ -29,7 +29,7 @@ void AuthDataOption::incrementalParse(void *buf, size_t optionLen, OptionSet *op
 //		throw InvalidFieldException();
 		
 	case SOCKS6_METHOD_USRPASSWD:
-		UsernamePasswdOption::incrementalParse(buf, optionLen, optionSet);
+		UsernamePasswdOption::incrementalParse(opt, optionLen, optionSet);
 		break;
 		
 	default:
@@ -53,9 +53,9 @@ void UsernamePasswdOption::fill(uint8_t *buf) const
 	req.pack(&bb);
 }
 
-void UsernamePasswdOption::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void UsernamePasswdOption::incrementalParse(SOCKS6AuthDataOption *optBase, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)buf;
+	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)optBase;
 	
 	size_t expectedDataSize = optionLen - sizeof(SOCKS6AuthDataOption);
 	

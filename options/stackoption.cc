@@ -19,9 +19,9 @@ void StackOption::fill(uint8_t *buf) const
 	opt->code  = getCode();
 }
 
-void StackOption::incrementalParse(void *buf, OptionSet *optionSet)
+void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 {
-	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(buf);
+	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(baseOpt);
 	
 	enumCast<SOCKS6StackLeg>(opt->leg);
 	
@@ -48,15 +48,19 @@ void StackOption::incrementalParse(void *buf, OptionSet *optionSet)
 		switch (opt->code)
 		{
 		case SOCKS6_STACK_CODE_TFO:
-			TFOOption::incrementalParse(buf, optionSet);
+			TFOOption::incrementalParse(opt, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MPTCP:
-			MPTCPOption::incrementalParse(buf, optionSet);
+			MPTCPOption::incrementalParse(opt, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_MP_SCHED:
-			MPSchedOption::incrementalParse(buf, optionSet);
+			MPSchedOption::incrementalParse(opt, optionSet);
+			break;
+			
+		case SOCKS6_STACK_CODE_BACKLOG:
+			BacklogOption::incrementalParse(opt, optionSet);
 			break;
 			
 		default:
@@ -92,9 +96,9 @@ void TOSOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSe
 	}
 }
 
-void TFOOption::incrementalParse(void *buf, OptionSet *optionSet)
+void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(buf, false);
+	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(optBase, false);
 	
 	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw invalid_argument("Bad leg");
@@ -104,9 +108,9 @@ void TFOOption::incrementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setTFOPayload(payloadSize);
 }
 
-void MPTCPOption::incrementalParse(void *buf, OptionSet *optionSet)
+void MPTCPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(buf, false);
+	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(optBase, false);
 	
 	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw invalid_argument("Bad leg");
@@ -114,9 +118,9 @@ void MPTCPOption::incrementalParse(void *buf, OptionSet *optionSet)
 	optionSet->setMPTCP();
 }
 
-void MPSchedOption::incrementalParse(void *buf, OptionSet *optionSet)
+void MPSchedOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6MPTCPSchedulerOption *opt = rawOptCast<SOCKS6MPTCPSchedulerOption>(buf, false);
+	SOCKS6MPTCPSchedulerOption *opt = rawOptCast<SOCKS6MPTCPSchedulerOption>(optBase, false);
 	
 	SOCKS6MPTCPScheduler sched = enumCast<SOCKS6MPTCPScheduler>(opt->scheduler);
 	
@@ -134,9 +138,9 @@ void MPSchedOption::incrementalParse(void *buf, OptionSet *optionSet)
 	}
 }
 
-void BacklogOption::incrementalParse(void *buf, OptionSet *optionSet)
+void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(buf, false);
+	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(optBase, false);
 	
 	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw invalid_argument("Bad leg");
