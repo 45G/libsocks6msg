@@ -115,9 +115,9 @@ void OptionSet::pack(ByteBuffer *bb) const
 	optsHead->optionsLength = 0;
 	
 	if (tfo)
-		cram(TFOOption(tfoPayload), optsHead, bb);
+		cram(TFOOption(SOCKS6_STACK_LEG_PROXY_REMOTE, tfoPayload), optsHead, bb);
 	if (mptcp)
-		cram(MPTCPOption(), optsHead, bb);
+		cram(MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE), optsHead, bb);
 	
 	if (mptcpSched.clientProxy > 0)
 	{
@@ -176,9 +176,9 @@ size_t OptionSet::packedSize() const
 	size_t size = sizeof(SOCKS6Options);
 	
 	if (tfo)
-		size += TFOOption(tfoPayload).packedSize();
+		size += TFOOption(SOCKS6_STACK_LEG_PROXY_REMOTE, tfoPayload).packedSize();
 	if (mptcp)
-		size += MPTCPOption().packedSize();
+		size += MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE).packedSize();
 	
 	if (mptcpSched.clientProxy > 0)
 	{
