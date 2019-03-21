@@ -23,10 +23,9 @@ void AuthDataOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, O
 	
 	switch (opt->method)
 	{
-	/* invalid, but handled by default */
-//	case SOCKS6_METHOD_NOAUTH:
-//	case SOCKS6_METHOD_UNACCEPTABLE:
-//		throw InvalidFieldException();
+	case SOCKS6_METHOD_NOAUTH:
+	case SOCKS6_METHOD_UNACCEPTABLE:
+		throw invalid_argument("Bad method");
 		
 	case SOCKS6_METHOD_USRPASSWD:
 		UsernamePasswdOption::incrementalParse(opt, optionLen, optionSet);
