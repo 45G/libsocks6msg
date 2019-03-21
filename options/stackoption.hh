@@ -55,6 +55,18 @@ public:
 	}
 };
 
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
+class SimpleStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
+{
+public:
+	virtual size_t packedSize() const
+	{
+		return sizeof(SOCKS6StackOption);
+	}
+
+	using StackOptionBase<LVL, CODE, LEG_RESTRICT>::StackOptionBase;
+};
+
 template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
 class IntStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
 {
@@ -105,12 +117,12 @@ public:
 	using IntStackOptionBase::IntStackOptionBase;
 };
 
-class MPTCPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPTCPOption: public SimpleStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
-	using StackOptionBase::StackOptionBase;
+	using SimpleStackOptionBase::SimpleStackOptionBase;
 };
 
 class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED, SOCKS6MPTCPScheduler, uint8_t>
