@@ -396,4 +396,12 @@ void SessionOptionSet::signalReject()
 	COMMIT(mandatoryOpt, new SessionInvalidOption());
 }
 
+void SessionOptionSet::setUntrusted()
+{
+	enforceMode(M_REQ);
+	if (reinterpret_cast<SessionIDOption *>(mandatoryOpt.get()) == nullptr)
+		throw logic_error("Must advertise a session ID");
+	COMMIT(untrustedOpt, new SessionUntrustedOption());
+}
+
 }

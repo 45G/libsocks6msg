@@ -71,7 +71,7 @@ public:
 	
 	bool tornDown() const
 	{
-		return teardownOpt.get() != nullptr;
+		return teardownOpt != nullptr;
 	}
 	
 	void setID(const std::vector<uint8_t> &ticket);
@@ -102,7 +102,10 @@ public:
 	
 	void setUntrusted();
 	
-	bool isUntrusted();
+	bool isUntrusted()
+	{
+		return untrustedOpt != nullptr;
+	}
 };
 
 class OptionSet: public OptionSetBase
