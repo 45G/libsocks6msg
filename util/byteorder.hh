@@ -6,7 +6,8 @@
 namespace S6M
 {
 
-template <typename T> T hton(T x)
+template <typename T>
+T hton(T x)
 {
 	static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "Bad integer size");
 	
@@ -18,7 +19,8 @@ template <typename T> T hton(T x)
 		return htonl(x);
 }
 
-template <typename T> T ntoh(T x)
+template <typename T>
+T ntoh(T x)
 {
 	static_assert(sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4, "Bad integer size");
 	

@@ -40,7 +40,8 @@ protected:
 	
 	void enforceMode(Mode mode1, Mode mode2) const;
 	
-	template <typename T> void ensureVacant(const std::unique_ptr<T> &ptr)
+	template <typename T>
+	void ensureVacant(const std::unique_ptr<T> &ptr)
 	{
 		if (ptr.get() != nullptr)
 			throw std::logic_error("Option already in place");

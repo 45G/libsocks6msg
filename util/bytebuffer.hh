@@ -37,7 +37,8 @@ public:
 		return totalSize;
 	}
 	
-	template <typename T> T *get(size_t count = 1)
+	template <typename T>
+	T *get(size_t count = 1)
 	{
 		size_t req = sizeof(T) * count;
 		
@@ -49,7 +50,8 @@ public:
 		return ret;
 	}
 	
-	template <typename T> void put(T *what, size_t count = 1)
+	template <typename T>
+	void put(T *what, size_t count = 1)
 	{
 		size_t req = sizeof(T) * count;
 		

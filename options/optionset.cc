@@ -14,17 +14,20 @@ namespace S6M
 	(FIELD).reset(WHAT); \
 	owner->registerOption((FIELD).get());
 
-template <typename T> static bool mayAssign(T field, T value)
+template <typename T>
+static bool mayAssign(T field, T value)
 {
 	return (field == (T)0 || field == value);
 }
 
-template <typename T> static bool mayAssign(T field1, T field2, T value)
+template <typename T>
+static bool mayAssign(T field1, T field2, T value)
 {
 	return mayAssign(field1, value) && mayAssign(field2, value);
 }
 
-template <typename T> static void checkedAssignment(T *field, T value)
+template <typename T>
+static void checkedAssignment(T *field, T value)
 {
 	if (!mayAssign(*field, value))
 		throw invalid_argument("");
@@ -32,7 +35,8 @@ template <typename T> static void checkedAssignment(T *field, T value)
 	*field = value;
 }
 
-template <typename T> static void checkedAssignment(T *field1, T *field2, T value)
+template <typename T>
+static void checkedAssignment(T *field1, T *field2, T value)
 {
 	if (!mayAssign(*field1, *field2, value))
 		throw invalid_argument("");
@@ -41,7 +45,8 @@ template <typename T> static void checkedAssignment(T *field1, T *field2, T valu
 	*field2 = value;
 }
 
-template <typename T, typename U> static void checkedAssignment(T *field1, T value1, U *field2, U value2)
+template <typename T, typename U>
+static void checkedAssignment(T *field1, T value1, U *field2, U value2)
 {
 	if (!mayAssign(*field1, value1))
 		throw invalid_argument("");

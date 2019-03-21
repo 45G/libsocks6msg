@@ -22,7 +22,8 @@ class Option
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
-	template <typename T> static T *rawOptCast(void *buf, bool allowPayload = true)
+	template <typename T>
+	static T *rawOptCast(void *buf, bool allowPayload = true)
 	{
 		size_t len = ntohs(((SOCKS6Option *)buf)->len);
 		

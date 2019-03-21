@@ -111,7 +111,7 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 	throw invalid_argument("Bad authentication reply code");
 }
 
-template<>
+template <>
 SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
 {
 	SOCKS6SessionType conv = (SOCKS6SessionType)val;
@@ -130,7 +130,7 @@ SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
 	throw invalid_argument("Bad session option type");
 }
 
-template<>
+template <>
 SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
 {
 	SOCKS6AddressType conv = (SOCKS6AddressType)val;

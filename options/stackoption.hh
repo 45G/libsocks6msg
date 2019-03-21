@@ -38,7 +38,8 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH> class StackOptionBase: public StackOption
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
+class StackOptionBase: public StackOption
 {
 public:
 	virtual size_t packedSize() const
@@ -54,7 +55,8 @@ public:
 	}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH> class IntStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
+class IntStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
 {
 	V value;
 
