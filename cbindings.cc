@@ -58,7 +58,7 @@ static void S6M_Addr_Fill(S6M_Address *cAddr, const Address *cppAddr)
 		
 	case SOCKS6_ADDR_DOMAIN:
 		cAddr->domain = cppAddr->getDomain()->c_str();
-		if (cAddr->domain == NULL)
+		if (cAddr->domain == nullptr)
 			throw bad_alloc();
 		break;
 	}
@@ -120,13 +120,13 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
 	cSet->initialDataLen = cppSet->getInitialDataLen();
 	
-	if (cppSet->getUsername() != NULL && cppSet->getUsername()->length() > 0)
+	if (cppSet->getUsername() != nullptr && cppSet->getUsername()->length() > 0)
 	{
 		cSet->userPasswdAuth.username = cppSet->getUsername()->c_str();
-		if (cSet->userPasswdAuth.username == NULL)
+		if (cSet->userPasswdAuth.username == nullptr)
 			throw bad_alloc();
 		cSet->userPasswdAuth.username = cppSet->getPassword()->c_str();
-		if (cSet->userPasswdAuth.passwd == NULL)
+		if (cSet->userPasswdAuth.passwd == nullptr)
 			throw bad_alloc();
 	}
 }
@@ -160,14 +160,14 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.replyCode > 0)
 		cppSet->setExpenditureReply(cSet->idempotence.replyCode);
 	
-	if (cSet->knownMethods != NULL)
+	if (cSet->knownMethods != nullptr)
 	{
 		for (SOCKS6Method *method = cSet->knownMethods; *method != SOCKS6_METHOD_NOAUTH; method++)
 			cppSet->advertiseMethod(*method);
 		cppSet->setInitialDataLen(cSet->initialDataLen);
 	}
 	
-	if (cSet->userPasswdAuth.username != NULL || cSet->userPasswdAuth.passwd != NULL)
+	if (cSet->userPasswdAuth.username != nullptr || cSet->userPasswdAuth.passwd != nullptr)
 		cppSet->setUsernamePassword(move(string(cSet->userPasswdAuth.username)), move(string(cSet->userPasswdAuth.passwd)));
 }
 
@@ -228,7 +228,7 @@ ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 {
 	S6M_Error err;
-	S6M_RequestExtended *req = NULL;
+	S6M_RequestExtended *req = nullptr;
 	
 	try
 	{
@@ -251,7 +251,7 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 	}
 	S6M_CATCH(err);
 	
-	if (req != NULL)
+	if (req != nullptr)
 		S6M_Request_free(req);
 	return err;
 }
@@ -312,7 +312,7 @@ ssize_t S6M_AuthReply_pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t 
 ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthReply)
 {
 	S6M_Error err;
-	S6M_AuthReplyExtended *authReply = NULL;
+	S6M_AuthReplyExtended *authReply = nullptr;
 	
 	try
 	{
@@ -333,7 +333,7 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	}
 	S6M_CATCH(err);
 	
-	if (authReply != NULL)
+	if (authReply != nullptr)
 		S6M_AuthReply_free(authReply);
 	return err;
 }
@@ -398,7 +398,7 @@ ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 {
 	S6M_Error err;
-	S6M_OpReplyExtended *opReply = NULL;
+	S6M_OpReplyExtended *opReply = nullptr;
 	
 	try
 	{
@@ -421,7 +421,7 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 	}
 	S6M_CATCH(err);
 	
-	if (opReply != NULL)
+	if (opReply != nullptr)
 		S6M_OpReply_free(opReply);
 	return err;
 }
