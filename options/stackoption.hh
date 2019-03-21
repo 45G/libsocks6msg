@@ -50,7 +50,7 @@ public:
 		: StackOption(leg, LVL, CODE) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V> class IntStackOptionBase: public StackOption
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW> class IntStackOptionBase: public StackOption
 {
 	V value;
 	
@@ -58,19 +58,14 @@ protected:
 	struct RawOption
 	{
 		SOCKS6StackOption stackOptionHead;
-		V value;
+		RAW value;
 	} __attribute__((packed));
 	
 	virtual void fill(uint8_t *buf) const
 	{
 		StackOption::fill(buf);
 		RawOption *opt = reinterpret_cast<RawOption *>(buf);
-		opt->value = hton(value);
-	}
-	
-	V getValue() const 
-	{
-		return value;
+		opt->value = hton((RAW)value);
 	}
 	
 public:
@@ -81,34 +76,29 @@ public:
 
 	IntStackOptionBase(SOCKS6StackLeg leg, V value)
 		: StackOption(leg, LVL, CODE), value(value) {}
+
+	V getValue() const
+	{
+		return value;
+	}
 };
 
-class TOSOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t>
+class TOSOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t, uint8_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
 	TOSOption(SOCKS6StackLeg leg, uint8_t tos)
 		: IntStackOptionBase(leg, tos) {}
-
-	uint8_t getTOS() const
-	{
-		return getValue();
-	}
 };
 
-class TFOOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t>
+class TFOOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t, uint16_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 	
 	TFOOption(uint16_t payloadSize)
 		: IntStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE, payloadSize) {}
-
-	uint16_t getPayloadSize() const
-	{
-		return getValue();
-	}
 };
 
 class MPTCPOption: public SimpleStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP>
@@ -120,7 +110,7 @@ public:
 		: SimpleStackOptionBase(SOCKS6_STACK_LEG_PROXY_REMOTE) {}
 };
 
-class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED, uint8_t>
+class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED, SOCKS6MPTCPScheduler, uint8_t>
 {
 	SOCKS6MPTCPScheduler sched;
 	
@@ -129,24 +119,14 @@ public:
 	
 	MPSchedOption(SOCKS6StackLeg leg, SOCKS6MPTCPScheduler sched)
 		: IntStackOptionBase(leg, sched) {}
-
-	SOCKS6MPTCPScheduler getScheduler() const
-	{
-		return (SOCKS6MPTCPScheduler)getValue();
-	}
 };
 
-class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t>
+class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
 	BacklogOption(uint16_t backlog);
-
-	uint16_t getBacklog() const
-	{
-		return getValue();
-	}
 };
 
 }
