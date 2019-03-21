@@ -4,7 +4,7 @@
 #pragma GCC diagnostic error "-Wswitch"
 
 #include "socks6.h"
-#include "exception.hh"
+#include "exceptions.hh"
 
 namespace S6M
 {

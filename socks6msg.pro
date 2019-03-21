@@ -11,7 +11,6 @@ SOURCES += \
     options/option.cc \
     options/stackoption.cc \
     util/sanity.cc \
-    util/exception.cc \
     options/idempotenceoption.cc \
     options/authmethodoption.cc \
     options/authdataoption.cc \
@@ -33,7 +32,6 @@ HEADERS += \
     options/option.hh \
     options/stackoption.hh \
     util/sanity.hh \
-    util/exception.hh \
     options/idempotenceoption.hh \
     options/authmethodoption.hh \
     util/bytebuffer.hh \
@@ -47,7 +45,8 @@ HEADERS += \
     messages/usrpasswd.hh \
     messages/version.hh \
     options/sessionoption.hh \
-    util/byteorder.hh
+    util/byteorder.hh \
+    util/exceptions.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg

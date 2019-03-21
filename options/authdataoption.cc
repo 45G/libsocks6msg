@@ -1,7 +1,7 @@
 #include <string>
 #include "authdataoption.hh"
 #include "optionset.hh"
-#include "exception.hh"
+#include "exceptions.hh"
 
 using namespace std;
 

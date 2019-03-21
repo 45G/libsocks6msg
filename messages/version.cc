@@ -1,5 +1,5 @@
 #include "version.hh"
-#include "exception.hh"
+#include "exceptions.hh"
 
 namespace S6M
 {

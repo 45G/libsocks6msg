@@ -17,7 +17,7 @@ using namespace S6M;
 	{ \
 		(err) = S6M_ERR_INVALID; \
 	} \
-	catch (length_error &) \
+	catch (EndOfBufferException &) \
 	{ \
 		(err) = S6M_ERR_BUFFER; \
 	} \

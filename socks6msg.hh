@@ -6,6 +6,6 @@
 #include "authreply.hh"
 #include "opreply.hh"
 #include "usrpasswd.hh"
-#include "exception.hh"
+#include "exceptions.hh"
 
 #endif // SOCKS6MSG_HH

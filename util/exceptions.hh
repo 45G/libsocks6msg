@@ -7,16 +7,14 @@
 namespace S6M
 {
 
-class BadVersionException: public std::exception
+class BadVersionException: public std::runtime_error
 {
 	uint8_t maj;
 	uint8_t min;
 	
 public:
 	BadVersionException(uint8_t major, uint8_t minor = 0)
-		: maj(major), min(minor) {}
-	
-	const char *what() const throw ();
+		: runtime_error("Unsupported protocol version"), maj(major), min(minor) {}
 	
 	uint8_t getMajor() const
 	{
@@ -27,6 +25,13 @@ public:
 	{
 		return min;
 	}
+};
+
+class EndOfBufferException: public std::length_error
+{
+public:
+	EndOfBufferException()
+		: length_error("End of buffer") {}
 };
 
 }
