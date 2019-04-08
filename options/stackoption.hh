@@ -55,18 +55,6 @@ public:
 	}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
-class SimpleStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
-{
-public:
-	virtual size_t packedSize() const
-	{
-		return sizeof(SOCKS6StackOption);
-	}
-
-	using StackOptionBase<LVL, CODE, LEG_RESTRICT>::StackOptionBase;
-};
-
 template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
 class IntStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
 {
