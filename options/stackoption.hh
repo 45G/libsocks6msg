@@ -38,25 +38,8 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
-class StackOptionBase: public StackOption
-{
-public:
-	virtual size_t packedSize() const
-	{
-		return sizeof(SOCKS6StackOption);
-	}
-
-	StackOptionBase(SOCKS6StackLeg leg)
-		: StackOption(leg, LVL, CODE)
-	{
-		if (LEG_RESTRICT != SOCKS6_STACK_LEG_BOTH && leg != LEG_RESTRICT)
-			throw std::invalid_argument("Bad leg");
-	}
-};
-
 template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
-class IntStackOptionBase: public StackOptionBase<LVL, CODE, LEG_RESTRICT>
+class StackOptionBase: public StackOption
 {
 	V value;
 
@@ -80,8 +63,12 @@ public:
 		return sizeof(SOCKS6StackOption) + sizeof(V);
 	}
 
-	IntStackOptionBase(SOCKS6StackLeg leg, V value)
-		: StackOptionBase<LVL, CODE, LEG_RESTRICT>(leg), value(value) {}
+	StackOptionBase(SOCKS6StackLeg leg, V value)
+		: StackOption(leg, LVL, CODE), value(value)
+	{
+		if (LEG_RESTRICT != SOCKS6_STACK_LEG_BOTH && leg != LEG_RESTRICT)
+			throw std::invalid_argument("Bad leg");
+	}
 
 	V getValue() const
 	{
@@ -89,31 +76,31 @@ public:
 	}
 };
 
-class TOSOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t, uint8_t>
+class TOSOption: public StackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t, uint8_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
-	using IntStackOptionBase::IntStackOptionBase;
+	using StackOptionBase::StackOptionBase;
 };
 
-class TFOOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class TFOOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
-	using IntStackOptionBase::IntStackOptionBase;
+	using StackOptionBase::StackOptionBase;
 };
 
-class MPTCPOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPTCPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
-	using IntStackOptionBase::IntStackOptionBase;
+	using StackOptionBase::StackOptionBase;
 };
 
-class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class BacklogOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);

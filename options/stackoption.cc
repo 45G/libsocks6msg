@@ -130,7 +130,7 @@ void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *opti
 }
 
 BacklogOption::BacklogOption(SOCKS6StackLeg leg, uint16_t backlog)
-	: IntStackOptionBase(leg, backlog)
+	: StackOptionBase(leg, backlog)
 {
 	if (backlog < SOCKS6_BACKLOG_MIN)
 		throw invalid_argument("Bad backlog size");
