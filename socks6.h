@@ -199,8 +199,7 @@ enum SOCKS6StackOptionCode
 	/* TCP */
 	SOCKS6_STACK_CODE_TFO      = 0x01,
 	SOCKS6_STACK_CODE_MPTCP    = 0x02,
-	SOCKS6_STACK_CODE_MP_SCHED = 0x03,
-	SOCKS6_STACK_CODE_BACKLOG  = 0x04,
+	SOCKS6_STACK_CODE_BACKLOG  = 0x03,
 
 	/* UDP */
 
@@ -218,18 +217,6 @@ struct SOCKS6TFOOption
 	struct SOCKS6StackOption stackOptionHead;
 	uint16_t                 payloadLen;
 } __attribute__((packed));
-
-struct SOCKS6MPTCPSchedulerOption
-{
-	struct SOCKS6StackOption stackOptionHead;
-	uint8_t                  scheduler;
-} __attribute__((packed));
-
-enum SOCKS6MPTCPScheduler
-{
-	SOCKS6_MPTCP_SCHEDULER_LOWEST_LATENCY_FIRST = 0x01,
-	SOCKS6_MPTCP_SCHEDULER_REDUNDANT            = 0x02,
-};
 
 struct SOCKS6BacklogOption
 {

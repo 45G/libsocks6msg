@@ -17,9 +17,6 @@ ENUM enumCast(int val)
 }
 
 template <>
-SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val);
-
-template <>
 SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val);
 
 template <>

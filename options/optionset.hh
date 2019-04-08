@@ -125,13 +125,6 @@ class OptionSet: public OptionSetBase
 	
 	bool mptcp = false;
 	
-	struct
-	{
-		SOCKS6MPTCPScheduler clientProxy = (SOCKS6MPTCPScheduler)0;
-		SOCKS6MPTCPScheduler proxyRemote = (SOCKS6MPTCPScheduler)0;
-		
-	} mptcpSched;
-
 	uint16_t backlog = 0;
 	
 	struct
@@ -216,22 +209,6 @@ public:
 	
 	void setMPTCP();
 	
-	SOCKS6MPTCPScheduler getClientProxySched() const
-	{
-		return mptcpSched.clientProxy;
-	}
-	
-	void setClientProxySched(SOCKS6MPTCPScheduler sched);
-	
-	SOCKS6MPTCPScheduler getProxyRemoteSched() const
-	{
-		return mptcpSched.proxyRemote;
-	}
-	
-	void setProxyRemoteSched(SOCKS6MPTCPScheduler sched);
-	
-	void setBothScheds(SOCKS6MPTCPScheduler sched);
-
 	void setBacklog(uint16_t backlog);
 
 	uint16_t getBacklog() const

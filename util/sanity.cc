@@ -9,21 +9,6 @@ namespace S6M
 {
 
 template <>
-SOCKS6MPTCPScheduler enumCast<SOCKS6MPTCPScheduler>(int val)
-{
-	SOCKS6MPTCPScheduler conv = (SOCKS6MPTCPScheduler)val;
-	
-	switch (conv)
-	{
-	case SOCKS6_MPTCP_SCHEDULER_LOWEST_LATENCY_FIRST:
-	case SOCKS6_MPTCP_SCHEDULER_REDUNDANT:
-		return conv;
-	}
-	
-	throw invalid_argument("Bad MPTCP Scheduler");
-}
-
-template <>
 SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 {
 	SOCKS6StackLeg conv = (SOCKS6StackLeg)val;

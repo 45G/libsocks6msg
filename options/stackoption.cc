@@ -55,10 +55,6 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 			MPTCPOption::incrementalParse(opt, optionSet);
 			break;
 			
-		case SOCKS6_STACK_CODE_MP_SCHED:
-			MPSchedOption::incrementalParse(opt, optionSet);
-			break;
-			
 		case SOCKS6_STACK_CODE_BACKLOG:
 			BacklogOption::incrementalParse(opt, optionSet);
 			break;
@@ -116,26 +112,6 @@ void MPTCPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *option
 		throw invalid_argument("Bad leg");
 	
 	optionSet->setMPTCP();
-}
-
-void MPSchedOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
-{
-	SOCKS6MPTCPSchedulerOption *opt = rawOptCast<SOCKS6MPTCPSchedulerOption>(optBase, false);
-	
-	SOCKS6MPTCPScheduler sched = enumCast<SOCKS6MPTCPScheduler>(opt->scheduler);
-	
-	switch (opt->stackOptionHead.leg)
-	{
-	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		optionSet->setClientProxySched(sched);
-		break;
-	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		optionSet->setProxyRemoteSched(sched);
-		break;
-	case SOCKS6_STACK_LEG_BOTH:
-		optionSet->setBothScheds(sched);
-		break;
-	}
 }
 
 void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)

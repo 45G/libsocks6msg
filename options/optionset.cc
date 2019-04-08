@@ -124,23 +124,6 @@ void OptionSet::pack(ByteBuffer *bb) const
 	if (mptcp)
 		cram(MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE), optsHead, bb);
 	
-	if (mptcpSched.clientProxy > 0)
-	{
-		if (mptcpSched.proxyRemote == mptcpSched.clientProxy)
-		{
-			cram(MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy), optsHead, bb);
-			goto both_sched_done;
-		}
-		else
-		{
-			cram(MPSchedOption(SOCKS6_STACK_LEG_CLIENT_PROXY, mptcpSched.clientProxy), optsHead, bb);
-		}
-	}
-	if (mptcpSched.proxyRemote > 0)
-		cram(MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote), optsHead, bb);
-	
-both_sched_done:
-
 	if (ipTOS.clientProxy > 0)
 	{
 		if (ipTOS.proxyRemote == ipTOS.clientProxy)
@@ -185,23 +168,6 @@ size_t OptionSet::packedSize() const
 	if (mptcp)
 		size += MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE).packedSize();
 	
-	if (mptcpSched.clientProxy > 0)
-	{
-		if (mptcpSched.proxyRemote == mptcpSched.clientProxy)
-		{
-			size += MPSchedOption(SOCKS6_STACK_LEG_BOTH, mptcpSched.clientProxy).packedSize();
-			goto both_sched_done;
-		}
-		else
-		{
-			size += MPSchedOption(SOCKS6_STACK_LEG_CLIENT_PROXY, mptcpSched.clientProxy).packedSize();
-		}
-	}
-	if (mptcpSched.proxyRemote > 0)
-		size += MPSchedOption(SOCKS6_STACK_LEG_PROXY_REMOTE, mptcpSched.proxyRemote).packedSize();
-	
-both_sched_done:
-
 	if (ipTOS.clientProxy > 0)
 	{
 		if (ipTOS.proxyRemote == ipTOS.clientProxy)
@@ -273,24 +239,6 @@ void OptionSet::setMPTCP()
 {
 	enforceMode(M_OP_REP);
 	mptcp = true;
-}
-
-void OptionSet::setClientProxySched(SOCKS6MPTCPScheduler sched)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&mptcpSched.clientProxy, sched);
-}
-
-void OptionSet::setProxyRemoteSched(SOCKS6MPTCPScheduler sched)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&mptcpSched.proxyRemote, sched);
-}
-
-void OptionSet::setBothScheds(SOCKS6MPTCPScheduler sched)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&mptcpSched.clientProxy, &mptcpSched.proxyRemote, sched);
 }
 
 void OptionSet::setBacklog(uint16_t backlog)

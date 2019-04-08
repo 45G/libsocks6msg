@@ -94,9 +94,6 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->tfoPayload = cppSet->getTFOPayload();
 	cSet->mptcp = cppSet->getMPTCP();
 	
-	cSet->mptcpSched.clientProxy = cppSet->getClientProxySched();
-	cSet->mptcpSched.proxyServer = cppSet->getProxyRemoteSched();
-
 	cSet->backlog = cppSet->getBacklog();
 	
 	cSet->idempotence.request = cppSet->requestedTokenWindow();
@@ -143,11 +140,6 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->mptcp)
 		cppSet->setMPTCP();
 	
-	if (cSet->mptcpSched.clientProxy > 0)
-		cppSet->setClientProxySched(cSet->mptcpSched.clientProxy);
-	if (cSet->mptcpSched.proxyServer > 0)
-		cppSet->setProxyRemoteSched(cSet->mptcpSched.proxyServer);
-
 	if (cSet->backlog > 0)
 		cppSet->setBacklog(cSet->backlog);
 	

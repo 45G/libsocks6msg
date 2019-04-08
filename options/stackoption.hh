@@ -125,14 +125,6 @@ public:
 	using SimpleStackOptionBase::SimpleStackOptionBase;
 };
 
-class MPSchedOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP_SCHED, SOCKS6MPTCPScheduler, uint8_t>
-{
-public:
-	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
-
-	using IntStackOptionBase::IntStackOptionBase;
-};
-
 class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:

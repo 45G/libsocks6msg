@@ -33,13 +33,6 @@ struct S6M_OptionSet
 	
 	int mptcp;
 	
-	struct
-	{
-		enum SOCKS6MPTCPScheduler clientProxy;
-		enum SOCKS6MPTCPScheduler proxyServer;
-		
-	} mptcpSched;
-
 	uint16_t backlog;
 	
 	struct
