@@ -18,7 +18,7 @@ extern "C"
  * 255: no particular draft revision
  * currently: draft-06 (106)
  */
-#define SOCKS6_VERSION_MINOR 205
+#define SOCKS6_VERSION_MINOR 106
 
 #define SOCKS6_PWAUTH_VERSION 0x01
 
