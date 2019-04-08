@@ -117,12 +117,12 @@ public:
 	using IntStackOptionBase::IntStackOptionBase;
 };
 
-class MPTCPOption: public SimpleStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MPTCP, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPTCPOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
 
-	using SimpleStackOptionBase::SimpleStackOptionBase;
+	using IntStackOptionBase::IntStackOptionBase;
 };
 
 class BacklogOption: public IntStackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>

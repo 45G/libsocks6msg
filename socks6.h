@@ -198,7 +198,7 @@ enum SOCKS6StackOptionCode
 
 	/* TCP */
 	SOCKS6_STACK_CODE_TFO      = 0x01,
-	SOCKS6_STACK_CODE_MPTCP    = 0x02,
+	SOCKS6_STACK_CODE_MP       = 0x02,
 	SOCKS6_STACK_CODE_BACKLOG  = 0x03,
 
 	/* UDP */
@@ -216,6 +216,12 @@ struct SOCKS6TFOOption
 {
 	struct SOCKS6StackOption stackOptionHead;
 	uint16_t                 payloadLen;
+} __attribute__((packed));
+
+struct SOCKS6MPOption
+{
+	struct SOCKS6StackOption stackOptionHead;
+	uint8_t                  availability;
 } __attribute__((packed));
 
 struct SOCKS6BacklogOption

@@ -51,7 +51,7 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 			TFOOption::incrementalParse(opt, optionSet);
 			break;
 			
-		case SOCKS6_STACK_CODE_MPTCP:
+		case SOCKS6_STACK_CODE_MP:
 			MPTCPOption::incrementalParse(opt, optionSet);
 			break;
 			
@@ -106,12 +106,15 @@ void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSe
 
 void MPTCPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
-	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(optBase, false);
+	SOCKS6MPOption *opt = rawOptCast<SOCKS6MPOption>(optBase, false);
 	
-	if (opt->leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
+	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
 		throw invalid_argument("Bad leg");
 	
-	optionSet->setMPTCP();
+	bool avail = opt->availability;
+	
+	if (avail)
+		optionSet->setMPTCP();
 }
 
 void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
