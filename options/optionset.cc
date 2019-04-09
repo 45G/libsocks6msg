@@ -9,6 +9,13 @@ using namespace boost;
 namespace S6M
 {
 
+template <typename T>
+void ensureVacant(const std::unique_ptr<T> &ptr)
+{
+	if (ptr.get() != nullptr)
+		throw std::logic_error("Option already in place");
+}
+
 #define COMMIT(FIELD, WHAT) \
 	ensureVacant(FIELD); \
 	(FIELD).reset(WHAT); \

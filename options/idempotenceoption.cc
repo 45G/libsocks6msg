@@ -65,7 +65,7 @@ void TokenWindowRequestOption::incrementalParse(SOCKS6IdempotenceOption *optBase
 	uint32_t winSize = ntohl(opt->windowSize);
 	tokenWindowSanity(winSize);
 	
-	optionSet->idem()->requestWindow(winSize);
+	optionSet->idempotence()->requestWindow(winSize);
 }
 
 TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
@@ -98,7 +98,7 @@ void TokenWindowAdvertOption::incrementalParse(SOCKS6IdempotenceOption *optBase,
 	
 	tokenWindowSanity(winSize);
 	
-	optionSet->idem()->advertiseWindow(winBase, winSize);
+	optionSet->idempotence()->advertiseWindow(winBase, winSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
@@ -125,7 +125,7 @@ void TokenExpenditureRequestOption::incrementalParse(SOCKS6IdempotenceOption *op
 {
 	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(optBase, false);
 	
-	optionSet->idem()->setToken(ntohl(opt->token));
+	optionSet->idempotence()->setToken(ntohl(opt->token));
 }
 
 size_t TokenExpenditureReplyOption::packedSize() const
@@ -146,7 +146,7 @@ void TokenExpenditureReplyOption::incrementalParse(SOCKS6IdempotenceOption *optB
 {
 	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(optBase, false);
 	
-	optionSet->idem()->setReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
+	optionSet->idempotence()->setReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
 }
 
 }

@@ -41,13 +41,6 @@ protected:
 	
 	void enforceMode(Mode mode1, Mode mode2) const;
 	
-	template <typename T>
-	void ensureVacant(const std::unique_ptr<T> &ptr)
-	{
-		if (ptr.get() != nullptr)
-			throw std::logic_error("Option already in place");
-	}
-	
 public:
 	OptionSetBase(OptionSet *owner, Mode mode)
 		: owner(owner), mode(mode) {}
@@ -301,12 +294,12 @@ public:
 		return &sessionSet;
 	}
 	
-	IdempotenceOptionSet *idem()
+	IdempotenceOptionSet *idempotence()
 	{
 		return &idempotenceSet;
 	}
 	
-	const IdempotenceOptionSet *idem() const
+	const IdempotenceOptionSet *idempotence() const
 	{
 		return &idempotenceSet;
 	}
