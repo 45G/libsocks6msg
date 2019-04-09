@@ -65,7 +65,7 @@ void TokenWindowRequestOption::incrementalParse(SOCKS6IdempotenceOption *optBase
 	uint32_t winSize = ntohl(opt->windowSize);
 	tokenWindowSanity(winSize);
 	
-	optionSet->idempotence()->requestWindow(winSize);
+	optionSet->idempotence()->request(winSize);
 }
 
 TokenWindowRequestOption::TokenWindowRequestOption(uint32_t winSize)
@@ -98,7 +98,7 @@ void TokenWindowAdvertOption::incrementalParse(SOCKS6IdempotenceOption *optBase,
 	
 	tokenWindowSanity(winSize);
 	
-	optionSet->idempotence()->advertiseWindow(winBase, winSize);
+	optionSet->idempotence()->advertise(winBase, winSize);
 }
 
 TokenWindowAdvertOption::TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)

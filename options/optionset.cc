@@ -309,7 +309,7 @@ void SessionOptionSet::setUntrusted()
 IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
 
-void IdempotenceOptionSet::requestWindow(uint32_t size)
+void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);
 	COMMIT(requestOpt, new TokenWindowRequestOption(size));
@@ -321,7 +321,7 @@ void IdempotenceOptionSet::setToken(uint32_t token)
 	COMMIT(expenditureOpt, new TokenExpenditureRequestOption(token));
 }
 
-void IdempotenceOptionSet::advertiseWindow(uint32_t base, uint32_t size)
+void IdempotenceOptionSet::advertise(uint32_t base, uint32_t size)
 {
 	enforceMode(M_AUTH_REP);
 	COMMIT(windowOpt, new TokenWindowAdvertOption(base, size));

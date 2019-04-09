@@ -113,9 +113,9 @@ class IdempotenceOptionSet: public OptionSetBase
 public:
 	IdempotenceOptionSet(OptionSet *owner);
 	
-	void requestWindow(uint32_t size);
+	void request(uint32_t size);
 	
-	uint32_t getRequestedWindowSize() const
+	uint32_t requestedSize() const
 	{
 		if (requestOpt.get() != nullptr)
 			return 0;
@@ -131,16 +131,16 @@ public:
 		return expenditureOpt->getToken();
 	}
 	
-	void advertiseWindow(uint32_t base, uint32_t size);
+	void advertise(uint32_t base, uint32_t size);
 	
-	boost::optional<uint32_t> getWindowBase() const
+	boost::optional<uint32_t> advertisedBase() const
 	{
 		if (windowOpt.get() == nullptr)
 			return {};
 		return windowOpt->getWinBase();
 	}
 	
-	uint32_t getWindowSize() const
+	uint32_t advertisedSize() const
 	{
 		if (windowOpt.get() == nullptr)
 			return 0;

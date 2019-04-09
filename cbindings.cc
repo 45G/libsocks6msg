@@ -95,11 +95,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	
 	cSet->backlog = cppSet->getBacklog();
 	
-	cSet->idempotence.request = cppSet->idempotence()->getRequestedWindowSize();
+	cSet->idempotence.request = cppSet->idempotence()->requestedSize();
 	cSet->idempotence.spend = (bool)cppSet->idempotence()->getToken();
 	cSet->idempotence.token = cppSet->idempotence()->getToken().get_value_or(0);
-	cSet->idempotence.windowBase = *(cppSet->idempotence()->getWindowBase());
-	cSet->idempotence.windowSize = cppSet->idempotence()->getWindowSize();
+	cSet->idempotence.windowBase = *(cppSet->idempotence()->advertisedBase());
+	cSet->idempotence.windowSize = cppSet->idempotence()->advertisedSize();
 	cSet->idempotence.replyCode = cppSet->idempotence()->getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
 	
 	int i = 0;
@@ -142,11 +142,11 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->setBacklog(cSet->backlog);
 	
 	if (cSet->idempotence.request > 0)
-		cppSet->idempotence()->requestWindow(cSet->idempotence.request);
+		cppSet->idempotence()->request(cSet->idempotence.request);
 	if (cSet->idempotence.spend)
 		cppSet->idempotence()->setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
-		cppSet->idempotence()->advertiseWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+		cppSet->idempotence()->advertise(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
 	if (cSet->idempotence.replyCode > 0)
 		cppSet->idempotence()->setReply(cSet->idempotence.replyCode);
 	
