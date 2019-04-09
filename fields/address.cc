@@ -21,7 +21,7 @@ size_t Address::packedSize() const
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		size += domain.packedSize();
+		size += (*domain).packedSize();
 		break;
 	}
 	
@@ -50,7 +50,7 @@ void Address::pack(ByteBuffer *bb)  const
 	}
 		
 	case SOCKS6_ADDR_DOMAIN:
-		domain.pack(bb);
+		(*domain).pack(bb);
 		break;
 	}
 }

@@ -8,6 +8,7 @@
 #include <set>
 #include <algorithm>
 #include <memory>
+#include <boost/optional/optional.hpp>
 #include "option.hh"
 #include "stackoption.hh"
 #include "idempotenceoption.hh"
@@ -109,6 +110,60 @@ public:
 	}
 };
 
+class IdempotenceOptionSet: public OptionSetBase
+{
+	std::unique_ptr<TokenWindowRequestOption>      requestOpt;
+	std::unique_ptr<TokenExpenditureRequestOption> expenditureOpt;
+	std::unique_ptr<TokenWindowAdvertOption>       windowOpt;
+	std::unique_ptr<TokenExpenditureReplyOption>   replyOpt;
+	
+public:
+	IdempotenceOptionSet(OptionSet *owner);
+	
+	void requestWindow(uint32_t size);
+	
+	uint32_t getRequestedWindowSize() const
+	{
+		if (requestOpt.get() != nullptr)
+			return 0;
+		return requestOpt->getWinSize();
+	}
+	
+	void setToken(uint32_t token);
+	
+	boost::optional<uint32_t> getToken() const
+	{
+		if (expenditureOpt.get() == nullptr)
+			return {};
+		return expenditureOpt->getToken();
+	}
+	
+	void advertiseWindow(uint32_t base, uint32_t size);
+	
+	boost::optional<uint32_t> getWindowBase() const
+	{
+		if (windowOpt.get() == nullptr)
+			return {};
+		return windowOpt->getWinBase();
+	}
+	
+	uint32_t getWindowSize() const
+	{
+		if (windowOpt.get() == nullptr)
+			return 0;
+		return windowOpt->getWinSize();
+	}
+	
+	void setReply(SOCKS6TokenExpenditureCode code);
+	
+	boost::optional<SOCKS6TokenExpenditureCode> getReply() const
+	{
+		if (replyOpt.get() == nullptr)
+			return {};
+		return replyOpt->getCode();
+	}
+};
+
 class OptionSet: public OptionSetBase
 {
 	struct TOS
@@ -129,26 +184,14 @@ class OptionSet: public OptionSetBase
 	
 	struct
 	{
-		uint32_t request = 0;
-		
-		bool spend = false;
-		uint32_t token = 0;
-		
-		uint32_t base;
-		uint32_t windowSize = 0;
-		
-		SOCKS6TokenExpenditureCode replyCode = (SOCKS6TokenExpenditureCode)0;
-	} idempotence;
-	
-	struct
-	{
 		uint16_t initialDataLen = 0;
 		std::set<SOCKS6Method> advertised;
 	} methods;
 	
 	std::unique_ptr<UsernamePasswdOption> userPasswd;
 	
-	SessionOptionSet sessionSet;
+	SessionOptionSet     sessionSet;
+	IdempotenceOptionSet idempotenceSet;
 	
 	std::list<Option *> options;
 	size_t optionsSize = 0;
@@ -161,7 +204,7 @@ class OptionSet: public OptionSetBase
 	
 public:
 	OptionSet(Mode mode)
-		: OptionSetBase(this, mode), sessionSet(this) {}
+		: OptionSetBase(this, mode), sessionSet(this), idempotenceSet(this) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	
@@ -216,45 +259,6 @@ public:
 		return backlog;
 	}
 	
-	//TODO: rename most of below methods
-	uint32_t requestedTokenWindow() const
-	{
-		return idempotence.request;
-	}
-	
-	void requestTokenWindow(uint32_t winSize);
-	
-	uint32_t getTokenWindowBase() const
-	{
-		return idempotence.base;
-	}
-	
-	uint32_t getTokenWindowSize() const
-	{
-		return idempotence.windowSize;
-	}
-	
-	void setTokenWindow(uint32_t base, uint32_t size);
-	
-	void setToken(uint32_t token);
-	
-	bool hasToken() const
-	{
-		return idempotence.spend;
-	}
-	
-	uint32_t getToken() const
-	{
-		return idempotence.token;
-	}
-	
-	void setExpenditureReply(SOCKS6TokenExpenditureCode code);
-	
-	SOCKS6TokenExpenditureCode getExpenditureReply() const
-	{
-		return idempotence.replyCode;
-	}
-	
 	const std::set<SOCKS6Method> *getAdvertisedMethods() const
 	{
 		return &methods.advertised;
@@ -297,7 +301,18 @@ public:
 		return &sessionSet;
 	}
 	
+	IdempotenceOptionSet *idem()
+	{
+		return &idempotenceSet;
+	}
+	
+	const IdempotenceOptionSet *idem() const
+	{
+		return &idempotenceSet;
+	}
+	
 	friend class SessionOptionSet;
+	friend class IdempotenceOptionSet;
 };
 
 }

@@ -9,7 +9,6 @@
 #include "socks6msg.hh"
 
 using namespace std;
-using namespace boost;
 using namespace S6M;
 
 #define S6M_CATCH(err) \
@@ -96,13 +95,12 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	
 	cSet->backlog = cppSet->getBacklog();
 	
-	cSet->idempotence.request = cppSet->requestedTokenWindow();
-	cSet->idempotence.spend = cppSet->hasToken();
-	if (cSet->idempotence.spend)
-		cSet->idempotence.token = cppSet->getToken();
-	cSet->idempotence.windowBase = cppSet->getTokenWindowBase();
-	cSet->idempotence.windowSize = cppSet->getTokenWindowSize();
-	cSet->idempotence.replyCode = cppSet->getExpenditureReply();
+	cSet->idempotence.request = cppSet->idem()->getRequestedWindowSize();
+	cSet->idempotence.spend = (bool)cppSet->idem()->getToken();
+	cSet->idempotence.token = cppSet->idem()->getToken().get_value_or(0);
+	cSet->idempotence.windowBase = *(cppSet->idem()->getWindowBase());
+	cSet->idempotence.windowSize = cppSet->idem()->getWindowSize();
+	cSet->idempotence.replyCode = cppSet->idem()->getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
 	
 	int i = 0;
 	cSet->knownMethods = new SOCKS6Method[cppSet->getAdvertisedMethods()->size()];
@@ -144,13 +142,13 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->setBacklog(cSet->backlog);
 	
 	if (cSet->idempotence.request > 0)
-		cppSet->requestTokenWindow(cSet->idempotence.request);
+		cppSet->idem()->requestWindow(cSet->idempotence.request);
 	if (cSet->idempotence.spend)
-		cppSet->setToken(cSet->idempotence.token);
+		cppSet->idem()->setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
-		cppSet->setTokenWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+		cppSet->idem()->advertiseWindow(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
 	if (cSet->idempotence.replyCode > 0)
-		cppSet->setExpenditureReply(cSet->idempotence.replyCode);
+		cppSet->idem()->setReply(cSet->idempotence.replyCode);
 	
 	if (cSet->knownMethods != nullptr)
 	{

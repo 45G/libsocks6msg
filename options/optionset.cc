@@ -71,7 +71,7 @@ void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) co
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: OptionSetBase(this, mode), sessionSet(this)
+	: OptionSetBase(this, mode), sessionSet(this), idempotenceSet(this)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	uint16_t optsLen = ntohs(optsHead->optionsLength);
@@ -140,15 +140,6 @@ void OptionSet::pack(ByteBuffer *bb) const
 		cram(TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote), optsHead, bb);
 
 both_tos_done:
-
-	if (idempotence.request > 0)
-		cram(TokenWindowRequestOption(idempotence.request), optsHead, bb);
-	if (idempotence.spend)
-		cram(TokenExpenditureRequestOption(idempotence.token), optsHead, bb);
-	if (idempotence.windowSize > 0)
-		cram(TokenWindowAdvertOption(idempotence.base, idempotence.windowSize), optsHead, bb);
-	if (idempotence.replyCode > 0)
-		cram(TokenExpenditureReplyOption(idempotence.replyCode), optsHead, bb);
 	
 	if (!methods.advertised.empty())
 		cram(AuthMethodOption(methods.initialDataLen, methods.advertised), optsHead, bb);
@@ -184,15 +175,6 @@ size_t OptionSet::packedSize() const
 		size += TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote).packedSize();
 
 both_tos_done:
-
-	if (idempotence.request > 0)
-		size += TokenWindowRequestOption(idempotence.request).packedSize();
-	if (idempotence.spend)
-		size += TokenExpenditureRequestOption(idempotence.token).packedSize();
-	if (idempotence.windowSize > 0)
-		size += TokenWindowAdvertOption(idempotence.base, idempotence.windowSize).packedSize();
-	if (idempotence.replyCode > 0)
-		size += TokenExpenditureReplyOption(idempotence.replyCode).packedSize();
 	
 	if (!methods.advertised.empty())
 		size += AuthMethodOption(methods.initialDataLen, methods.advertised).packedSize();
@@ -244,46 +226,6 @@ void OptionSet::setMPTCP()
 void OptionSet::setBacklog(uint16_t backlog)
 {
 	checkedAssignment(&this->backlog, backlog);
-}
-
-void OptionSet::requestTokenWindow(uint32_t winSize)
-{
-	enforceMode(M_REQ);
-	checkedAssignment(&idempotence.request, winSize);
-}
-
-void OptionSet::setTokenWindow(uint32_t base, uint32_t size)
-{
-	enforceMode(M_AUTH_REP);
-	
-	if (size == 0)
-		throw invalid_argument("");
-	if (idempotence.windowSize > 0 && (idempotence.base != base || idempotence.windowSize != size))
-		throw invalid_argument("");
-	
-	idempotence.base = base;
-	idempotence.windowSize = size;
-}
-
-void OptionSet::setToken(uint32_t token)
-{
-	enforceMode(M_REQ);
-	
-	if (idempotence.spend && idempotence.token != token)
-		throw invalid_argument("");
-	
-	idempotence.spend = true;
-	idempotence.token = token;
-}
-
-void OptionSet::setExpenditureReply(SOCKS6TokenExpenditureCode code)
-{
-	enforceMode(M_AUTH_REP);
-	
-	if (code == 0)
-		throw invalid_argument("");
-	
-	checkedAssignment(&idempotence.replyCode, code);
 }
 
 void OptionSet::advertiseMethod(SOCKS6Method method)
@@ -355,6 +297,33 @@ void SessionOptionSet::setUntrusted()
 	if (reinterpret_cast<SessionIDOption *>(mandatoryOpt.get()) == nullptr)
 		throw logic_error("Must advertise a session ID");
 	COMMIT(untrustedOpt, new SessionUntrustedOption());
+}
+
+IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
+	: OptionSetBase(owner, owner->mode) {}
+
+void IdempotenceOptionSet::requestWindow(uint32_t size)
+{
+	enforceMode(M_REQ);
+	COMMIT(requestOpt, new TokenWindowRequestOption(size));
+}
+
+void IdempotenceOptionSet::setToken(uint32_t token)
+{
+	enforceMode(M_REQ);
+	COMMIT(expenditureOpt, new TokenExpenditureRequestOption(token));
+}
+
+void IdempotenceOptionSet::advertiseWindow(uint32_t base, uint32_t size)
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(windowOpt, new TokenWindowAdvertOption(base, size));
+}
+
+void IdempotenceOptionSet::setReply(SOCKS6TokenExpenditureCode code)
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(replyOpt, new TokenExpenditureReplyOption(code));
 }
 
 }

@@ -4,6 +4,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <vector>
+#include <boost/optional.hpp>
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "string.hh"
@@ -17,7 +18,7 @@ class Address
 	
 	in_addr ipv4;
 	in6_addr ipv6;
-	String domain;
+	boost::optional<String> domain;
 	
 public:
 	size_t packedSize() const;
@@ -66,7 +67,7 @@ public:
 	
 	const std::string *getDomain() const
 	{
-		return domain.getStr();
+		return (*domain).getStr();
 	}
 };
 

@@ -92,7 +92,7 @@ public:
 	using StackOptionBase::StackOptionBase;
 };
 
-class MPTCPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPTCPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
