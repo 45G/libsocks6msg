@@ -57,7 +57,7 @@ public:
 	
 	void request();
 	
-	bool requested()
+	bool requested() const
 	{
 		return dynamic_cast<SessionRequestOption *>(mandatoryOpt.get()) != nullptr;
 	}
@@ -83,7 +83,7 @@ public:
 	
 	void signalOK();
 	
-	bool isOK()
+	bool isOK() const
 	{
 		return dynamic_cast<SessionOKOption *>(mandatoryOpt.get()) != nullptr;
 	}
@@ -97,7 +97,7 @@ public:
 	
 	void setUntrusted();
 	
-	bool isUntrusted()
+	bool isUntrusted() const
 	{
 		return untrustedOpt != nullptr;
 	}
@@ -157,23 +157,74 @@ public:
 	}
 };
 
+template <typename T>
+class StackOptionPair: public OptionSetBase
+{
+	std::shared_ptr<T> clientProxy;
+	std::shared_ptr<T> proxyRemote;
+	
+public:
+	StackOptionPair(OptionSet *owner);
+	
+	void set(SOCKS6StackLeg leg, typename T::Value value);
+	
+	boost::optional<typename T::Value> get(SOCKS6StackLeg leg) const;
+};
+
+class StackOptionSet: public OptionSetBase
+{
+	StackOptionPair<TOSOption>     tosSet     { owner };
+	StackOptionPair<TFOOption>     tfoSet     { owner };
+	StackOptionPair<MPTCPOption>   mptcpSet   { owner };
+	StackOptionPair<BacklogOption> backlogSet { owner };
+	
+public:
+	StackOptionSet(OptionSet *owner);
+	
+	StackOptionPair<TOSOption> *tos()
+	{
+		return &tosSet;
+	}
+	
+	const StackOptionPair<TOSOption> *tos() const
+	{
+		return &tosSet;
+	}
+	
+	StackOptionPair<TFOOption> *tfo()
+	{
+		return &tfoSet;
+	}
+	
+	const StackOptionPair<TFOOption> *tfo() const
+	{
+		return &tfoSet;
+	}
+	
+	StackOptionPair<MPTCPOption> *mptcp()
+	{
+		return &mptcpSet;
+	}
+	
+	const StackOptionPair<MPTCPOption> *mptcp() const
+	{
+		return &mptcpSet;
+	}
+	
+	StackOptionPair<BacklogOption> *backlog()
+	{
+		return &backlogSet;
+	}
+	
+	const StackOptionPair<BacklogOption> *backlog() const
+	{
+		return &backlogSet;
+	}
+};
+
 class OptionSet: public OptionSetBase
 {
-	struct TOS
-	{
-		uint8_t clientProxy;
-		uint8_t proxyRemote;
-
-		TOS()
-			: clientProxy(0), proxyRemote(0) {}
-	} ipTOS;
-
-	bool tfo = false;
-	uint16_t tfoPayload = 0;
-	
-	bool mptcp = false;
-	
-	uint16_t backlog = 0;
+	StackOptionSet stackSet { this };
 	
 	struct
 	{
@@ -208,48 +259,6 @@ public:
 	Mode getMode() const
 	{
 		return mode;
-	}
-	
-	void setClientProxyTOS(uint8_t ipTOS);
-
-	uint8_t getClientProxyTOS() const
-	{
-		return ipTOS.clientProxy;
-	}
-
-	void setProxyRemoteTOS(uint8_t ipTOS);
-
-	uint8_t getProxyRemoteTOS() const
-	{
-		return ipTOS.proxyRemote;
-	}
-
-	void setBothTOS(uint8_t ipTOS);
-
-	uint16_t getTFOPayload() const
-	{
-		return tfoPayload;
-	}
-	
-	void setTFOPayload(uint16_t payloadSize);
-
-	bool hasTFO() const
-	{
-		return tfo;
-	}
-	
-	bool getMPTCP() const
-	{
-		return mptcp;
-	}
-	
-	void setMPTCP();
-	
-	void setBacklog(uint16_t backlog);
-
-	uint16_t getBacklog() const
-	{
-		return backlog;
 	}
 	
 	const std::set<SOCKS6Method> *getAdvertisedMethods() const
@@ -304,8 +313,21 @@ public:
 		return &idempotenceSet;
 	}
 	
+	StackOptionSet *stack()
+	{
+		return &stackSet;
+	}
+	
+	const StackOptionSet *stack() const
+	{
+		return &stackSet;
+	}
+	
 	friend class SessionOptionSet;
 	friend class IdempotenceOptionSet;
+	friend class StackOptionSet;
+	template <typename T>
+	friend class StackOptionPair;
 };
 
 }

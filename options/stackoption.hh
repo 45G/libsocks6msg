@@ -58,6 +58,8 @@ protected:
 	}
 
 public:
+	typedef V Value;
+	
 	virtual size_t packedSize() const
 	{
 		return sizeof(SOCKS6StackOption) + sizeof(V);

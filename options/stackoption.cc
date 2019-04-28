@@ -75,58 +75,36 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 void TOSOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
 	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(optBase, false);
+	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 
-	uint8_t tos = opt->tos;
-
-	switch (opt->stackOptionHead.leg)
-	{
-	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		optionSet->setClientProxyTOS(tos);
-		break;
-	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		optionSet->setProxyRemoteTOS(tos);
-		break;
-	case SOCKS6_STACK_LEG_BOTH:
-		optionSet->setBothTOS(tos);
-		break;
-	}
+	optionSet->stack()->tos()->set(leg, opt->tos);
 }
 
 void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
 	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(optBase, false);
-	
-	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
-		throw invalid_argument("Bad leg");
-
+	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	uint16_t payloadSize = ntohs(opt->payloadLen);
 	
-	optionSet->setTFOPayload(payloadSize);
+	optionSet->stack()->tfo()->set(leg, payloadSize);
 }
 
 void MPTCPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
 	SOCKS6MPOption *opt = rawOptCast<SOCKS6MPOption>(optBase, false);
-	
-	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
-		throw invalid_argument("Bad leg");
-	
+	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	bool avail = opt->availability;
 	
-	if (avail)
-		optionSet->setMPTCP();
+	optionSet->stack()->mptcp()->set(leg, avail);
 }
 
 void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
 	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(optBase, false);
-	
-	if (opt->stackOptionHead.leg != SOCKS6_STACK_LEG_PROXY_REMOTE)
-		throw invalid_argument("Bad leg");
-
+	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	uint8_t backlog = ntohs(opt->backlog);
-
-	optionSet->setBacklog(backlog);
+	
+	optionSet->stack()->backlog()->set(leg, backlog);
 }
 
 BacklogOption::BacklogOption(SOCKS6StackLeg leg, uint16_t backlog)

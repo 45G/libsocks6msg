@@ -16,10 +16,24 @@ void ensureVacant(const std::unique_ptr<T> &ptr)
 		throw std::logic_error("Option already in place");
 }
 
+template <typename T>
+void ensureVacant(const std::shared_ptr<T> &ptr)
+{
+	if (ptr.get() != nullptr)
+		throw std::logic_error("Option already in place");
+}
+
 #define COMMIT(FIELD, WHAT) \
 	ensureVacant(FIELD); \
 	(FIELD).reset(WHAT); \
 	owner->registerOption((FIELD).get());
+
+#define COMMIT2(FIELD1, FIELD2, WHAT) \
+	ensureVacant(FIELD1); \
+	ensureVacant(FIELD2); \
+	(FIELD1).reset(WHAT); \
+	(FIELD2) = (FIELD1); \
+	owner->registerOption((FIELD1).get());
 
 template <typename T>
 static bool mayAssign(T field, T value)
@@ -126,28 +140,6 @@ void OptionSet::pack(ByteBuffer *bb) const
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	optsHead->optionsLength = 0;
 	
-	if (tfo)
-		cram(TFOOption(SOCKS6_STACK_LEG_PROXY_REMOTE, tfoPayload), optsHead, bb);
-	if (mptcp)
-		cram(MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE, true), optsHead, bb);
-	
-	if (ipTOS.clientProxy > 0)
-	{
-		if (ipTOS.proxyRemote == ipTOS.clientProxy)
-		{
-			cram(TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy), optsHead, bb);
-			goto both_tos_done;
-		}
-		else
-		{
-			cram(TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy), optsHead, bb);
-		}
-	}
-	if (ipTOS.proxyRemote > 0)
-		cram(TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote), optsHead, bb);
-
-both_tos_done:
-	
 	if (!methods.advertised.empty())
 		cram(AuthMethodOption(methods.initialDataLen, methods.advertised), optsHead, bb);
 	
@@ -161,78 +153,12 @@ size_t OptionSet::packedSize() const
 {
 	size_t size = sizeof(SOCKS6Options);
 	
-	if (tfo)
-		size += TFOOption(SOCKS6_STACK_LEG_PROXY_REMOTE, tfoPayload).packedSize();
-	if (mptcp)
-		size += MPTCPOption(SOCKS6_STACK_LEG_PROXY_REMOTE, true).packedSize();
-	
-	if (ipTOS.clientProxy > 0)
-	{
-		if (ipTOS.proxyRemote == ipTOS.clientProxy)
-		{
-			size += TOSOption(SOCKS6_STACK_LEG_BOTH, ipTOS.clientProxy).packedSize();
-			goto both_tos_done;
-		}
-		else
-		{
-			size += TOSOption(SOCKS6_STACK_LEG_CLIENT_PROXY, ipTOS.clientProxy).packedSize();
-		}
-	}
-	if (ipTOS.proxyRemote > 0)
-		size += TOSOption(SOCKS6_STACK_LEG_PROXY_REMOTE, ipTOS.proxyRemote).packedSize();
-
-both_tos_done:
-	
 	if (!methods.advertised.empty())
 		size += AuthMethodOption(methods.initialDataLen, methods.advertised).packedSize();
 	
 	size += optionsSize;
 	
 	return size;
-}
-
-void OptionSet::setClientProxyTOS(uint8_t tos)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&ipTOS.clientProxy, tos);
-}
-
-void OptionSet::setProxyRemoteTOS(uint8_t tos)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&ipTOS.proxyRemote, tos);
-}
-
-void OptionSet::setBothTOS(uint8_t tos)
-{
-	enforceMode(M_REQ, M_OP_REP);
-	checkedAssignment(&ipTOS.clientProxy, &ipTOS.proxyRemote, tos);
-}
-
-void OptionSet::setTFOPayload(uint16_t payloadSize)
-{
-	enforceMode(M_REQ);
-	if (tfo)
-	{
-		if (payloadSize != tfoPayload)
-			throw invalid_argument("");
-	}
-	else
-	{
-		tfo = true;
-		tfoPayload = payloadSize;
-	}
-}
-
-void OptionSet::setMPTCP()
-{
-	enforceMode(M_OP_REP);
-	mptcp = true;
-}
-
-void OptionSet::setBacklog(uint16_t backlog)
-{
-	checkedAssignment(&this->backlog, backlog);
 }
 
 void OptionSet::advertiseMethod(SOCKS6Method method)
@@ -332,5 +258,51 @@ void IdempotenceOptionSet::setReply(SOCKS6TokenExpenditureCode code)
 	enforceMode(M_AUTH_REP);
 	COMMIT(replyOpt, new TokenExpenditureReplyOption(code));
 }
+
+template<typename T>
+StackOptionPair<T>::StackOptionPair(OptionSet *owner)
+	: OptionSetBase(owner, owner->mode) {}
+
+template<typename T>
+void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
+{
+	enforceMode(M_REQ, M_AUTH_REP);
+	switch(leg)
+	{
+	case SOCKS6_STACK_LEG_CLIENT_PROXY:
+		COMMIT(clientProxy, new T(leg, value));
+		return;
+	case SOCKS6_STACK_LEG_PROXY_REMOTE:
+		COMMIT(proxyRemote, new T(leg, value));
+		return;
+	case SOCKS6_STACK_LEG_BOTH:
+		COMMIT2(clientProxy, proxyRemote, new T(leg, value));
+		return;
+	}
+}
+
+template<typename T>
+boost::optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
+{
+	enforceMode(M_REQ, M_AUTH_REP);
+	switch(leg)
+	{
+	case SOCKS6_STACK_LEG_CLIENT_PROXY:
+		if (clientProxy.get() == nullptr)
+			return {};
+		return clientProxy->getValue();
+		
+	case SOCKS6_STACK_LEG_PROXY_REMOTE:
+		if (proxyRemote.get() == nullptr)
+			return {};
+		return clientProxy->getValue();
+		
+	case SOCKS6_STACK_LEG_BOTH:
+		throw logic_error("Bad leg");
+	}
+}
+
+StackOptionSet::StackOptionSet(OptionSet *owner)
+	: OptionSetBase(owner, owner->mode) {}
 
 }
