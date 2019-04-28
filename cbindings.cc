@@ -105,7 +105,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	list<S6M_StackOption> stackOpts;
 	fillStackOptions(cppSet->stack()->tos(),     &stackOpts);
 	fillStackOptions(cppSet->stack()->tfo(),     &stackOpts);
-	fillStackOptions(cppSet->stack()->mp(),   &stackOpts);
+	fillStackOptions(cppSet->stack()->mp(),      &stackOpts);
 	fillStackOptions(cppSet->stack()->backlog(), &stackOpts);
 	
 	if (stackOpts.empty())
