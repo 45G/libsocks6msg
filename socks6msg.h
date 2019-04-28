@@ -20,20 +20,18 @@ struct S6M_Address
 	const char *domain;
 };
 
+struct S6M_StackOption
+{
+	enum SOCKS6StackLeg leg;
+	enum SOCKS6StackLevel level;
+	enum SOCKS6StackOptionCode code;
+	int value;
+};
+
 struct S6M_OptionSet
 {
-	struct
-	{
-		uint8_t clientProxy;
-		uint8_t proxyRemote;
-	} tos;
-
-	int tfo;
-	uint16_t tfoPayload;
-	
-	int mptcp;
-	
-	uint16_t backlog;
+	S6M_StackOption *stackOptions;
+	int stackOptionCount;
 	
 	struct
 	{

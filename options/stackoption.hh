@@ -38,7 +38,7 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode CODE, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode C, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
 class StackOptionBase: public StackOption
 {
 	V value;
@@ -58,6 +58,9 @@ protected:
 	}
 
 public:
+	static const SOCKS6StackLevel      LEVEL = LVL;
+	static const SOCKS6StackOptionCode CODE  = C;
+	
 	typedef V Value;
 	
 	virtual size_t packedSize() const
@@ -66,7 +69,7 @@ public:
 	}
 
 	StackOptionBase(SOCKS6StackLeg leg, V value)
-		: StackOption(leg, LVL, CODE), value(value)
+		: StackOption(leg, LVL, C), value(value)
 	{
 		if (LEG_RESTRICT != SOCKS6_STACK_LEG_BOTH && leg != LEG_RESTRICT)
 			throw std::invalid_argument("Bad leg");
@@ -94,7 +97,7 @@ public:
 	using StackOptionBase::StackOptionBase;
 };
 
-class MPTCPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t>
+class MPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, bool, uint8_t>
 {
 public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);

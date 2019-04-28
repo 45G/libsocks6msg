@@ -80,20 +80,48 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 	throw invalid_argument("Bad address type");
 }
 
+template <typename SET>
+static void fillStackOptions(const SET *set, list<S6M_StackOption> *stackOpts)
+{
+	SOCKS6StackLeg legs[] = { SOCKS6_STACK_LEG_CLIENT_PROXY, SOCKS6_STACK_LEG_PROXY_REMOTE };
+	
+	for (int i = 0; i < 2; i++)
+	{
+		auto value = set->get(legs[i]);
+		if (!value)
+			continue;
+		
+		S6M_StackOption opt { legs[i], SET::Option::LEVEL, SET::Option::CODE, (int)value.get() };
+		stackOpts->push_back(opt);
+	}
+}
+
 /*
  * S6m_OptionSet
  */
 
 static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 {
-	cSet->tos.clientProxy = cppSet->getClientProxyTOS();
-	cSet->tos.proxyRemote = cppSet->getProxyRemoteTOS();
-
-	cSet->tfo = cppSet->hasTFO();
-	cSet->tfoPayload = cppSet->getTFOPayload();
-	cSet->mptcp = cppSet->getMPTCP();
+	list<S6M_StackOption> stackOpts;
+	fillStackOptions(cppSet->stack()->tos(),     &stackOpts);
+	fillStackOptions(cppSet->stack()->tfo(),     &stackOpts);
+	fillStackOptions(cppSet->stack()->mp(),   &stackOpts);
+	fillStackOptions(cppSet->stack()->backlog(), &stackOpts);
 	
-	cSet->backlog = cppSet->getBacklog();
+	if (stackOpts.empty())
+	{
+		cSet->stackOptions = new S6M_StackOption[stackOpts.size()];
+		int i = 0;
+		BOOST_FOREACH(S6M_StackOption opt, stackOpts)
+		{
+			cSet->stackOptions[i] = opt;
+			i++;
+		}
+	}
+	else
+	{
+		cSet = nullptr;
+	}
 	
 	cSet->idempotence.request = cppSet->idempotence()->requestedSize();
 	cSet->idempotence.spend = (bool)cppSet->idempotence()->getToken();
@@ -128,18 +156,32 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 
 static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 {
-	if (cSet->tos.clientProxy > 0)
-		cppSet->setClientProxyTOS(cSet->tos.clientProxy);
-	if (cSet->tos.proxyRemote > 0)
-		cppSet->setProxyRemoteTOS(cSet->tos.proxyRemote);
-
-	if (cSet->tfo)
-		cppSet->setTFOPayload(cSet->tfoPayload);
-	if (cSet->mptcp)
-		cppSet->setMPTCP();
-	
-	if (cSet->backlog > 0)
-		cppSet->setBacklog(cSet->backlog);
+	for (int i = 0; i < cSet->stackOptionCount; i++)
+	{
+		S6M_StackOption *option = &cSet->stackOptions[i];
+		if (option->level == SOCKS6_STACK_LEVEL_IP)
+		{
+			if (option->code == SOCKS6_STACK_CODE_TOS)
+				cppSet->stack()->tos()->set(option->leg, option->value);
+			else
+				throw logic_error("Invalid option");
+		}
+		else if (option->level == SOCKS6_STACK_LEVEL_TCP)
+		{
+			if (option->code == SOCKS6_STACK_CODE_TFO)
+				cppSet->stack()->tfo()->set(option->leg, option->value);
+			else if (option->code == SOCKS6_STACK_CODE_MP)
+				cppSet->stack()->mp()->set(option->leg, option->value);
+			else if (option->code == SOCKS6_STACK_CODE_BACKLOG)
+				cppSet->stack()->backlog()->set(option->leg, option->value);
+			else
+				throw logic_error("Invalid option");
+		}
+		else
+		{
+			throw logic_error("Invalid option");
+		}
+	}
 	
 	if (cSet->idempotence.request > 0)
 		cppSet->idempotence()->request(cSet->idempotence.request);
@@ -164,6 +206,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
 {
 	delete optionSet->knownMethods;
+	delete optionSet->stackOptions;
 }
 
 /*

@@ -52,7 +52,7 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 			break;
 			
 		case SOCKS6_STACK_CODE_MP:
-			MPTCPOption::incrementalParse(opt, optionSet);
+			MPOption::incrementalParse(opt, optionSet);
 			break;
 			
 		case SOCKS6_STACK_CODE_BACKLOG:
@@ -89,13 +89,13 @@ void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSe
 	optionSet->stack()->tfo()->set(leg, payloadSize);
 }
 
-void MPTCPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+void MPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 {
 	SOCKS6MPOption *opt = rawOptCast<SOCKS6MPOption>(optBase, false);
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	bool avail = opt->availability;
 	
-	optionSet->stack()->mptcp()->set(leg, avail);
+	optionSet->stack()->mp()->set(leg, avail);
 }
 
 void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)

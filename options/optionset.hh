@@ -164,6 +164,8 @@ class StackOptionPair: public OptionSetBase
 	std::shared_ptr<T> proxyRemote;
 	
 public:
+	typedef T Option;
+	
 	StackOptionPair(OptionSet *owner);
 	
 	void set(SOCKS6StackLeg leg, typename T::Value value);
@@ -175,7 +177,7 @@ class StackOptionSet: public OptionSetBase
 {
 	StackOptionPair<TOSOption>     tosSet     { owner };
 	StackOptionPair<TFOOption>     tfoSet     { owner };
-	StackOptionPair<MPTCPOption>   mptcpSet   { owner };
+	StackOptionPair<MPOption>   mptcpSet   { owner };
 	StackOptionPair<BacklogOption> backlogSet { owner };
 	
 public:
@@ -201,12 +203,12 @@ public:
 		return &tfoSet;
 	}
 	
-	StackOptionPair<MPTCPOption> *mptcp()
+	StackOptionPair<MPOption> *mp()
 	{
 		return &mptcpSet;
 	}
 	
-	const StackOptionPair<MPTCPOption> *mptcp() const
+	const StackOptionPair<MPOption> *mp() const
 	{
 		return &mptcpSet;
 	}
