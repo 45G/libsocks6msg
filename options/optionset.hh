@@ -226,7 +226,9 @@ public:
 
 class OptionSet: public OptionSetBase
 {
-	StackOptionSet stackSet { this };
+	StackOptionSet       stackSet       { this };
+	SessionOptionSet     sessionSet     { this };
+	IdempotenceOptionSet idempotenceSet { this };
 	
 	struct
 	{
@@ -235,9 +237,6 @@ class OptionSet: public OptionSetBase
 	} methods;
 	
 	std::unique_ptr<UsernamePasswdOption> userPasswd;
-	
-	SessionOptionSet     sessionSet;
-	IdempotenceOptionSet idempotenceSet;
 	
 	std::list<Option *> options;
 	size_t optionsSize = 0;
@@ -250,7 +249,7 @@ class OptionSet: public OptionSetBase
 	
 public:
 	OptionSet(Mode mode)
-		: OptionSetBase(this, mode), sessionSet(this), idempotenceSet(this) {}
+		: OptionSetBase(this, mode) {}
 	
 	OptionSet(ByteBuffer *bb, Mode mode);
 	

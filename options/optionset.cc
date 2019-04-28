@@ -92,7 +92,7 @@ void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) co
 }
 
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
-	: OptionSetBase(this, mode), sessionSet(this), idempotenceSet(this)
+	: OptionSetBase(this, mode)
 {
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	uint16_t optsLen = ntohs(optsHead->optionsLength);
