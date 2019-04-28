@@ -33,12 +33,15 @@ void AuthMethodOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen,
 {
 	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(optBase);
 
-	optionSet->setInitialDataLen(ntohs(opt->initialDataLen));
+	uint16_t initDataLen = ntoh(opt->initialDataLen);
 	
 	int methodCount = optionLen - sizeof(SOCKS6AuthMethodOption);
 	
+	set<SOCKS6Method> methods;
 	for (int i = 0; i < methodCount; i++)
-		optionSet->advertiseMethod((SOCKS6Method)opt->methods[i]);
+		methods.insert((SOCKS6Method)opt->methods[i]);
+	
+	optionSet->advertiseMethods(methods, initDataLen);
 }
 
 AuthMethodOption::AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods)

@@ -230,11 +230,7 @@ class OptionSet: public OptionSetBase
 	SessionOptionSet     sessionSet     { this };
 	IdempotenceOptionSet idempotenceSet { this };
 	
-	struct
-	{
-		uint16_t initialDataLen = 0;
-		std::set<SOCKS6Method> advertised;
-	} methods;
+	std::unique_ptr<AuthMethodOption> authMethodOption;
 	
 	std::unique_ptr<UsernamePasswdOption> userPasswd;
 	
@@ -264,19 +260,21 @@ public:
 	
 	const std::set<SOCKS6Method> *getAdvertisedMethods() const
 	{
-		return &methods.advertised;
+		static const std::set<SOCKS6Method> EMPTY_SET;
+		if (authMethodOption.get() == nullptr)
+			return &EMPTY_SET;
+		
+		return authMethodOption->getMethods();
 	}
 	
-	void advertiseMethod(SOCKS6Method method);
+	void advertiseMethods(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen);
 
 	uint16_t getInitialDataLen() const
 	{
-		if (methods.advertised.empty())
+		if (authMethodOption.get() == nullptr)
 			return 0;
-		return methods.initialDataLen;
+		return authMethodOption->getInitialDataLen();
 	}
-
-	void setInitialDataLen(uint16_t initialDataLen);
 	
 	void setUsernamePassword(const std::string &user, const std::string &passwd);
 	

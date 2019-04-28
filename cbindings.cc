@@ -194,9 +194,11 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	
 	if (cSet->knownMethods != nullptr)
 	{
-		for (SOCKS6Method *method = cSet->knownMethods; *method != SOCKS6_METHOD_NOAUTH; method++)
-			cppSet->advertiseMethod(*method);
-		cppSet->setInitialDataLen(cSet->initialDataLen);
+		set<SOCKS6Method> methods;
+		
+		for (int i = 0; i < cSet->knownMethodCount; i++)
+			methods.insert((SOCKS6Method)cSet->knownMethods[i]);
+		cppSet->advertiseMethods(methods, cSet->initialDataLen);
 	}
 	
 	if (cSet->userPasswdAuth.username != nullptr || cSet->userPasswdAuth.passwd != nullptr)

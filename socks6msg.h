@@ -47,6 +47,7 @@ struct S6M_OptionSet
 	} idempotence;
 	
 	enum SOCKS6Method *knownMethods;
+	int knownMethodCount;
 	uint16_t initialDataLen;
 	
 	struct

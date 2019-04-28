@@ -140,9 +140,6 @@ void OptionSet::pack(ByteBuffer *bb) const
 	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
 	optsHead->optionsLength = 0;
 	
-	if (!methods.advertised.empty())
-		cram(AuthMethodOption(methods.initialDataLen, methods.advertised), optsHead, bb);
-	
 	BOOST_FOREACH(Option *option, options)
 	{
 		cram(*option, optsHead, bb);
@@ -153,35 +150,17 @@ size_t OptionSet::packedSize() const
 {
 	size_t size = sizeof(SOCKS6Options);
 	
-	if (!methods.advertised.empty())
-		size += AuthMethodOption(methods.initialDataLen, methods.advertised).packedSize();
-	
 	size += optionsSize;
 	
 	return size;
 }
 
-void OptionSet::advertiseMethod(SOCKS6Method method)
+void OptionSet::advertiseMethods(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 {
 	enforceMode(M_REQ);
-
-	if (method == SOCKS6_METHOD_NOAUTH)
-		return;
-	if (method == SOCKS6_METHOD_UNACCEPTABLE)
-		throw invalid_argument("Bad method");
-
-	methods.advertised.insert(method);
+	COMMIT(authMethodOption, new AuthMethodOption(initialDataLen, methods));
 }
 
-void OptionSet::setInitialDataLen(uint16_t initialDataLen)
-{
-	enforceMode(M_REQ);
-
-	if (initialDataLen > SOCKS6_INITIAL_DATA_MAX)
-		throw invalid_argument("Bad initial data length");
-
-	checkedAssignment(&methods.initialDataLen, initialDataLen);
-}
 
 void OptionSet::setUsernamePassword(const string &user, const string &passwd)
 {
