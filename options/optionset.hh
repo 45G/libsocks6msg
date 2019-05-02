@@ -117,7 +117,7 @@ public:
 	
 	uint32_t requestedSize() const
 	{
-		if (requestOpt.get() != nullptr)
+		if (requestOpt.get() == nullptr)
 			return 0;
 		return requestOpt->getWinSize();
 	}
