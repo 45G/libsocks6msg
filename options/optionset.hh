@@ -117,7 +117,7 @@ public:
 	
 	uint32_t requestedSize() const
 	{
-		if (requestOpt.get() == nullptr)
+		if (requestOpt == nullptr)
 			return 0;
 		return requestOpt->getWinSize();
 	}
@@ -126,7 +126,7 @@ public:
 	
 	boost::optional<uint32_t> getToken() const
 	{
-		if (expenditureOpt.get() == nullptr)
+		if (expenditureOpt == nullptr)
 			return {};
 		return expenditureOpt->getToken();
 	}
@@ -135,14 +135,14 @@ public:
 	
 	boost::optional<uint32_t> advertisedBase() const
 	{
-		if (windowOpt.get() == nullptr)
+		if (windowOpt == nullptr)
 			return {};
 		return windowOpt->getWinBase();
 	}
 	
 	uint32_t advertisedSize() const
 	{
-		if (windowOpt.get() == nullptr)
+		if (windowOpt == nullptr)
 			return 0;
 		return windowOpt->getWinSize();
 	}
@@ -151,7 +151,7 @@ public:
 	
 	boost::optional<SOCKS6TokenExpenditureCode> getReply() const
 	{
-		if (replyOpt.get() == nullptr)
+		if (replyOpt == nullptr)
 			return {};
 		return replyOpt->getCode();
 	}
@@ -261,7 +261,7 @@ public:
 	const std::set<SOCKS6Method> *getAdvertisedMethods() const
 	{
 		static const std::set<SOCKS6Method> EMPTY_SET;
-		if (authMethodOption.get() == nullptr)
+		if (authMethodOption == nullptr)
 			return &EMPTY_SET;
 		
 		return authMethodOption->getMethods();
@@ -271,7 +271,7 @@ public:
 
 	uint16_t getInitialDataLen() const
 	{
-		if (authMethodOption.get() == nullptr)
+		if (authMethodOption == nullptr)
 			return 0;
 		return authMethodOption->getInitialDataLen();
 	}
@@ -280,14 +280,14 @@ public:
 	
 	const std::string *getUsername() const
 	{
-		if (userPasswd.get() == nullptr)
+		if (userPasswd == nullptr)
 			return nullptr;
 		return userPasswd->getUsername();
 	}
 	
 	const std::string *getPassword() const
 	{
-		if (userPasswd.get() == nullptr)
+		if (userPasswd == nullptr)
 			return nullptr;
 		return userPasswd->getPassword();
 	}
