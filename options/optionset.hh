@@ -177,7 +177,7 @@ class StackOptionSet: public OptionSetBase
 {
 	StackOptionPair<TOSOption>     tosSet     { owner };
 	StackOptionPair<TFOOption>     tfoSet     { owner };
-	StackOptionPair<MPOption>      mptcpSet   { owner };
+	StackOptionPair<MPOption>      mpSet   { owner };
 	StackOptionPair<BacklogOption> backlogSet { owner };
 	
 public:
@@ -205,12 +205,12 @@ public:
 	
 	StackOptionPair<MPOption> *mp()
 	{
-		return &mptcpSet;
+		return &mpSet;
 	}
 	
 	const StackOptionPair<MPOption> *mp() const
 	{
-		return &mptcpSet;
+		return &mpSet;
 	}
 	
 	StackOptionPair<BacklogOption> *backlog()
