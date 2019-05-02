@@ -279,9 +279,15 @@ boost::optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) c
 	case SOCKS6_STACK_LEG_BOTH:
 		throw logic_error("Bad leg");
 	}
+	return {};
 }
 
 StackOptionSet::StackOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
+
+template class StackOptionPair<TOSOption>;
+template class StackOptionPair<TFOOption>;
+template class StackOptionPair<MPOption>;
+template class StackOptionPair<BacklogOption>;
 
 }
