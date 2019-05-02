@@ -35,50 +35,6 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 	(FIELD2) = (FIELD1); \
 	owner->registerOption((FIELD1).get());
 
-template <typename T>
-static bool mayAssign(T field, T value)
-{
-	return (field == (T)0 || field == value);
-}
-
-template <typename T>
-static bool mayAssign(T field1, T field2, T value)
-{
-	return mayAssign(field1, value) && mayAssign(field2, value);
-}
-
-template <typename T>
-static void checkedAssignment(T *field, T value)
-{
-	if (!mayAssign(*field, value))
-		throw invalid_argument("");
-
-	*field = value;
-}
-
-template <typename T>
-static void checkedAssignment(T *field1, T *field2, T value)
-{
-	if (!mayAssign(*field1, *field2, value))
-		throw invalid_argument("");
-
-	*field1 = value;
-	*field2 = value;
-}
-
-template <typename T, typename U>
-static void checkedAssignment(T *field1, T value1, U *field2, U value2)
-{
-	if (!mayAssign(*field1, value1))
-		throw invalid_argument("");
-	if (!mayAssign(*field2, value2))
-		throw invalid_argument("");
-
-	*field1 = value1;
-	*field2 = value2;
-}
-
-
 void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
 {
 	if (mode != mode1)
