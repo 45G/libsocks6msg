@@ -177,7 +177,7 @@ class StackOptionSet: public OptionSetBase
 {
 	StackOptionPair<TOSOption>     tosSet     { owner };
 	StackOptionPair<TFOOption>     tfoSet     { owner };
-	StackOptionPair<MPOption>      mpSet   { owner };
+	StackOptionPair<MPOption>      mpSet      { owner };
 	StackOptionPair<BacklogOption> backlogSet { owner };
 	
 public:
