@@ -58,7 +58,7 @@ size_t SessionRequestOption::packedSize() const
 void SessionRequestOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
-	optionSet->session()->request();
+	optionSet->session.request();
 }
 
 void SessionIDOption::fill(uint8_t *buf) const
@@ -91,7 +91,7 @@ void SessionIDOption::incrementalParse(SOCKS6SessionOption *buf, OptionSet *opti
 	
 	size_t ticketLen = ntohs(buf->optionHead.len) - sizeof(SOCKS6SessionIDOption);
 	vector<uint8_t> ticket(opt->ticket, opt->ticket + ticketLen);
-	optionSet->session()->setID(move(ticket));
+	optionSet->session.setID(move(ticket));
 }
 
 size_t SessionTeardownOption::packedSize() const
@@ -102,7 +102,7 @@ size_t SessionTeardownOption::packedSize() const
 void SessionTeardownOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
-	optionSet->session()->tearDown();
+	optionSet->session.tearDown();
 }
 
 size_t SessionOKOption::packedSize() const
@@ -113,7 +113,7 @@ size_t SessionOKOption::packedSize() const
 void SessionOKOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
-	optionSet->session()->signalOK();
+	optionSet->session.signalOK();
 }
 
 size_t SessionInvalidOption::packedSize() const
@@ -124,7 +124,7 @@ size_t SessionInvalidOption::packedSize() const
 void SessionInvalidOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
-	optionSet->session()->signalReject();
+	optionSet->session.signalReject();
 }
 
 size_t SessionUntrustedOption::packedSize() const
@@ -135,7 +135,7 @@ size_t SessionUntrustedOption::packedSize() const
 void SessionUntrustedOption::incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet)
 {
 	rawOptCast<SOCKS6SessionOption>(optBase, false);
-	optionSet->session()->setUntrusted();
+	optionSet->session.setUntrusted();
 }
 
 }

@@ -77,7 +77,7 @@ void TOSOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSe
 	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(optBase, false);
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 
-	optionSet->stack()->tos()->set(leg, opt->tos);
+	optionSet->stack.tos.set(leg, opt->tos);
 }
 
 void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
@@ -86,7 +86,7 @@ void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSe
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	uint16_t payloadSize = ntohs(opt->payloadLen);
 	
-	optionSet->stack()->tfo()->set(leg, payloadSize);
+	optionSet->stack.tfo.set(leg, payloadSize);
 }
 
 void MPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
@@ -95,7 +95,7 @@ void MPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	bool avail = opt->availability;
 	
-	optionSet->stack()->mp()->set(leg, avail);
+	optionSet->stack.mp.set(leg, avail);
 }
 
 void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
@@ -104,7 +104,7 @@ void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *opti
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
 	uint8_t backlog = ntohs(opt->backlog);
 	
-	optionSet->stack()->backlog()->set(leg, backlog);
+	optionSet->stack.backlog.set(leg, backlog);
 }
 
 BacklogOption::BacklogOption(SOCKS6StackLeg leg, uint16_t backlog)

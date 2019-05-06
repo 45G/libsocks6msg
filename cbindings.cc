@@ -103,10 +103,10 @@ static void fillStackOptions(const SET *set, list<S6M_StackOption> *stackOpts)
 static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 {
 	list<S6M_StackOption> stackOpts;
-	fillStackOptions(cppSet->stack()->tos(),     &stackOpts);
-	fillStackOptions(cppSet->stack()->tfo(),     &stackOpts);
-	fillStackOptions(cppSet->stack()->mp(),      &stackOpts);
-	fillStackOptions(cppSet->stack()->backlog(), &stackOpts);
+	fillStackOptions(&cppSet->stack.tos,     &stackOpts);
+	fillStackOptions(&cppSet->stack.tfo,     &stackOpts);
+	fillStackOptions(&cppSet->stack.mp,      &stackOpts);
+	fillStackOptions(&cppSet->stack.backlog, &stackOpts);
 	
 	if (stackOpts.empty())
 	{
@@ -123,12 +123,12 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 		cSet = nullptr;
 	}
 	
-	cSet->idempotence.request = cppSet->idempotence()->requestedSize();
-	cSet->idempotence.spend = (bool)cppSet->idempotence()->getToken();
-	cSet->idempotence.token = cppSet->idempotence()->getToken().get_value_or(0);
-	cSet->idempotence.windowBase = *(cppSet->idempotence()->advertisedBase());
-	cSet->idempotence.windowSize = cppSet->idempotence()->advertisedSize();
-	cSet->idempotence.replyCode = cppSet->idempotence()->getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
+	cSet->idempotence.request = cppSet->idempotence.requestedSize();
+	cSet->idempotence.spend = (bool)cppSet->idempotence.getToken();
+	cSet->idempotence.token = cppSet->idempotence.getToken().get_value_or(0);
+	cSet->idempotence.windowBase = *(cppSet->idempotence.advertisedBase());
+	cSet->idempotence.windowSize = cppSet->idempotence.advertisedSize();
+	cSet->idempotence.replyCode = cppSet->idempotence.getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
 	
 	int i = 0;
 	cSet->knownMethods = new SOCKS6Method[cppSet->getAdvertisedMethods()->size()];
@@ -162,18 +162,18 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		if (option->level == SOCKS6_STACK_LEVEL_IP)
 		{
 			if (option->code == SOCKS6_STACK_CODE_TOS)
-				cppSet->stack()->tos()->set(option->leg, option->value);
+				cppSet->stack.tos.set(option->leg, option->value);
 			else
 				throw logic_error("Invalid option");
 		}
 		else if (option->level == SOCKS6_STACK_LEVEL_TCP)
 		{
 			if (option->code == SOCKS6_STACK_CODE_TFO)
-				cppSet->stack()->tfo()->set(option->leg, option->value);
+				cppSet->stack.tfo.set(option->leg, option->value);
 			else if (option->code == SOCKS6_STACK_CODE_MP)
-				cppSet->stack()->mp()->set(option->leg, option->value);
+				cppSet->stack.mp.set(option->leg, option->value);
 			else if (option->code == SOCKS6_STACK_CODE_BACKLOG)
-				cppSet->stack()->backlog()->set(option->leg, option->value);
+				cppSet->stack.backlog.set(option->leg, option->value);
 			else
 				throw logic_error("Invalid option");
 		}
@@ -184,13 +184,13 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	}
 	
 	if (cSet->idempotence.request > 0)
-		cppSet->idempotence()->request(cSet->idempotence.request);
+		cppSet->idempotence.request(cSet->idempotence.request);
 	if (cSet->idempotence.spend)
-		cppSet->idempotence()->setToken(cSet->idempotence.token);
+		cppSet->idempotence.setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
-		cppSet->idempotence()->advertise(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+		cppSet->idempotence.advertise(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
 	if (cSet->idempotence.replyCode > 0)
-		cppSet->idempotence()->setReply(cSet->idempotence.replyCode);
+		cppSet->idempotence.setReply(cSet->idempotence.replyCode);
 	
 	if (cSet->knownMethods != nullptr)
 	{

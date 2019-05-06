@@ -175,61 +175,17 @@ public:
 
 class StackOptionSet: public OptionSetBase
 {
-	StackOptionPair<TOSOption>     tosSet     { owner };
-	StackOptionPair<TFOOption>     tfoSet     { owner };
-	StackOptionPair<MPOption>      mpSet      { owner };
-	StackOptionPair<BacklogOption> backlogSet { owner };
-	
 public:
+	StackOptionPair<TOSOption>     tos     { owner };
+	StackOptionPair<TFOOption>     tfo     { owner };
+	StackOptionPair<MPOption>      mp      { owner };
+	StackOptionPair<BacklogOption> backlog { owner };
+	
 	StackOptionSet(OptionSet *owner);
-	
-	StackOptionPair<TOSOption> *tos()
-	{
-		return &tosSet;
-	}
-	
-	const StackOptionPair<TOSOption> *tos() const
-	{
-		return &tosSet;
-	}
-	
-	StackOptionPair<TFOOption> *tfo()
-	{
-		return &tfoSet;
-	}
-	
-	const StackOptionPair<TFOOption> *tfo() const
-	{
-		return &tfoSet;
-	}
-	
-	StackOptionPair<MPOption> *mp()
-	{
-		return &mpSet;
-	}
-	
-	const StackOptionPair<MPOption> *mp() const
-	{
-		return &mpSet;
-	}
-	
-	StackOptionPair<BacklogOption> *backlog()
-	{
-		return &backlogSet;
-	}
-	
-	const StackOptionPair<BacklogOption> *backlog() const
-	{
-		return &backlogSet;
-	}
 };
 
 class OptionSet: public OptionSetBase
 {
-	StackOptionSet       stackSet       { this };
-	SessionOptionSet     sessionSet     { this };
-	IdempotenceOptionSet idempotenceSet { this };
-	
 	std::unique_ptr<AuthMethodOption> authMethodOption;
 	
 	std::unique_ptr<UsernamePasswdOption> userPasswd;
@@ -244,6 +200,10 @@ class OptionSet: public OptionSetBase
 	}
 	
 public:
+	StackOptionSet       stack       { this };
+	SessionOptionSet     session     { this };
+	IdempotenceOptionSet idempotence { this };
+
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
 	
@@ -290,36 +250,6 @@ public:
 		if (userPasswd == nullptr)
 			return nullptr;
 		return userPasswd->getPassword();
-	}
-	
-	SessionOptionSet *session()
-	{
-		return &sessionSet;
-	}
-	
-	const SessionOptionSet *session() const
-	{
-		return &sessionSet;
-	}
-	
-	IdempotenceOptionSet *idempotence()
-	{
-		return &idempotenceSet;
-	}
-	
-	const IdempotenceOptionSet *idempotence() const
-	{
-		return &idempotenceSet;
-	}
-	
-	StackOptionSet *stack()
-	{
-		return &stackSet;
-	}
-	
-	const StackOptionSet *stack() const
-	{
-		return &stackSet;
 	}
 	
 	friend class SessionOptionSet;
