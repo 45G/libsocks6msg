@@ -32,9 +32,7 @@ SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val)
 	switch (conv)
 	{
 	case SOCKS6_TOK_EXPEND_SUCCESS:
-	case SOCKS6_TOK_EXPEND_NO_WND:
-	case SOCKS6_TOK_EXPEND_OUT_OF_WND:
-	case SOCKS6_TOK_EXPEND_DUPLICATE:
+	case SOCKS6_TOK_EXPEND_FAILURE:
 		return conv;
 	}
 	
