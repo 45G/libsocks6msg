@@ -136,4 +136,19 @@ void tokenWindowSanity(uint32_t winSize)
 		throw invalid_argument("Bad window size");
 }
 
+template<>
+SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val)
+{
+	SOCKS6MPAvailability conv = (SOCKS6MPAvailability)val;
+
+	switch (conv)
+	{
+	case SOCKS6_MP_AVAILABLE:
+	case SOCKS6_MP_UNAVAILABLE:
+		return conv;
+	}
+
+	throw invalid_argument("Bad MP availability");
+}
+
 }

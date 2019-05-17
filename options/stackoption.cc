@@ -93,7 +93,7 @@ void MPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet
 {
 	SOCKS6MPOption *opt = rawOptCast<SOCKS6MPOption>(optBase, false);
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-	bool avail = opt->availability;
+	SOCKS6MPAvailability avail = enumCast<SOCKS6MPAvailability>(opt->availability);
 	
 	optionSet->stack.mp.set(leg, avail);
 }

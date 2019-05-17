@@ -224,6 +224,12 @@ struct SOCKS6MPOption
 	uint8_t                  availability;
 } __attribute__((packed));
 
+enum SOCKS6MPAvailability
+{
+	SOCKS6_MP_AVAILABLE   = 0x01,
+	SOCKS6_MP_UNAVAILABLE = 0x02,
+};
+
 struct SOCKS6BacklogOption
 {
 	struct SOCKS6StackOption stackOptionHead;
