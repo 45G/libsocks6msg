@@ -28,7 +28,8 @@ void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf);
 	uint16_t kind = ntohs(opt->kind);
 	
-	switch (kind) {
+	switch (kind)
+	{
 	case SOCKS6_OPTION_STACK:
 		StackOption::incrementalParse(opt, optionSet);
 		break;
