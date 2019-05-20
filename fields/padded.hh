@@ -2,10 +2,16 @@
 #define S6M_PADDED_HH
 
 #include <cstring>
+#include <socks6.h>
 #include <bytebuffer.hh>
 
 namespace S6M
 {
+
+static constexpr size_t paddingOf(size_t size)
+{
+	return (SOCKS6_ALIGNMENT - size % SOCKS6_ALIGNMENT) % SOCKS6_ALIGNMENT;
+}
 
 template <typename T, int HEAD_START = 0>
 class Padded: public T
@@ -17,7 +23,7 @@ public:
 	
 	size_t paddingSize() const
 	{
-		return (ALIGN - (T::packedSize() + HEAD_START) % ALIGN) % ALIGN;
+		return paddingOf(T::packedSize() + HEAD_START);
 	}
 	
 	Padded(ByteBuffer *bb)

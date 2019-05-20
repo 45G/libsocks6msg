@@ -22,6 +22,8 @@ extern "C"
 
 #define SOCKS6_PWAUTH_VERSION 0x01
 
+#define SOCKS6_ALIGNMENT 4
+
 struct SOCKS6Version
 {
 	uint8_t major;
