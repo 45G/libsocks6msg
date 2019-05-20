@@ -77,7 +77,7 @@ Address::Address(ByteBuffer *bb)
 	}
 		
 	case SOCKS6_ADDR_DOMAIN:
-		domain = String(bb);
+		domain = Padded<String>(bb);
 		break;
 	}
 }

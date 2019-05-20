@@ -8,6 +8,7 @@
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "string.hh"
+#include "padded.hh"
 
 namespace S6M
 {
@@ -18,7 +19,7 @@ class Address
 	
 	in_addr ipv4;
 	in6_addr ipv6;
-	boost::optional<String> domain;
+	boost::optional<Padded<String>> domain;
 	
 public:
 	size_t packedSize() const;
