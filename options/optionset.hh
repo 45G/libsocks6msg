@@ -217,10 +217,34 @@ public:
 	}
 };
 
+class AuthMethodOptionSet: public OptionSetBase
+{
+	std::unique_ptr<AuthMethodAdvertOption> advertOption;
+	
+public:
+	AuthMethodOptionSet(OptionSet *owner);
+	
+	const std::set<SOCKS6Method> *getAdvertised() const
+	{
+		static const std::set<SOCKS6Method> EMPTY_SET;
+		if (advertOption == nullptr)
+			return &EMPTY_SET;
+		
+		return advertOption->getMethods();
+	}
+	
+	void advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen);
+
+	uint16_t getInitialDataLen() const
+	{
+		if (advertOption == nullptr)
+			return 0;
+		return advertOption->getInitialDataLen();
+	}
+};
+
 class OptionSet: public OptionSetBase
 {
-	std::unique_ptr<AuthMethodOption> authMethodOption;
-	
 	std::list<Option *> options;
 	size_t optionsSize = 0;
 	
@@ -235,6 +259,7 @@ public:
 	SessionOptionSet     session     { this };
 	IdempotenceOptionSet idempotence { this };
 	UserPasswdOptionSet  userPasswd  { this };
+	AuthMethodOptionSet  authMethods { this };
 
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
@@ -250,30 +275,13 @@ public:
 		return mode;
 	}
 	
-	const std::set<SOCKS6Method> *getAdvertisedMethods() const
-	{
-		static const std::set<SOCKS6Method> EMPTY_SET;
-		if (authMethodOption == nullptr)
-			return &EMPTY_SET;
-		
-		return authMethodOption->getMethods();
-	}
-	
-	void advertiseMethods(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen);
-
-	uint16_t getInitialDataLen() const
-	{
-		if (authMethodOption == nullptr)
-			return 0;
-		return authMethodOption->getInitialDataLen();
-	}
-	
 	friend class SessionOptionSet;
 	friend class IdempotenceOptionSet;
 	friend class StackOptionSet;
 	template <typename T>
 	friend class StackOptionPair;
 	friend class UserPasswdOptionSet;
+	friend class AuthMethodOptionSet;
 };
 
 }

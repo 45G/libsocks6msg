@@ -6,7 +6,7 @@
 namespace S6M
 {
 
-class AuthMethodOption: public Option
+class AuthMethodAdvertOption: public Option
 {
 	uint16_t initialDataLen;
 	std::set<SOCKS6Method> methods;
@@ -14,12 +14,17 @@ class AuthMethodOption: public Option
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
+	size_t unpaddedSize() const
+	{
+		return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
+	}
+	
 public:
 	virtual size_t packedSize() const;
 	
 	static void incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet);
 	
-	AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods);
+	AuthMethodAdvertOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods);
 
 	uint16_t getInitialDataLen() const
 	{

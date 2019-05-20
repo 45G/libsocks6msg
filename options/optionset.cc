@@ -111,12 +111,6 @@ size_t OptionSet::packedSize() const
 	return size;
 }
 
-void OptionSet::advertiseMethods(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
-{
-	enforceMode(M_REQ);
-	COMMIT(authMethodOption, new AuthMethodOption(initialDataLen, methods));
-}
-
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
 
@@ -252,6 +246,12 @@ void UserPasswdOptionSet::setReply(bool success)
 {
 	enforceMode(M_AUTH_REP);
 	COMMIT(reply, new UsernamePasswdReplyOption(success));
+}
+
+void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
+{
+	enforceMode(M_REQ);
+	COMMIT(advertOption, new AuthMethodAdvertOption(initialDataLen, methods));
 }
 
 }

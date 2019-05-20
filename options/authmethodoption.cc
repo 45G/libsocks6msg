@@ -2,18 +2,19 @@
 #include <boost/foreach.hpp>
 #include "authmethodoption.hh"
 #include "optionset.hh"
+#include "padded.hh"
 
 using namespace std;
 
 namespace S6M
 {
 
-size_t AuthMethodOption::packedSize() const
+size_t AuthMethodAdvertOption::packedSize() const
 {
-	return sizeof(SOCKS6Option) + methods.size() * sizeof(uint8_t);
+	return unpaddedSize() + paddingOf(unpaddedSize());
 }
 
-void AuthMethodOption::fill(uint8_t *buf) const
+void AuthMethodAdvertOption::fill(uint8_t *buf) const
 {
 	Option::fill(buf);
 	
@@ -27,9 +28,12 @@ void AuthMethodOption::fill(uint8_t *buf) const
 		opt->methods[i] = method;
 		i++;
 	}
+	
+	for (int j = 0; j < (int)paddingOf(unpaddedSize()); j++)
+		opt->methods[i + j] = 0;
 }
 
-void AuthMethodOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
+void AuthMethodAdvertOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
 {
 	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(optBase);
 
@@ -41,10 +45,10 @@ void AuthMethodOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen,
 	for (int i = 0; i < methodCount; i++)
 		methods.insert((SOCKS6Method)opt->methods[i]);
 	
-	optionSet->advertiseMethods(methods, initDataLen);
+	optionSet->authMethods.advertise(methods, initDataLen);
 }
 
-AuthMethodOption::AuthMethodOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods)
+AuthMethodAdvertOption::AuthMethodAdvertOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods)
 	: Option(SOCKS6_OPTION_AUTH_METHOD), initialDataLen(initialDataLen), methods(methods)
 {
 	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())

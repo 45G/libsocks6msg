@@ -132,8 +132,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->idempotence.replyCode = cppSet->idempotence.getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
 	
 	int i = 0;
-	cSet->knownMethods = new SOCKS6Method[cppSet->getAdvertisedMethods()->size()];
-	BOOST_FOREACH(SOCKS6Method method, *(cppSet->getAdvertisedMethods()))
+	cSet->knownMethods = new SOCKS6Method[cppSet->authMethods.getAdvertised()->size()];
+	BOOST_FOREACH(SOCKS6Method method, *(cppSet->authMethods.getAdvertised()))
 	{
 		if (method == SOCKS6_METHOD_NOAUTH)
 			continue;
@@ -142,7 +142,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 		i++;
 	}
 	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
-	cSet->initialDataLen = cppSet->getInitialDataLen();
+	cSet->initialDataLen = cppSet->authMethods.getInitialDataLen();
 	
 	if (cppSet->userPasswd.getUsername() != nullptr && cppSet->userPasswd.getUsername()->length() > 0)
 	{
@@ -199,7 +199,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		
 		for (int i = 0; i < cSet->knownMethodCount; i++)
 			methods.insert((SOCKS6Method)cSet->knownMethods[i]);
-		cppSet->advertiseMethods(methods, cSet->initialDataLen);
+		cppSet->authMethods.advertise(methods, cSet->initialDataLen);
 	}
 	
 	if (cSet->userPasswdAuth.username != nullptr || cSet->userPasswdAuth.passwd != nullptr)
