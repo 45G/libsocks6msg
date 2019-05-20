@@ -3,6 +3,7 @@
 
 #include "option.hh"
 #include "byteorder.hh"
+#include "padded.hh"
 
 namespace S6M
 {
@@ -48,6 +49,7 @@ protected:
 	{
 		SOCKS6StackOption stackOptionHead;
 		RAW value;
+		uint8_t padding[paddingOf(sizeof(SOCKS6StackOption) + sizeof(RAW))];
 	} __attribute__((packed));
 
 	virtual void fill(uint8_t *buf) const
@@ -55,6 +57,7 @@ protected:
 		StackOption::fill(buf);
 		RawOption *opt = reinterpret_cast<RawOption *>(buf);
 		opt->value = hton((RAW)value);
+		memset(opt->padding, 0, sizeof(opt->padding));
 	}
 
 public:

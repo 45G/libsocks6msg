@@ -2,6 +2,7 @@
 #define SOCKS6MSG_AUTHDATAOPTION_HH
 
 #include "option.hh"
+#include "padded.hh"
 
 namespace S6M
 {
@@ -27,7 +28,7 @@ public:
 
 class UsernamePasswdOption: public AuthDataOption
 {
-	UserPasswordRequest req;
+	Padded<UserPasswordRequest, sizeof(SOCKS6AuthDataOption)> req;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
