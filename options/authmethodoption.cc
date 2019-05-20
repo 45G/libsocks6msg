@@ -33,13 +33,13 @@ void AuthMethodAdvertOption::fill(uint8_t *buf) const
 		opt->methods[i + j] = 0;
 }
 
-void AuthMethodAdvertOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
+void AuthMethodAdvertOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 {
 	SOCKS6AuthMethodAdvertOption *opt = rawOptCast<SOCKS6AuthMethodAdvertOption>(optBase);
 
 	uint16_t initDataLen = ntoh(opt->initialDataLen);
 	
-	int methodCount = optionLen - sizeof(SOCKS6AuthMethodAdvertOption);
+	int methodCount = ntoh(opt->optionHead.len) - sizeof(SOCKS6AuthMethodAdvertOption);
 	
 	set<SOCKS6Method> methods;
 	for (int i = 0; i < methodCount; i++)

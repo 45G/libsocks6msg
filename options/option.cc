@@ -23,7 +23,7 @@ void Option::fill(uint8_t *buf) const
 	opt->len  = htons(packedSize());
 }
 
-void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
+void Option::incrementalParse(void *buf, OptionSet *optionSet)
 {
 	SOCKS6Option *opt = rawOptCast<SOCKS6Option>(buf);
 	uint16_t kind = ntohs(opt->kind);
@@ -35,14 +35,14 @@ void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 		break;
 		
 	case SOCKS6_OPTION_AUTH_METHOD_ADVERT:
-		AuthMethodAdvertOption::incrementalParse(opt, optionLen, optionSet);
+		AuthMethodAdvertOption::incrementalParse(opt, optionSet);
 		break;
 	case SOCKS6_OPTION_AUTH_METHOD_SELECT:
 		AuthMethodSelectOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_AUTH_DATA:
-		AuthDataOption::incrementalParse(opt, optionLen, optionSet);
+		AuthDataOption::incrementalParse(opt, optionSet);
 		break;
 		
 	case SOCKS6_OPTION_SESSION:

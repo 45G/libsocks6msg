@@ -17,7 +17,7 @@ void AuthDataOption::fill(uint8_t *buf) const
 	opt->method = method;
 }
 
-void AuthDataOption::incrementalParse(SOCKS6Option *baseOpt, size_t optionLen, OptionSet *optionSet)
+void AuthDataOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 {
 	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(baseOpt);
 	
@@ -29,7 +29,7 @@ void AuthDataOption::incrementalParse(SOCKS6Option *baseOpt, size_t optionLen, O
 		
 	case SOCKS6_METHOD_USRPASSWD:
 		if (optionSet->getMode() == OptionSet::M_REQ)
-			UsernamePasswdReqOption::incrementalParse(opt, optionLen, optionSet);
+			UsernamePasswdReqOption::incrementalParse(opt, optionSet);
 		else
 			UsernamePasswdReplyOption::incrementalParse(opt, optionSet);
 		break;
@@ -55,11 +55,11 @@ void UsernamePasswdReqOption::fill(uint8_t *buf) const
 	req.pack(&bb);
 }
 
-void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, size_t optionLen, OptionSet *optionSet)
+void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, OptionSet *optionSet)
 {
 	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)baseOpt;
 	
-	size_t expectedDataSize = optionLen - sizeof(SOCKS6AuthDataOption);
+	size_t expectedDataSize = ntoh(opt->optionHead.len) - sizeof(SOCKS6AuthDataOption);
 	
 	try
 	{

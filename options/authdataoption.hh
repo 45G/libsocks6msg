@@ -20,7 +20,7 @@ public:
 		return method;
 	}
 	
-	static void incrementalParse(SOCKS6Option *baseOpt, size_t optionLen, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet);
 	
 	AuthDataOption(SOCKS6Method method)
 		: Option(SOCKS6_OPTION_AUTH_DATA), method(method) {}
@@ -36,7 +36,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6AuthDataOption *baseOpt, size_t optionLen, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6AuthDataOption *baseOpt, OptionSet *optionSet);
 	
 	UsernamePasswdReqOption(const std::string &username, const std::string &passwd);
 

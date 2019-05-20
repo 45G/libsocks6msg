@@ -22,7 +22,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
 	AuthMethodAdvertOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods);
 
