@@ -21,8 +21,8 @@ void UserPasswordRequest::pack(ByteBuffer *bb) const
 	uint8_t *ver = bb->get<uint8_t>();
 	*ver = VERSION;
 	
-	username.pack(bb);
-	password.pack(bb);
+	username->pack(bb);
+	password->pack(bb);
 }
 
 size_t UserPasswordRequest::pack(uint8_t *buf, size_t bufSize) const

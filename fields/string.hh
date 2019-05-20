@@ -14,9 +14,6 @@ class String
 	std::string str;
 	
 public:
-	//TODO: get rid of this constructor
-	String() {}
-	
 	String(const std::string &str);
 	
 	String(ByteBuffer *bb);

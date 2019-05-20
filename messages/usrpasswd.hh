@@ -2,6 +2,7 @@
 #define SOCKS6MSG_USRPASSWD_HH
 
 #include <string>
+#include <boost/optional.hpp>
 #include "bytebuffer.hh"
 #include "string.hh"
 
@@ -16,8 +17,8 @@ protected:
 
 class UserPasswordRequest: public UserPasswordBase
 {
-	String username;
-	String password;
+	boost::optional<String> username;
+	boost::optional<String> password;
 	
 public:
 	UserPasswordRequest(const std::string &username, const std::string &password)
@@ -34,17 +35,17 @@ public:
 	
 	size_t packedSize() const
 	{
-		return 1 + username.packedSize() + password.packedSize();
+		return 1 + username->packedSize() + password->packedSize();
 	}
 	
 	const std::string *getUsername() const
 	{
-		return username.getStr();
+		return username->getStr();
 	}
 	
 	const std::string *getPassword() const
 	{
-		return password.getStr();
+		return password->getStr();
 	}
 };
 
