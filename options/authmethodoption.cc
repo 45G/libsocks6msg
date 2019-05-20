@@ -18,7 +18,7 @@ void AuthMethodAdvertOption::fill(uint8_t *buf) const
 {
 	Option::fill(buf);
 	
-	SOCKS6AuthMethodOption *opt = reinterpret_cast<SOCKS6AuthMethodOption *>(buf);
+	SOCKS6AuthMethodAdvertOption *opt = reinterpret_cast<SOCKS6AuthMethodAdvertOption *>(buf);
 	
 	opt->initialDataLen = htons(initialDataLen);
 
@@ -35,11 +35,11 @@ void AuthMethodAdvertOption::fill(uint8_t *buf) const
 
 void AuthMethodAdvertOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthMethodOption *opt = rawOptCast<SOCKS6AuthMethodOption>(optBase);
+	SOCKS6AuthMethodAdvertOption *opt = rawOptCast<SOCKS6AuthMethodAdvertOption>(optBase);
 
 	uint16_t initDataLen = ntoh(opt->initialDataLen);
 	
-	int methodCount = optionLen - sizeof(SOCKS6AuthMethodOption);
+	int methodCount = optionLen - sizeof(SOCKS6AuthMethodAdvertOption);
 	
 	set<SOCKS6Method> methods;
 	for (int i = 0; i < methodCount; i++)
@@ -49,7 +49,7 @@ void AuthMethodAdvertOption::incrementalParse(SOCKS6Option *optBase, size_t opti
 }
 
 AuthMethodAdvertOption::AuthMethodAdvertOption(uint16_t initialDataLen, std::set<SOCKS6Method> methods)
-	: Option(SOCKS6_OPTION_AUTH_METHOD), initialDataLen(initialDataLen), methods(methods)
+	: Option(SOCKS6_OPTION_AUTH_METHOD_ADVERT), initialDataLen(initialDataLen), methods(methods)
 {
 	if (methods.find(SOCKS6_METHOD_UNACCEPTABLE) != methods.end())
 		throw invalid_argument("Bad method");

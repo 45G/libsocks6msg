@@ -145,18 +145,19 @@ struct SOCKS6Option
 
 enum SOCKS6OptionKind
 {
-	SOCKS6_OPTION_STACK       = 1,
+	SOCKS6_OPTION_STACK              = 1,
 
-	SOCKS6_OPTION_AUTH_METHOD = 2,
+	SOCKS6_OPTION_AUTH_METHOD_ADVERT = 2,
+	SOCKS6_OPTION_AUTH_METHOD_SELECT = 3,
 
-	SOCKS6_OPTION_AUTH_DATA   = 3,
+	SOCKS6_OPTION_AUTH_DATA          = 4,
 
-	SOCKS6_OPTION_SESSION     = 4,
+	SOCKS6_OPTION_SESSION            = 5,
 
-	SOCKS6_OPTION_IDEMPOTENCE = 5,
+	SOCKS6_OPTION_IDEMPOTENCE        = 6,
 
-	SOCKS6_OPTION_VENDOR_MIN  = 64512,
-	SOCKS6_OPTION_VENDOR_MAX  = 65535,
+	SOCKS6_OPTION_VENDOR_MIN         = 64512,
+	SOCKS6_OPTION_VENDOR_MAX         = 65535,
 };
 
 struct SOCKS6StackOption
@@ -244,7 +245,7 @@ struct SOCKS6BacklogOption
 
 #define SOCKS6_BACKLOG_MIN 1
 
-struct SOCKS6AuthMethodOption
+struct SOCKS6AuthMethodAdvertOption
 {
 	struct SOCKS6Option optionHead;
 	uint16_t            initialDataLen;
@@ -252,6 +253,13 @@ struct SOCKS6AuthMethodOption
 } __attribute__((packed));
 
 #define SOCKS6_INITIAL_DATA_MAX (1 << 14)
+
+struct SOCKS6AuthMethodSelectOption
+{
+	struct SOCKS6Option optionHead;
+	uint8_t             method;
+	uint8_t             padding[3];
+} __attribute__((packed));
 
 struct SOCKS6AuthDataOption
 {
