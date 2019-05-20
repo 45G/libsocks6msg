@@ -17,9 +17,9 @@ void AuthDataOption::fill(uint8_t *buf) const
 	opt->method = method;
 }
 
-void AuthDataOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, OptionSet *optionSet)
+void AuthDataOption::incrementalParse(SOCKS6Option *baseOpt, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(optBase);
+	SOCKS6AuthDataOption *opt = rawOptCast<SOCKS6AuthDataOption>(baseOpt);
 	
 	switch (opt->method)
 	{
@@ -28,7 +28,10 @@ void AuthDataOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, O
 		throw invalid_argument("Bad method");
 		
 	case SOCKS6_METHOD_USRPASSWD:
-		UsernamePasswdOption::incrementalParse(opt, optionLen, optionSet);
+		if (optionSet->getMode() == OptionSet::M_REQ)
+			UsernamePasswdReqOption::incrementalParse(opt, optionLen, optionSet);
+		else
+			UsernamePasswdReplyOption::incrementalParse(opt, optionSet);
 		break;
 		
 	default:
@@ -36,12 +39,12 @@ void AuthDataOption::incrementalParse(SOCKS6Option *optBase, size_t optionLen, O
 	}	
 }
 
-size_t UsernamePasswdOption::packedSize() const
+size_t UsernamePasswdReqOption::packedSize() const
 {
 	return sizeof(SOCKS6AuthDataOption) + req.packedSize();
 }
 
-void UsernamePasswdOption::fill(uint8_t *buf) const
+void UsernamePasswdReqOption::fill(uint8_t *buf) const
 {
 	AuthDataOption::fill(buf);
 	
@@ -52,21 +55,21 @@ void UsernamePasswdOption::fill(uint8_t *buf) const
 	req.pack(&bb);
 }
 
-void UsernamePasswdOption::incrementalParse(SOCKS6AuthDataOption *optBase, size_t optionLen, OptionSet *optionSet)
+void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, size_t optionLen, OptionSet *optionSet)
 {
-	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)optBase;
+	SOCKS6AuthDataOption *opt = (SOCKS6AuthDataOption *)baseOpt;
 	
 	size_t expectedDataSize = optionLen - sizeof(SOCKS6AuthDataOption);
 	
 	try
 	{
 		ByteBuffer bb(opt->methodData, expectedDataSize);
-		UserPasswordRequest req(&bb);
+		Padded<UserPasswordRequest> req(&bb);
 		
 		if (bb.getUsed() != expectedDataSize)
 			throw invalid_argument("Spurious bytes at the end of the option");
 		
-		optionSet->setUsernamePassword(*req.getUsername(), *req.getPassword());
+		optionSet->userPasswd.setCredentials(*req.getUsername(), *req.getPassword());
 	}
 	catch (length_error &)
 	{
@@ -78,7 +81,45 @@ void UsernamePasswdOption::incrementalParse(SOCKS6AuthDataOption *optBase, size_
 	}
 }
 
-UsernamePasswdOption::UsernamePasswdOption(const string &username, const string &passwd)
+UsernamePasswdReqOption::UsernamePasswdReqOption(const string &username, const string &passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
+
+struct RawUsrPasswdReply
+{
+	SOCKS6AuthDataOption authDataOptionHead;
+	
+	uint8_t version;
+	uint8_t status;
+	
+	uint8_t padding[1];
+} __attribute__((packed));
+
+void UsernamePasswdReplyOption::fill(uint8_t *buf) const
+{
+	AuthDataOption::fill(buf);
+	
+	RawUsrPasswdReply *opt = reinterpret_cast<RawUsrPasswdReply *>(buf);
+	
+	opt->version = SOCKS6_PWAUTH_VERSION;
+	opt->status = !success;
+	opt->padding[0] = 0;
+}
+
+size_t UsernamePasswdReplyOption::packedSize() const
+{
+	return sizeof(RawUsrPasswdReply);
+}
+
+void UsernamePasswdReplyOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, OptionSet *optionSet)
+{
+	RawUsrPasswdReply *opt = rawOptCast<RawUsrPasswdReply>(baseOpt, false);
+	
+	if (opt->version != SOCKS6_PWAUTH_VERSION)
+		throw BadVersionException(opt->version);
+	
+	bool success = !opt->status;
+	
+	optionSet->userPasswd.setReply(success);
+}
 
 }

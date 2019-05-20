@@ -1,5 +1,5 @@
-#ifndef S6M_PADDED_HH
-#define S6M_PADDED_HH
+#ifndef SOCKS6MSG_PADDED_HH
+#define SOCKS6MSG_PADDED_HH
 
 #include <cstring>
 #include <socks6.h>
@@ -48,4 +48,4 @@ public:
 
 }
 
-#endif // S6M_PADDED_HH
+#endif // SOCKS6MSG_PADDED_HH

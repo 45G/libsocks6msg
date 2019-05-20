@@ -10,6 +10,7 @@ namespace S6M
 class Version
 {
 	Version() {}
+	
 public:
 	static void parse(ByteBuffer *bb);
 	

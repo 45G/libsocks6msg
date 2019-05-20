@@ -117,13 +117,6 @@ void OptionSet::advertiseMethods(const std::set<SOCKS6Method> &methods, uint16_t
 	COMMIT(authMethodOption, new AuthMethodOption(initialDataLen, methods));
 }
 
-
-void OptionSet::setUsernamePassword(const string &user, const string &passwd)
-{
-	enforceMode(M_REQ);
-	COMMIT(userPasswd, new UsernamePasswdOption(user, passwd));
-}
-
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
 
@@ -245,5 +238,20 @@ template class StackOptionPair<TOSOption>;
 template class StackOptionPair<TFOOption>;
 template class StackOptionPair<MPOption>;
 template class StackOptionPair<BacklogOption>;
+
+UserPasswdOptionSet::UserPasswdOptionSet(OptionSet *owner)
+	: OptionSetBase(owner, owner->mode) {}
+
+void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
+{
+	enforceMode(M_REQ);
+	COMMIT(req, new UsernamePasswdReqOption(user, passwd));
+}
+
+void UserPasswdOptionSet::setReply(bool success)
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(reply, new UsernamePasswdReplyOption(success));
+}
 
 }

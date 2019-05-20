@@ -48,7 +48,7 @@ public:
 
 class SessionOptionSet: public OptionSetBase
 {
-	std::unique_ptr<SessionOption>          mandatoryOpt;
+	std::unique_ptr<SessionOption>          mandatoryOpt; //SessionRequestOption or SessionIDOption
 	std::unique_ptr<SessionTeardownOption>  teardownOpt;
 	std::unique_ptr<SessionUntrustedOption> untrustedOpt;
 	
@@ -184,11 +184,42 @@ public:
 	StackOptionSet(OptionSet *owner);
 };
 
+class UserPasswdOptionSet: public OptionSetBase
+{
+	std::unique_ptr<UsernamePasswdReqOption>   req;
+	std::unique_ptr<UsernamePasswdReplyOption> reply;
+public:
+	UserPasswdOptionSet(OptionSet *owner);
+	
+	void setCredentials(const std::string &user, const std::string &passwd);
+	
+	const std::string *getUsername() const
+	{
+		if (req == nullptr)
+			return nullptr;
+		return req->getUsername();
+	}
+	
+	const std::string *getPassword() const
+	{
+		if (req == nullptr)
+			return nullptr;
+		return req->getPassword();
+	}
+	
+	void setReply(bool success);
+	
+	boost::optional<bool> getReply()
+	{
+		if (reply == nullptr)
+			return {};
+		return reply->isSuccessful();
+	}
+};
+
 class OptionSet: public OptionSetBase
 {
 	std::unique_ptr<AuthMethodOption> authMethodOption;
-	
-	std::unique_ptr<UsernamePasswdOption> userPasswd;
 	
 	std::list<Option *> options;
 	size_t optionsSize = 0;
@@ -203,6 +234,7 @@ public:
 	StackOptionSet       stack       { this };
 	SessionOptionSet     session     { this };
 	IdempotenceOptionSet idempotence { this };
+	UserPasswdOptionSet  userPasswd  { this };
 
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
@@ -236,27 +268,12 @@ public:
 		return authMethodOption->getInitialDataLen();
 	}
 	
-	void setUsernamePassword(const std::string &user, const std::string &passwd);
-	
-	const std::string *getUsername() const
-	{
-		if (userPasswd == nullptr)
-			return nullptr;
-		return userPasswd->getUsername();
-	}
-	
-	const std::string *getPassword() const
-	{
-		if (userPasswd == nullptr)
-			return nullptr;
-		return userPasswd->getPassword();
-	}
-	
 	friend class SessionOptionSet;
 	friend class IdempotenceOptionSet;
 	friend class StackOptionSet;
 	template <typename T>
 	friend class StackOptionPair;
+	friend class UserPasswdOptionSet;
 };
 
 }
