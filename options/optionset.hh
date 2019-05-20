@@ -220,6 +220,7 @@ public:
 class AuthMethodOptionSet: public OptionSetBase
 {
 	std::unique_ptr<AuthMethodAdvertOption> advertOption;
+	std::unique_ptr<AuthMethodSelectOption> selectOption;
 	
 public:
 	AuthMethodOptionSet(OptionSet *owner);
@@ -240,6 +241,15 @@ public:
 		if (advertOption == nullptr)
 			return 0;
 		return advertOption->getInitialDataLen();
+	}
+	
+	void select(SOCKS6Method method);
+	
+	boost::optional<SOCKS6Method> getSelected() const
+	{
+		if (selectOption == nullptr)
+			return {};
+		return selectOption->getMethod();
 	}
 };
 

@@ -36,6 +36,9 @@ void Option::incrementalParse(void *buf, size_t optionLen, OptionSet *optionSet)
 	case SOCKS6_OPTION_AUTH_METHOD_ADVERT:
 		AuthMethodAdvertOption::incrementalParse(opt, optionLen, optionSet);
 		break;
+	case SOCKS6_OPTION_AUTH_METHOD_SELECT:
+		AuthMethodSelectOption::incrementalParse(opt, optionSet);
+		break;
 		
 	case SOCKS6_OPTION_AUTH_DATA:
 		AuthDataOption::incrementalParse(opt, optionLen, optionSet);

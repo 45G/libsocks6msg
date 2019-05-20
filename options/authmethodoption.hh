@@ -37,6 +37,26 @@ public:
 	}
 };
 
+class AuthMethodSelectOption: public Option
+{
+	SOCKS6Method method;
+	
+protected:
+	virtual void fill(uint8_t *buf) const;
+	
+public:
+	virtual size_t packedSize() const;
+	
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	
+	AuthMethodSelectOption(SOCKS6Method method);
+
+	SOCKS6Method getMethod() const
+	{
+		return method;
+	}
+};
+
 }
 
 #endif // SOCKS6MSG_AUTHMETHODOPTION_HH

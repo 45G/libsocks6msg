@@ -256,4 +256,10 @@ void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint1
 	COMMIT(advertOption, new AuthMethodAdvertOption(initialDataLen, methods));
 }
 
+void AuthMethodOptionSet::select(SOCKS6Method method)
+{
+	enforceMode(M_AUTH_REP);
+	COMMIT(selectOption, new AuthMethodSelectOption(method));
+}
+
 }

@@ -58,4 +58,33 @@ AuthMethodAdvertOption::AuthMethodAdvertOption(uint16_t initialDataLen, std::set
 		throw invalid_argument("No methods");
 }
 
+void AuthMethodSelectOption::fill(uint8_t *buf) const
+{
+	Option::fill(buf);
+	
+	SOCKS6AuthMethodSelectOption *opt = reinterpret_cast<SOCKS6AuthMethodSelectOption *>(buf);
+	
+	opt->method = method;
+	memset(opt->padding, 0, sizeof(opt->padding));
+}
+
+size_t AuthMethodSelectOption::packedSize() const
+{
+	return sizeof(SOCKS6AuthMethodSelectOption);
+}
+
+void AuthMethodSelectOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+{
+	SOCKS6AuthMethodSelectOption *opt = rawOptCast<SOCKS6AuthMethodSelectOption>(optBase, false);
+	
+	optionSet->authMethods.select((SOCKS6Method)opt->method);
+}
+
+AuthMethodSelectOption::AuthMethodSelectOption(SOCKS6Method method)
+	: Option(SOCKS6_OPTION_AUTH_METHOD_ADVERT), method(method)
+{
+	if (method == SOCKS6_METHOD_NOAUTH)
+		throw logic_error("Bad method");
+}
+
 }
