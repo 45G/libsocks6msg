@@ -69,6 +69,8 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 			optLen = ntohs(opt->len);
 			if (optLen < sizeof(SOCKS6Option))
 				break;
+			if (optLen % 4 != 0)
+				break;
 
 			bb->get<uint8_t>(optLen - sizeof(SOCKS6Option));
 		}
