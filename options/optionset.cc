@@ -68,9 +68,9 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 			/* bad option length wrecks remaining options */
 			optLen = ntohs(opt->len);
 			if (optLen < sizeof(SOCKS6Option))
-				throw length_error("option too short");
+				throw length_error("Option too short");
 			if (optLen % 4 != 0)
-				throw length_error("bad option size");
+				throw length_error("Option not aligned");
 
 			bb->get<uint8_t>(optLen - sizeof(SOCKS6Option));
 		}
