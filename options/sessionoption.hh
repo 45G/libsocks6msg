@@ -7,37 +7,18 @@
 namespace S6M
 {
 
-class SessionOption: public Option
+class SessionRequestOption: public Option
 {
-	SOCKS6SessionType type;
-	
-protected:
-	virtual void fill(uint8_t *buf) const;
-	
 public:
-	SessionOption(SOCKS6SessionType type)
-		: Option(SOCKS6_OPTION_SESSION), type(type) {}
+	SessionRequestOption()
+		: Option(SOCKS6_OPTION_SESSION_REQUEST) {}
 	
-	SOCKS6SessionType getType() const
-	{
-		return type;
-	}
+	virtual size_t packedSize() const;
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
-class SessionRequestOption: public SessionOption
-{
-public:
-	SessionRequestOption()
-		: SessionOption(SOCKS6_SESSION_REQUEST) {}
-	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
-};
-
-class SessionIDOption: public SessionOption
+class SessionIDOption: public Option
 {
 	std::vector<uint8_t> ticket;
 	
@@ -54,51 +35,51 @@ public:
 	
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6SessionOption *buf, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *buf, OptionSet *optionSet);
 };
 
-class SessionTeardownOption: public SessionOption
+class SessionTeardownOption: public Option
 {
 public:
 	SessionTeardownOption()
-		: SessionOption(SOCKS6_SESSION_TEARDOWN) {}
+		: Option(SOCKS6_OPTION_SESSION_TEARDOWN) {}
 	
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
-class SessionOKOption: public SessionOption
+class SessionOKOption: public Option
 {
 public:
 	SessionOKOption()
-		: SessionOption(SOCKS6_SESSION_OK) {}
+		: Option(SOCKS6_OPTION_SESSION_OK) {}
 	
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
-class SessionInvalidOption: public SessionOption
+class SessionInvalidOption: public Option
 {
 public:
 	SessionInvalidOption()
-		: SessionOption(SOCKS6_SESSION_INVALID) {}
+		: Option(SOCKS6_OPTION_SESSION_INVALID) {}
 	
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
-class SessionUntrustedOption: public SessionOption
+class SessionUntrustedOption: public Option
 {
 public:
 	SessionUntrustedOption()
-		: SessionOption(SOCKS6_SESSION_UNTRUSTED) {}
+		: Option(SOCKS6_OPTION_SESSION_UNTRUSTED) {}
 	
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6SessionOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 };
 
 }

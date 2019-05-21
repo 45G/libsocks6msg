@@ -48,7 +48,7 @@ public:
 
 class SessionOptionSet: public OptionSetBase
 {
-	std::unique_ptr<SessionOption>          mandatoryOpt; //SessionRequestOption or SessionIDOption
+	std::unique_ptr<Option>                 mandatoryOpt; //SessionRequestOption or SessionIDOption
 	std::unique_ptr<SessionTeardownOption>  teardownOpt;
 	std::unique_ptr<SessionUntrustedOption> untrustedOpt;
 	

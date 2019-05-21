@@ -151,9 +151,14 @@ enum SOCKS6OptionKind
 
 	SOCKS6_OPTION_AUTH_DATA          = 4,
 
-	SOCKS6_OPTION_SESSION            = 5,
+	SOCKS6_OPTION_SESSION_REQUEST    = 5,
+	SOCKS6_OPTION_SESSION_ID         = 6,
+	SOCKS6_OPTION_SESSION_UNTRUSTED  = 7,
+	SOCKS6_OPTION_SESSION_OK         = 8,
+	SOCKS6_OPTION_SESSION_INVALID    = 9,
+	SOCKS6_OPTION_SESSION_TEARDOWN   = 10,
 
-	SOCKS6_OPTION_IDEMPOTENCE        = 6,
+	SOCKS6_OPTION_IDEMPOTENCE        = 11,
 
 	SOCKS6_OPTION_VENDOR_MIN         = 64512,
 	SOCKS6_OPTION_VENDOR_MAX         = 65535,
@@ -267,28 +272,10 @@ struct SOCKS6AuthDataOption
 	uint8_t             methodData[0];
 } __attribute__((packed));
 
-struct SOCKS6SessionOption
-{
-	struct SOCKS6Option optionHead;
-	uint8_t             type;
-	uint8_t             sessionData[0];
-} __attribute__((packed));
-
-enum SOCKS6SessionType
-{
-	SOCKS6_SESSION_REQUEST   = 0x01,
-	SOCKS6_SESSION_ID        = 0x02,
-	SOCKS6_SESSION_TEARDOWN  = 0x03,
-	SOCKS6_SESSION_OK        = 0x04,
-	SOCKS6_SESSION_INVALID   = 0x05,
-	SOCKS6_SESSION_UNTRUSTED = 0x06,
-	
-};
-
 struct SOCKS6SessionIDOption
 {
-	struct SOCKS6SessionOption sessionOptionHead;
-	uint8_t                    ticket[0];
+	struct SOCKS6Option optionHead;
+	uint8_t             ticket[0];
 };
 
 #define SOCKS6_ID_LENGTH_MAX (SOCKS6_OPTIONS_LENGTH_MAX - sizeof(struct SOCKS6SessionIDOption))

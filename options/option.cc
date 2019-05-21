@@ -45,10 +45,25 @@ void Option::incrementalParse(void *buf, OptionSet *optionSet)
 		AuthDataOption::incrementalParse(opt, optionSet);
 		break;
 		
-	case SOCKS6_OPTION_SESSION:
-		SessionOption::incrementalParse(opt, optionSet);
+	case SOCKS6_OPTION_SESSION_REQUEST:
+		SessionRequestOption::incrementalParse(opt, optionSet);
 		break;
-		
+	case SOCKS6_OPTION_SESSION_ID:
+		SessionIDOption::incrementalParse(opt, optionSet);
+		break;
+	case SOCKS6_OPTION_SESSION_UNTRUSTED:
+		SessionUntrustedOption::incrementalParse(opt, optionSet);
+		break;
+	case SOCKS6_OPTION_SESSION_OK:
+		SessionOKOption::incrementalParse(opt, optionSet);
+		break;
+	case SOCKS6_OPTION_SESSION_INVALID:
+		SessionInvalidOption::incrementalParse(opt, optionSet);
+		break;
+	case SOCKS6_OPTION_SESSION_TEARDOWN:
+		SessionTeardownOption::incrementalParse(opt, optionSet);
+		break;
+
 	case SOCKS6_OPTION_IDEMPOTENCE:
 		IdempotenceOption::incrementalParse(opt, optionSet);
 		break;

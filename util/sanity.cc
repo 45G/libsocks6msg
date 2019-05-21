@@ -95,25 +95,6 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 }
 
 template <>
-SOCKS6SessionType enumCast<SOCKS6SessionType>(int val)
-{
-	SOCKS6SessionType conv = (SOCKS6SessionType)val;
-	
-	switch (conv)
-	{
-	case SOCKS6_SESSION_REQUEST:
-	case SOCKS6_SESSION_ID:
-	case SOCKS6_SESSION_TEARDOWN:
-	case SOCKS6_SESSION_OK:
-	case SOCKS6_SESSION_INVALID:
-	case SOCKS6_SESSION_UNTRUSTED:
-		return conv;
-	}
-	
-	throw invalid_argument("Bad session option type");
-}
-
-template <>
 SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
 {
 	SOCKS6AddressType conv = (SOCKS6AddressType)val;
