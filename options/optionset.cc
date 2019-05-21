@@ -250,6 +250,9 @@ void UserPasswdOptionSet::setReply(bool success)
 	COMMIT(reply, new UsernamePasswdReplyOption(success));
 }
 
+AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
+	: OptionSetBase(owner, owner->mode) {}
+
 void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 {
 	enforceMode(M_REQ);
