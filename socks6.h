@@ -283,23 +283,17 @@ struct SOCKS6SessionIDOption
 
 #define SOCKS6_ID_LENGTH_MAX (SOCKS6_OPTIONS_LENGTH_MAX - sizeof(struct SOCKS6SessionIDOption))
 
-struct SOCKS6IdempotenceOption
-{
-	struct SOCKS6Option optionHead;
-	uint8_t             idempotenceData[0];
-} __attribute__((packed));
-
 struct SOCKS6WindowRequestOption
 {
-	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t                       windowSize;
+	struct SOCKS6Option optionHead;
+	uint32_t            windowSize;
 } __attribute__((packed));
 
 struct SOCKS6WindowAdvertOption
 {
-	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t                       windowBase;
-	uint32_t                       windowSize;
+	struct SOCKS6Option optionHead;
+	uint32_t            windowBase;
+	uint32_t            windowSize;
 } __attribute__((packed));
 
 #define SOCKS6_TOKEN_WINDOW_MIN 1
@@ -307,14 +301,14 @@ struct SOCKS6WindowAdvertOption
 
 struct SOCKS6TokenExpenditureOption
 {
-	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint32_t                       token;
+	struct SOCKS6Option optionHead;
+	uint32_t            token;
 } __attribute__((packed));
 
 struct SOCKS6TokenExpenditureReplyOption
 {
-	struct SOCKS6IdempotenceOption idempotenceOptionHead;
-	uint8_t                        code;
+	struct SOCKS6Option optionHead;
+	uint8_t             code;
 } __attribute__((packed));
 
 enum SOCKS6TokenExpenditureCode
