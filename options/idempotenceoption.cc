@@ -27,7 +27,6 @@ void TokenWindowRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet
 	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(optBase, false);
 	
 	uint32_t winSize = ntohl(opt->windowSize);
-	tokenWindowSanity(winSize);
 	
 	optionSet->idempotence.request(winSize);
 }
@@ -59,8 +58,6 @@ void TokenWindowAdvertOption::incrementalParse(SOCKS6Option *optBase, OptionSet 
 	
 	uint32_t winBase = ntohl(opt->windowBase);
 	uint32_t winSize = ntohl(opt->windowSize);
-	
-	tokenWindowSanity(winSize);
 	
 	optionSet->idempotence.advertise(winBase, winSize);
 }
