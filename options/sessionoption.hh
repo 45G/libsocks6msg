@@ -7,15 +7,13 @@
 namespace S6M
 {
 
-class SessionRequestOption: public Option
+class SessionRequestOption: public SimpleOptionBase<SessionRequestOption>
 {
 public:
 	SessionRequestOption()
-		: Option(SOCKS6_OPTION_SESSION_REQUEST) {}
+		: SimpleOptionBase(SOCKS6_OPTION_SESSION_REQUEST) {}
 	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
 class SessionIDOption: public Option
@@ -38,48 +36,40 @@ public:
 	static void incrementalParse(SOCKS6Option *buf, OptionSet *optionSet);
 };
 
-class SessionTeardownOption: public Option
+class SessionTeardownOption: public SimpleOptionBase<SessionTeardownOption>
 {
 public:
 	SessionTeardownOption()
-		: Option(SOCKS6_OPTION_SESSION_TEARDOWN) {}
+		: SimpleOptionBase(SOCKS6_OPTION_SESSION_TEARDOWN) {}
 	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionOKOption: public Option
+class SessionOKOption: public SimpleOptionBase<SessionOKOption>
 {
 public:
 	SessionOKOption()
-		: Option(SOCKS6_OPTION_SESSION_OK) {}
+		: SimpleOptionBase(SOCKS6_OPTION_SESSION_OK) {}
 	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionInvalidOption: public Option
+class SessionInvalidOption: public SimpleOptionBase<SessionInvalidOption>
 {
 public:
 	SessionInvalidOption()
-		: Option(SOCKS6_OPTION_SESSION_INVALID) {}
+		: SimpleOptionBase(SOCKS6_OPTION_SESSION_INVALID) {}
 	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionUntrustedOption: public Option
+class SessionUntrustedOption: public SimpleOptionBase<SessionUntrustedOption>
 {
 public:
 	SessionUntrustedOption()
-		: Option(SOCKS6_OPTION_SESSION_UNTRUSTED) {}
+		: SimpleOptionBase(SOCKS6_OPTION_SESSION_UNTRUSTED) {}
 	
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
 }

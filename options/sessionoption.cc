@@ -6,14 +6,8 @@ using namespace std;
 namespace S6M
 {
 
-size_t SessionRequestOption::packedSize() const
+void SessionRequestOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6Option);
-}
-
-void SessionRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	rawOptCast<SOCKS6Option>(optBase, false);
 	optionSet->session.request();
 }
 
@@ -53,47 +47,23 @@ void SessionIDOption::incrementalParse(SOCKS6Option *buf, OptionSet *optionSet)
 	optionSet->session.setID(move(ticket));
 }
 
-size_t SessionTeardownOption::packedSize() const
+void SessionTeardownOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6Option);
-}
-
-void SessionTeardownOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	rawOptCast<SOCKS6Option>(optBase, false);
 	optionSet->session.tearDown();
 }
 
-size_t SessionOKOption::packedSize() const
+void SessionOKOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6Option);
-}
-
-void SessionOKOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	rawOptCast<SOCKS6Option>(optBase, false);
 	optionSet->session.signalOK();
 }
 
-size_t SessionInvalidOption::packedSize() const
+void SessionInvalidOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6Option);
-}
-
-void SessionInvalidOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	rawOptCast<SOCKS6Option>(optBase, false);
 	optionSet->session.signalReject();
 }
 
-size_t SessionUntrustedOption::packedSize() const
+void SessionUntrustedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6Option);
-}
-
-void SessionUntrustedOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	rawOptCast<SOCKS6Option>(optBase, false);
 	optionSet->session.setUntrusted();
 }
 

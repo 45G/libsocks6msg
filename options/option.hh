@@ -58,6 +58,26 @@ public:
 	virtual ~Option();
 };
 
+template <typename T>
+class SimpleOptionBase: public Option
+{
+public:
+	using Option::Option;
+
+	virtual size_t packedSize() const
+	{
+		return sizeof(SOCKS6Option);
+	}
+
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+	{
+		rawOptCast<SOCKS6Option>(optBase, false);
+		T::simpleParse(optBase, optionSet);
+	}
+
+	static void simpleParse(SOCKS6Option *optBase, OptionSet *optionSet);
+};
+
 }
 
 #endif // SOCKS6MSG_OPTION_HH
