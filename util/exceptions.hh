@@ -9,21 +9,15 @@ namespace S6M
 
 class BadVersionException: public std::runtime_error
 {
-	uint8_t maj;
-	uint8_t min;
+	uint8_t version;
 	
 public:
-	BadVersionException(uint8_t major, uint8_t minor = 0)
-		: runtime_error("Unsupported protocol version"), maj(major), min(minor) {}
+	BadVersionException(uint8_t version)
+		: runtime_error("Unsupported protocol version"), version(version) {}
 	
-	uint8_t getMajor() const
+	uint8_t getVersion() const
 	{
-		return maj;
-	}
-	
-	uint8_t getMinor() const
-	{
-		return min;
+		return version;
 	}
 };
 

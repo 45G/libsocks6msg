@@ -7,20 +7,15 @@ namespace S6M
 void Version::parse(ByteBuffer *bb)
 {
 	/* parse byte-by-byte; other SOCKS versions don't have minors */
-	uint8_t *major = bb->get<uint8_t>();
-	if (*major != SOCKS6_VERSION_MAJOR)
-		throw BadVersionException(*major);
-	
-	uint8_t *minor = bb->get<uint8_t>();
-	if (*minor != SOCKS6_VERSION_MINOR)
-		throw BadVersionException(*major, *minor);
+	uint8_t *version = bb->get<uint8_t>();
+	if (*version != SOCKS6_VERSION)
+		throw BadVersionException(*version);
 }
 
 void Version::pack(ByteBuffer *bb)
 {
 	SOCKS6Version *rawVer = bb->get<SOCKS6Version>();
-	rawVer->major = SOCKS6_VERSION_MAJOR;
-	rawVer->minor = SOCKS6_VERSION_MINOR;
+	rawVer->version = SOCKS6_VERSION;
 }
 
 }
