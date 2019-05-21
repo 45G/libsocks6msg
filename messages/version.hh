@@ -12,6 +12,8 @@ class Version
 	Version() {}
 	
 public:
+	static void check(ByteBuffer *bb);
+
 	static void parse(ByteBuffer *bb);
 	
 	static size_t packedSize()
