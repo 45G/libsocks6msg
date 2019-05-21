@@ -38,15 +38,22 @@ public:
 	}
 	
 	template <typename T>
-	T *get(size_t count = 1)
+	T *peek(size_t count = 1)
 	{
 		size_t req = sizeof(T) * count;
-		
+
 		if (req + used > totalSize)
 			throw EndOfBufferException();
-		
+
 		T *ret = reinterpret_cast<T *>(buf + used);
-		used += req;
+		return ret;
+	}
+
+	template <typename T>
+	T *get(size_t count = 1)
+	{
+		T *ret = peek<T>(count);
+		used += sizeof(T) * count;
 		return ret;
 	}
 	
