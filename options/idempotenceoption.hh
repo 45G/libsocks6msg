@@ -6,26 +6,7 @@
 namespace S6M
 {
 
-class IdempotenceOption: public Option
-{
-	SOCKS6IDempotenceType type;
-	
-protected:
-	virtual void fill(uint8_t *buf) const;
-	
-public:
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
-	
-	IdempotenceOption(SOCKS6IDempotenceType type)
-		: Option(SOCKS6_OPTION_IDEMPOTENCE), type(type) {}
-
-	SOCKS6IDempotenceType getType() const
-	{
-		return type;
-	}
-};
-
-class TokenWindowRequestOption: public IdempotenceOption
+class TokenWindowRequestOption: public Option
 {
 	uint32_t winSize;
 	
@@ -35,7 +16,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6IdempotenceOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
 	TokenWindowRequestOption(uint32_t winSize);
 
@@ -45,7 +26,7 @@ public:
 	}
 };
 
-class TokenWindowAdvertOption: public IdempotenceOption
+class TokenWindowAdvertOption: public Option
 {
 	uint32_t winBase;
 	uint32_t winSize;
@@ -56,7 +37,7 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6IdempotenceOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
 	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
 
@@ -71,7 +52,7 @@ public:
 	}
 };
 
-class TokenExpenditureRequestOption: public IdempotenceOption
+class TokenExpenditureRequestOption: public Option
 {
 	uint32_t token;
 	
@@ -81,10 +62,10 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6IdempotenceOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
 	TokenExpenditureRequestOption(uint32_t token)
-		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND), token(token) {}
+		: Option(SOCKS6_OPTION_IDEMPOTENCE_EXPEND), token(token) {}
 
 	uint32_t getToken() const
 	{
@@ -92,7 +73,7 @@ public:
 	}
 };
 
-class TokenExpenditureReplyOption: public IdempotenceOption
+class TokenExpenditureReplyOption: public Option
 {
 	SOCKS6TokenExpenditureCode code;
 	
@@ -102,10 +83,10 @@ protected:
 public:
 	virtual size_t packedSize() const;
 	
-	static void incrementalParse(SOCKS6IdempotenceOption *optBase, OptionSet *optionSet);
+	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
 	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
-		: IdempotenceOption(SOCKS6_IDEMPOTENCE_TOK_EXPEND_REPLY), code(code) {}
+		: Option(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REPLY), code(code) {}
 
 	SOCKS6TokenExpenditureCode getCode() const
 	{
