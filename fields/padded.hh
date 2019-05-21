@@ -2,8 +2,8 @@
 #define SOCKS6MSG_PADDED_HH
 
 #include <cstring>
-#include <socks6.h>
-#include <bytebuffer.hh>
+#include "socks6.h"
+#include "bytebuffer.hh"
 
 namespace S6M
 {
