@@ -314,7 +314,7 @@ ssize_t S6M_AuthReply_packedSize(const S6M_AuthReply *authReply)
 	
 	try
 	{
-		AuthenticationReply cppAuthReply(authReply->code, authReply->method);
+		AuthenticationReply cppAuthReply(authReply->code);
 		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
 		
 		return cppAuthReply.packedSize();
@@ -333,7 +333,7 @@ ssize_t S6M_AuthReply_pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t 
 	{
 		ByteBuffer bb(buf, size);
 		
-		AuthenticationReply cppAuthReply(authReply->code, authReply->method);
+		AuthenticationReply cppAuthReply(authReply->code);
 		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
 		cppAuthReply.pack(&bb);
 		
@@ -361,7 +361,6 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		authReply->cppPasswd = *cppAuthReply.getOptionSet()->userPasswd.getPassword();
 		
 		authReply->code = cppAuthReply.getReplyCode();
-		authReply->method = cppAuthReply.getMethod();
 		S6M_OptionSet_Fill(&authReply->optionSet, cppAuthReply.getOptionSet());
 		
 		*pauthReply = authReply;

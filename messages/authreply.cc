@@ -5,8 +5,8 @@
 namespace S6M
 {
 
-AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method)
-	: replyCode(replyCode), method(method), optionSet(OptionSet::M_AUTH_REP) {}
+AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode)
+	: replyCode(replyCode), optionSet(OptionSet::M_AUTH_REP) {}
 
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	: optionSet(OptionSet::M_AUTH_REP)
@@ -15,8 +15,6 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
-	/* be permissive with the method */
-	method  = (SOCKS6Method)rawAuthReply->method;
 	
 	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP);
 }
@@ -27,7 +25,6 @@ void AuthenticationReply::pack(ByteBuffer *bb) const
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	rawAuthReply->type = replyCode;
-	rawAuthReply->method = method;
 	
 	optionSet.pack(bb);
 }

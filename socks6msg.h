@@ -71,8 +71,6 @@ struct S6M_AuthReply
 {
 	enum SOCKS6AuthReplyCode code;
 	
-	enum SOCKS6Method method;
-	
 	struct S6M_OptionSet optionSet;
 };
 

@@ -88,7 +88,6 @@ struct SOCKS6Options
 struct SOCKS6AuthReply
 {
 	uint8_t type;
-	uint8_t method;
 } __attribute__((packed));
 
 enum SOCKS6AuthReplyCode

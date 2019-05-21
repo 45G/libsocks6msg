@@ -11,12 +11,10 @@ class AuthenticationReply
 {
 	SOCKS6AuthReplyCode replyCode;
 	
-	SOCKS6Method method;
-	
 	OptionSet optionSet;
 	
 public:
-	AuthenticationReply(SOCKS6AuthReplyCode replyCode, SOCKS6Method method);
+	AuthenticationReply(SOCKS6AuthReplyCode replyCode);
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
@@ -29,11 +27,6 @@ public:
 	SOCKS6AuthReplyCode getReplyCode() const
 	{
 		return replyCode;
-	}
-	
-	SOCKS6Method getMethod() const
-	{
-		return method;
 	}
 	
 	OptionSet *getOptionSet()
