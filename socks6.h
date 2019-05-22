@@ -115,6 +115,7 @@ struct SOCKS6OperationReply
 	uint8_t  code;
 	uint16_t optionsLength;
 	uint16_t bindPort;
+	uint8_t  padding;
 	uint8_t  bindAddress[0];
 } __attribute__((packed));
 
