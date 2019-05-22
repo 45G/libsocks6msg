@@ -17,7 +17,7 @@ extern "C"
  */
 #define SOCKS6_VERSION 10
 
-#define SOCKS6_PWAUTH_VERSION 0x01
+#define SOCKS6_PWAUTH_VERSION 1
 
 #define SOCKS6_ALIGNMENT 4
 
@@ -55,17 +55,17 @@ struct SOCKS6DomainAddress
 
 enum SOCKS6RequestCode
 {
-	SOCKS6_REQUEST_NOOP      = 0x00,
-	SOCKS6_REQUEST_CONNECT   = 0x01,
-	SOCKS6_REQUEST_BIND      = 0x02,
-	SOCKS6_REQUEST_UDP_ASSOC = 0x03,
+	SOCKS6_REQUEST_NOOP      = 0,
+	SOCKS6_REQUEST_CONNECT   = 1,
+	SOCKS6_REQUEST_BIND      = 2,
+	SOCKS6_REQUEST_UDP_ASSOC = 3,
 };
 
 enum SOCKS6AddressType
 {
-	SOCKS6_ADDR_IPV4   = 0x01,
-	SOCKS6_ADDR_DOMAIN = 0x03,
-	SOCKS6_ADDR_IPV6   = 0x04,
+	SOCKS6_ADDR_IPV4   = 1,
+	SOCKS6_ADDR_DOMAIN = 3,
+	SOCKS6_ADDR_IPV6   = 4,
 };
 
 #define SOCKS6_OPTIONS_LENGTH_MAX (1 << 14)
@@ -79,8 +79,8 @@ struct SOCKS6AuthReply
 
 enum SOCKS6AuthReplyCode
 {
-	SOCKS6_AUTH_REPLY_SUCCESS = 0x00,
-	SOCKS6_AUTH_REPLY_MORE    = 0x01,
+	SOCKS6_AUTH_REPLY_SUCCESS = 0,
+	SOCKS6_AUTH_REPLY_MORE    = 1,
 };
 
 /**
@@ -114,16 +114,16 @@ struct SOCKS6OperationReply
 
 enum SOCKS6OperationReplyCode
 {
-	SOCKS6_OPERATION_REPLY_SUCCESS            = 0x00,
-	SOCKS6_OPERATION_REPLY_FAILURE            = 0x01, /* general SOCKS server failure */
-	SOCKS6_OPERATION_REPLY_NOT_ALLOWED        = 0x02, /* connection not allowed by ruleset */
-	SOCKS6_OPERATION_REPLY_NET_UNREACH        = 0x03, /* network unreachable */
-	SOCKS6_OPERATION_REPLY_HOST_UNREACH       = 0x04, /* host unreachable */
-	SOCKS6_OPERATION_REPLY_REFUSED            = 0x05, /* connection refused */
-	SOCKS6_OPERATION_REPLY_TTL_EXPIRED        = 0x06, /* TTL expired */
-	SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED  = 0x07, /* command not supported */
-	SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED = 0x08, /* address type not supported */
-	SOCKS6_OPERATION_REPLY_TIMEOUT            = 0x09, /* connection attempt timed out */
+	SOCKS6_OPERATION_REPLY_SUCCESS            = 0,
+	SOCKS6_OPERATION_REPLY_FAILURE            = 1, /* general SOCKS server failure */
+	SOCKS6_OPERATION_REPLY_NOT_ALLOWED        = 2, /* connection not allowed by ruleset */
+	SOCKS6_OPERATION_REPLY_NET_UNREACH        = 3, /* network unreachable */
+	SOCKS6_OPERATION_REPLY_HOST_UNREACH       = 4, /* host unreachable */
+	SOCKS6_OPERATION_REPLY_REFUSED            = 5, /* connection refused */
+	SOCKS6_OPERATION_REPLY_TTL_EXPIRED        = 6, /* TTL expired */
+	SOCKS6_OPERATION_REPLY_CMD_NOT_SUPPORTED  = 7, /* command not supported */
+	SOCKS6_OPERATION_REPLY_ADDR_NOT_SUPPORTED = 8, /* address type not supported */
+	SOCKS6_OPERATION_REPLY_TIMEOUT            = 9, /* connection attempt timed out */
 };
 
 struct SOCKS6Option
@@ -188,23 +188,21 @@ enum SOCKS6StackLevel
 	SOCKS6_STACK_LEVEL_IPV6 = 3,
 	SOCKS6_STACK_LEVEL_TCP  = 4,
 	SOCKS6_STACK_LEVEL_UDP  = 5,
-	/* for future revisions */
-	//SOCKS6_STACK_LEVEL_TLS  = 0x06,
 };
 
 enum SOCKS6StackOptionCode
 {
 	/* IP */
-	SOCKS6_STACK_CODE_TOS      = 0x01,
+	SOCKS6_STACK_CODE_TOS      = 1,
 
 	/* IPv4 */
 
 	/* IPv6 */
 
 	/* TCP */
-	SOCKS6_STACK_CODE_TFO      = 0x01,
-	SOCKS6_STACK_CODE_MP       = 0x02,
-	SOCKS6_STACK_CODE_BACKLOG  = 0x03,
+	SOCKS6_STACK_CODE_TFO      = 1,
+	SOCKS6_STACK_CODE_MP       = 2,
+	SOCKS6_STACK_CODE_BACKLOG  = 3,
 
 	/* UDP */
 
@@ -231,8 +229,8 @@ struct SOCKS6MPOption
 
 enum SOCKS6MPAvailability
 {
-	SOCKS6_MP_AVAILABLE   = 0x01,
-	SOCKS6_MP_UNAVAILABLE = 0x02,
+	SOCKS6_MP_AVAILABLE   = 1,
+	SOCKS6_MP_UNAVAILABLE = 2,
 };
 
 struct SOCKS6BacklogOption
@@ -304,8 +302,8 @@ struct SOCKS6TokenExpenditureReplyOption
 
 enum SOCKS6TokenExpenditureCode
 {
-	SOCKS6_TOK_EXPEND_SUCCESS = 0x01,
-	SOCKS6_TOK_EXPEND_FAILURE = 0x02,
+	SOCKS6_TOK_EXPEND_SUCCESS = 1,
+	SOCKS6_TOK_EXPEND_FAILURE = 2,
 };
 
 struct SOCKS6AssocInit
