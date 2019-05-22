@@ -17,7 +17,7 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	address = Address(bb);
 	
-	optionSet = OptionSet(bb, OptionSet::M_OP_REP);
+	optionSet = OptionSet(bb, OptionSet::M_OP_REP, ntohs(rawOpReply->optionsLength));
 }
 
 void OperationReply::pack(ByteBuffer *bb) const
@@ -26,6 +26,7 @@ void OperationReply::pack(ByteBuffer *bb) const
 	
 	rawOpReply->version = SOCKS6_VERSION;
 	rawOpReply->code = code;
+	rawOpReply->optionsLength = htons(optionSet.packedSize());
 	rawOpReply->bindPort = htons(port);
 	
 	address.pack(bb);

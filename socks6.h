@@ -30,6 +30,7 @@ struct SOCKS6Request
 {
 	uint8_t  version;
 	uint8_t  commandCode;
+	uint16_t optionsLength;
 	uint16_t port;
 	uint8_t  address[0];
 } __attribute__((packed));
@@ -74,18 +75,13 @@ enum SOCKS6AddressType
 	SOCKS6_ADDR_IPV6   = 0x04,
 };
 
-struct SOCKS6Options
-{
-	uint16_t optionsLength;
-	uint8_t  options[0];
-} __attribute__((packed));
-
 #define SOCKS6_OPTIONS_LENGTH_MAX (1 << 14)
 
 struct SOCKS6AuthReply
 {
-	uint8_t version;
-	uint8_t type;
+	uint8_t  version;
+	uint8_t  type;
+	uint16_t optionsLength;
 } __attribute__((packed));
 
 enum SOCKS6AuthReplyCode
@@ -116,6 +112,7 @@ struct SOCKS6OperationReply
 {
 	uint8_t  version;
 	uint8_t  code;
+	uint16_t optionsLength;
 	uint16_t bindPort;
 	uint8_t  bindAddress[0];
 } __attribute__((packed));

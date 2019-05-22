@@ -274,11 +274,14 @@ public:
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
 	
-	OptionSet(ByteBuffer *bb, Mode mode);
+	OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength);
 	
 	void pack(ByteBuffer *bb) const;
 	
-	size_t packedSize() const;
+	size_t packedSize() const
+	{
+		return optionsSize;
+	}
 	
 	Mode getMode() const
 	{

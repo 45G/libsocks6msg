@@ -16,7 +16,7 @@ Request::Request(ByteBuffer *bb)
 	
 	address = Address(bb);
 	
-	optionSet = OptionSet(bb, OptionSet::M_REQ);
+	optionSet = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
 }
 
 void Request::pack(ByteBuffer *bb) const
@@ -24,6 +24,7 @@ void Request::pack(ByteBuffer *bb) const
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	rawRequest->version = SOCKS6_VERSION;
 	rawRequest->commandCode = commandCode;
+	rawRequest->optionsLength = htons(optionSet.packedSize());
 	rawRequest->port = htons(port);
 	
 	address.pack(bb);

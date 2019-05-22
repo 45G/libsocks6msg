@@ -16,7 +16,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
 	
-	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP);
+	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP, ntohs(rawAuthReply->optionsLength));
 }
 
 void AuthenticationReply::pack(ByteBuffer *bb) const
@@ -24,6 +24,7 @@ void AuthenticationReply::pack(ByteBuffer *bb) const
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	rawAuthReply->version = SOCKS6_VERSION;
 	rawAuthReply->type = replyCode;
+	rawAuthReply->optionsLength = htons(optionSet.packedSize());
 	
 	optionSet.pack(bb);
 }

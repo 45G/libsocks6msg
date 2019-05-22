@@ -47,14 +47,12 @@ void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) co
 		throw logic_error("Option not available");
 }
 
-OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
+OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	: OptionSetBase(this, mode)
 {
-	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
-	uint16_t optsLen = ntohs(optsHead->optionsLength);
-	if (optsLen > SOCKS6_OPTIONS_LENGTH_MAX)
+	if (optionsLength > SOCKS6_OPTIONS_LENGTH_MAX)
 		throw invalid_argument("Bad options length");
-	ByteBuffer optsBB(bb->get<uint8_t>(optsLen), optsLen);
+	ByteBuffer optsBB(bb->get<uint8_t>(optionsLength), optionsLength);
 	
 	while (optsBB.getUsed() < optsBB.getTotalSize())
 	{
@@ -87,30 +85,12 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode)
 	}
 }
 
-static void cram(const Option &option, SOCKS6Options *optionsHead, ByteBuffer *bb)
-{
-	option.pack(bb);
-	optionsHead->optionsLength += option.packedSize();
-}
-
 void OptionSet::pack(ByteBuffer *bb) const
 {
-	SOCKS6Options *optsHead = bb->get<SOCKS6Options>();
-	optsHead->optionsLength = 0;
-	
 	BOOST_FOREACH(Option *option, options)
 	{
-		cram(*option, optsHead, bb);
+		option->pack(bb);
 	}
-}
-
-size_t OptionSet::packedSize() const
-{
-	size_t size = sizeof(SOCKS6Options);
-	
-	size += optionsSize;
-	
-	return size;
 }
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
