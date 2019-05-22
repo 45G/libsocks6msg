@@ -32,6 +32,7 @@ struct SOCKS6Request
 	uint8_t  commandCode;
 	uint16_t optionsLength;
 	uint16_t port;
+	uint8_t  padding;
 	uint8_t  address[0];
 } __attribute__((packed));
 

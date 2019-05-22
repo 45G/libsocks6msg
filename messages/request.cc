@@ -26,6 +26,7 @@ void Request::pack(ByteBuffer *bb) const
 	rawRequest->commandCode = commandCode;
 	rawRequest->optionsLength = htons(optionSet.packedSize());
 	rawRequest->port = htons(port);
+	rawRequest->padding = 0;
 	
 	address.pack(bb);
 	
