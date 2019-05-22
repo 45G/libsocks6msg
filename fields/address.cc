@@ -8,31 +8,24 @@ namespace S6M
 
 size_t Address::packedSize() const
 {
-	size_t size = 1;
-	
 	switch (type)
 	{
 	case SOCKS6_ADDR_IPV4:
-		size += sizeof(in_addr);
-		break;
+		return sizeof(in_addr);
 		
 	case SOCKS6_ADDR_IPV6:
-		size += sizeof(in6_addr);
-		break;
+		return sizeof(in6_addr);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		size += (*domain).packedSize();
-		break;
+		return (*domain).packedSize();
 	}
 	
-	return size;
+	/* never happens */
+	return 0;
 }
 
 void Address::pack(ByteBuffer *bb)  const
 {
-	uint8_t *rawType = bb->get<uint8_t>();
-	*rawType = type;
-	
 	switch (type)
 	{
 	case SOCKS6_ADDR_IPV4:
@@ -55,11 +48,9 @@ void Address::pack(ByteBuffer *bb)  const
 	}
 }
 
-Address::Address(ByteBuffer *bb)
+Address::Address(SOCKS6AddressType type, ByteBuffer *bb)
+	: type(type)
 {
-	uint8_t *rawType = bb->get<uint8_t>();
-	type = enumCast<SOCKS6AddressType>(*rawType);
-	
 	switch (type)
 	{
 	case SOCKS6_ADDR_IPV4:

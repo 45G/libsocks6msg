@@ -49,7 +49,7 @@ public:
 	Address(const std::string &domain)
 		: type(SOCKS6_ADDR_DOMAIN), domain(domain) {}
 	
-	Address(ByteBuffer *bb);
+	Address(SOCKS6AddressType type, ByteBuffer *bb);
 	
 	SOCKS6AddressType getType() const
 	{

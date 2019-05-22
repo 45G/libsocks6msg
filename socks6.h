@@ -33,30 +33,22 @@ struct SOCKS6Request
 	uint16_t optionsLength;
 	uint16_t port;
 	uint8_t  padding;
+	uint8_t  addressType;
 	uint8_t  address[0];
-} __attribute__((packed));
-
-struct SOCKS6Address
-{
-	uint8_t type;
-	uint8_t address[0];
 } __attribute__((packed));
 
 struct SOCKS6IPv4Address
 {
-	uint8_t  type;
 	uint32_t ipv4Address;
 } __attribute__((packed));
 
 struct SOCKS6IPv6Address
 {
-	uint8_t type;
 	uint8_t ipv6Address[16];
 } __attribute__((packed));
 
 struct SOCKS6DomainAddress
 {
-	uint8_t type;
 	uint8_t len;
 	uint8_t domain[0];
 } __attribute__((packed));
@@ -116,6 +108,7 @@ struct SOCKS6OperationReply
 	uint16_t optionsLength;
 	uint16_t bindPort;
 	uint8_t  padding;
+	uint8_t  addressType;
 	uint8_t  bindAddress[0];
 } __attribute__((packed));
 

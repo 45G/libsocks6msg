@@ -14,8 +14,9 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	code = enumCast<SOCKS6OperationReplyCode>(rawOpReply->code);
 	port = ntohs(rawOpReply->bindPort);
+	SOCKS6AddressType addrType = enumCast<SOCKS6AddressType>(rawOpReply->addressType);
 	
-	address = Address(bb);
+	address = Address(addrType, bb);
 	
 	optionSet = OptionSet(bb, OptionSet::M_OP_REP, ntohs(rawOpReply->optionsLength));
 }
