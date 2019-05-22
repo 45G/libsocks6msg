@@ -28,6 +28,7 @@ struct SOCKS6Version
 
 struct SOCKS6Request
 {
+	uint8_t  version;
 	uint8_t  commandCode;
 	uint16_t port;
 	uint8_t  address[0];
@@ -60,10 +61,10 @@ struct SOCKS6DomainAddress
 
 enum SOCKS6RequestCode
 {
-	SOCKS6_REQUEST_NOOP       = 0x00,
-	SOCKS6_REQUEST_CONNECT    = 0x01,
-	SOCKS6_REQUEST_BIND       = 0x02,
-	SOCKS6_REQUEST_UDP_ASSOC  = 0x03,
+	SOCKS6_REQUEST_NOOP      = 0x00,
+	SOCKS6_REQUEST_CONNECT   = 0x01,
+	SOCKS6_REQUEST_BIND      = 0x02,
+	SOCKS6_REQUEST_UDP_ASSOC = 0x03,
 };
 
 enum SOCKS6AddressType
@@ -83,6 +84,7 @@ struct SOCKS6Options
 
 struct SOCKS6AuthReply
 {
+	uint8_t version;
 	uint8_t type;
 } __attribute__((packed));
 
@@ -112,6 +114,7 @@ enum SOCKS6Method
 
 struct SOCKS6OperationReply
 {
+	uint8_t  version;
 	uint8_t  code;
 	uint16_t bindPort;
 	uint8_t  bindAddress[0];

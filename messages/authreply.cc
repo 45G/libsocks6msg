@@ -11,7 +11,7 @@ AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode)
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	: optionSet(OptionSet::M_AUTH_REP)
 {
-	Version::parse(bb);
+	Version::check(bb);
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
@@ -21,9 +21,8 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 
 void AuthenticationReply::pack(ByteBuffer *bb) const
 {
-	Version::pack(bb);
-	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
+	rawAuthReply->version = SOCKS6_VERSION;
 	rawAuthReply->type = replyCode;
 	
 	optionSet.pack(bb);

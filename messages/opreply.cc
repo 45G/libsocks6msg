@@ -1,5 +1,6 @@
 #include "opreply.hh"
 #include "sanity.hh"
+#include "version.hh"
 
 namespace S6M
 {
@@ -7,6 +8,8 @@ namespace S6M
 OperationReply::OperationReply(ByteBuffer *bb)
 	: optionSet(OptionSet::M_OP_REP)
 {
+	Version::check(bb);
+	
 	SOCKS6OperationReply *rawOpReply = bb->get<SOCKS6OperationReply>();
 	
 	code = enumCast<SOCKS6OperationReplyCode>(rawOpReply->code);
@@ -21,6 +24,7 @@ void OperationReply::pack(ByteBuffer *bb) const
 {
 	SOCKS6OperationReply *rawOpReply = bb->get<SOCKS6OperationReply>();
 	
+	rawOpReply->version = SOCKS6_VERSION;
 	rawOpReply->code = code;
 	rawOpReply->bindPort = htons(port);
 	

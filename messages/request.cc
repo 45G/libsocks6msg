@@ -8,7 +8,7 @@ namespace S6M
 Request::Request(ByteBuffer *bb)
 	: optionSet(OptionSet::M_REQ)
 {
-	Version::parse(bb);
+	Version::check(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	commandCode = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
@@ -21,9 +21,8 @@ Request::Request(ByteBuffer *bb)
 
 void Request::pack(ByteBuffer *bb) const
 {
-	Version::pack(bb);
-	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
+	rawRequest->version = SOCKS6_VERSION;
 	rawRequest->commandCode = commandCode;
 	rawRequest->port = htons(port);
 	
