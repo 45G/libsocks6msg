@@ -328,10 +328,10 @@ struct SOCKS6AssocConfirmation
 
 struct SOCKS6DatagramHeader
 {
-	struct SOCKS6Version version;
-	uint32_t             assocID;
-	uint16_t             port;
-	uint8_t              address[0];
+	uint8_t  version;
+	uint32_t assocID;
+	uint16_t port;
+	uint8_t  address[0];
 } __attribute__((packed));
 
 #ifdef __cplusplus
