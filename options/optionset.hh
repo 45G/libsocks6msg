@@ -157,20 +157,32 @@ public:
 	}
 };
 
-template <typename T>
+template <typename OPT>
 class StackOptionPair: public OptionSetBase
 {
-	std::shared_ptr<T> clientProxy;
-	std::shared_ptr<T> proxyRemote;
+	std::shared_ptr<OPT> clientProxy;
+	std::shared_ptr<OPT> proxyRemote;
 	
 public:
-	typedef T Option;
+	typedef OPT Option;
+	
+	static const SOCKS6StackLeg LEG_RESTRICT = OPT::LEG_RESTRICT;
 	
 	StackOptionPair(OptionSet *owner);
 	
-	void set(SOCKS6StackLeg leg, typename T::Value value);
+	void set(SOCKS6StackLeg leg, typename OPT::Value value);
 	
-	boost::optional<typename T::Value> get(SOCKS6StackLeg leg) const;
+	boost::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const;
+	
+	void set(typename OPT::Value value)
+	{
+		set(OPT::LEG_RESTRICT, value);
+	}
+	
+	boost::optional<typename OPT::Value> get() const
+	{
+		return get(OPT::LEG_RESTRICT);
+	}
 };
 
 class StackOptionSet: public OptionSetBase

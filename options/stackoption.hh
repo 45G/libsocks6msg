@@ -39,7 +39,7 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode C, typename V, typename RAW, SOCKS6StackLeg LEG_RESTRICT = SOCKS6_STACK_LEG_BOTH>
+template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode C, typename V, typename RAW, SOCKS6StackLeg LR = SOCKS6_STACK_LEG_BOTH>
 class StackOptionBase: public StackOption
 {
 	V value;
@@ -61,8 +61,9 @@ protected:
 	}
 
 public:
-	static const SOCKS6StackLevel      LEVEL = LVL;
-	static const SOCKS6StackOptionCode CODE  = C;
+	static const SOCKS6StackLevel      LEVEL        = LVL;
+	static const SOCKS6StackOptionCode CODE         = C;
+	static const SOCKS6StackLeg        LEG_RESTRICT = LR;
 	
 	typedef V Value;
 	
@@ -74,7 +75,7 @@ public:
 	StackOptionBase(SOCKS6StackLeg leg, V value)
 		: StackOption(leg, LVL, C), value(value)
 	{
-		if (LEG_RESTRICT != SOCKS6_STACK_LEG_BOTH && leg != LEG_RESTRICT)
+		if (LR != SOCKS6_STACK_LEG_BOTH && leg != LR)
 			throw std::invalid_argument("Bad leg");
 	}
 
