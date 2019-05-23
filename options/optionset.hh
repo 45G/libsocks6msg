@@ -166,21 +166,23 @@ class StackOptionPair: public OptionSetBase
 public:
 	typedef OPT Option;
 	
-	static const SOCKS6StackLeg LEG_RESTRICT = OPT::LEG_RESTRICT;
-	
 	StackOptionPair(OptionSet *owner);
 	
 	void set(SOCKS6StackLeg leg, typename OPT::Value value);
 	
 	boost::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const;
 	
+	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
 	void set(typename OPT::Value value)
 	{
-		set(OPT::LEG_RESTRICT, value);
+		static_assert (LEG != SOCKS6_STACK_LEG_BOTH, "Option is not restricted to one leg");
+		set(LEG, value);
 	}
 	
+	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
 	boost::optional<typename OPT::Value> get() const
 	{
+		static_assert (LEG != SOCKS6_STACK_LEG_BOTH, "Option is not restricted to one leg");
 		return get(OPT::LEG_RESTRICT);
 	}
 };
