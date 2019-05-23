@@ -28,6 +28,7 @@ void Request::pack(ByteBuffer *bb) const
 	rawRequest->optionsLength = htons(optionSet.packedSize());
 	rawRequest->port = htons(port);
 	rawRequest->padding = 0;
+	rawRequest->addressType = address.getType();
 	
 	address.pack(bb);
 	

@@ -30,6 +30,7 @@ void OperationReply::pack(ByteBuffer *bb) const
 	rawOpReply->optionsLength = htons(optionSet.packedSize());
 	rawOpReply->bindPort = htons(port);
 	rawOpReply->padding = 0;
+	rawOpReply->addressType = address.getType();
 	
 	address.pack(bb);
 	
