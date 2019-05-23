@@ -105,8 +105,6 @@ void SessionOptionSet::request()
 void SessionOptionSet::tearDown()
 {
 	enforceMode(M_REQ);
-	if (mandatoryOpt == nullptr)
-		throw logic_error("Request must be part of session");
 	COMMIT(teardownOpt, new SessionTeardownOption());
 }
 
@@ -131,8 +129,6 @@ void SessionOptionSet::signalReject()
 void SessionOptionSet::setUntrusted()
 {
 	enforceMode(M_REQ);
-	if (reinterpret_cast<SessionIDOption *>(mandatoryOpt.get()) == nullptr)
-		throw logic_error("Must advertise a session ID");
 	COMMIT(untrustedOpt, new SessionUntrustedOption());
 }
 
