@@ -231,7 +231,7 @@ ssize_t S6M_Request_packedSize(const S6M_Request *req)
 	{
 		Address addr = S6M_Addr_Flush(&req->addr);
 		Request cppReq(req->code, addr, req->port);
-		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
+		S6M_OptionSet_Flush(&cppReq.options, &req->optionSet);
 		
 		return cppReq.packedSize();
 	}
@@ -250,7 +250,7 @@ ssize_t S6M_Request_pack(const S6M_Request *req, uint8_t *buf, size_t size)
 		
 		Address addr = S6M_Addr_Flush(&req->addr);
 		Request cppReq(req->code, addr, req->port);
-		S6M_OptionSet_Flush(cppReq.getOptionSet(), &req->optionSet);
+		S6M_OptionSet_Flush(&cppReq.options, &req->optionSet);
 		cppReq.pack(&bb);
 		
 		return bb.getUsed();
@@ -274,13 +274,13 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 		req = new S6M_RequestExtended();
 		memset((S6M_Request *)req, 0, sizeof(S6M_Request));
 		req->cppAddr = *(cppReq.getAddress());
-		req->cppUsername = *cppReq.getOptionSet()->userPasswd.getUsername();
-		req->cppPasswd = *cppReq.getOptionSet()->userPasswd.getPassword();
+		req->cppUsername = *cppReq.options.userPasswd.getUsername();
+		req->cppPasswd = *cppReq.options.userPasswd.getPassword();
 		
 		req->code = cppReq.getCommandCode();
 		S6M_Addr_Fill(&req->addr, cppReq.getAddress());
 		req->port = cppReq.getPort();
-		S6M_OptionSet_Fill(&req->optionSet, cppReq.getOptionSet());
+		S6M_OptionSet_Fill(&req->optionSet, &cppReq.options);
 		
 		*preq = req;
 		return bb.getUsed();
@@ -315,7 +315,7 @@ ssize_t S6M_AuthReply_packedSize(const S6M_AuthReply *authReply)
 	try
 	{
 		AuthenticationReply cppAuthReply(authReply->code);
-		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
+		S6M_OptionSet_Flush(&cppAuthReply.options, &authReply->optionSet);
 		
 		return cppAuthReply.packedSize();
 		
@@ -334,7 +334,7 @@ ssize_t S6M_AuthReply_pack(const S6M_AuthReply *authReply, uint8_t *buf, size_t 
 		ByteBuffer bb(buf, size);
 		
 		AuthenticationReply cppAuthReply(authReply->code);
-		S6M_OptionSet_Flush(cppAuthReply.getOptionSet(), &authReply->optionSet);
+		S6M_OptionSet_Flush(&cppAuthReply.options, &authReply->optionSet);
 		cppAuthReply.pack(&bb);
 		
 		return bb.getUsed();
@@ -357,11 +357,11 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		
 		authReply = new S6M_AuthReplyExtended();
 		memset((S6M_AuthReply *)authReply, 0, sizeof(S6M_AuthReply));
-		authReply->cppUsername = *cppAuthReply.getOptionSet()->userPasswd.getUsername();
-		authReply->cppPasswd = *cppAuthReply.getOptionSet()->userPasswd.getPassword();
+		authReply->cppUsername = *cppAuthReply.options.userPasswd.getUsername();
+		authReply->cppPasswd = *cppAuthReply.options.userPasswd.getPassword();
 		
 		authReply->code = cppAuthReply.getReplyCode();
-		S6M_OptionSet_Fill(&authReply->optionSet, cppAuthReply.getOptionSet());
+		S6M_OptionSet_Fill(&authReply->optionSet, &cppAuthReply.options);
 		
 		*pauthReply = authReply;
 		return bb.getUsed();
@@ -399,7 +399,7 @@ ssize_t S6M_OpReply_packedSize(const S6M_OpReply *opReply)
 	{
 		Address addr = S6M_Addr_Flush(&opReply->addr);
 		OperationReply cppOpReply(opReply->code, addr, opReply->port);
-		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
+		S6M_OptionSet_Flush(&cppOpReply.options, &opReply->optionSet);
 		
 		return cppOpReply.packedSize();
 		
@@ -419,7 +419,7 @@ ssize_t S6M_OpReply_pack(const S6M_OpReply *opReply, uint8_t *buf, size_t size)
 		
 		Address addr = S6M_Addr_Flush(&opReply->addr);
 		OperationReply cppOpReply(opReply->code, addr, opReply->port);
-		S6M_OptionSet_Flush(cppOpReply.getOptionSet(), &opReply->optionSet);
+		S6M_OptionSet_Flush(&cppOpReply.options, &opReply->optionSet);
 		cppOpReply.pack(&bb);
 		
 		return bb.getUsed();
@@ -443,13 +443,13 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 		opReply = new S6M_OpReplyExtended();
 		memset((S6M_OpReply *)opReply, 0, sizeof(S6M_OpReply));
 		opReply->cppAddr = *(cppOpReply.getAddress());
-		opReply->cppUsername = *cppOpReply.getOptionSet()->userPasswd.getUsername();
-		opReply->cppPasswd = *cppOpReply.getOptionSet()->userPasswd.getPassword();
+		opReply->cppUsername = *cppOpReply.options.userPasswd.getUsername();
+		opReply->cppPasswd = *cppOpReply.options.userPasswd.getPassword();
 		
 		opReply->code = cppOpReply.getCode();
 		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddress());
 		opReply->port = cppOpReply.getPort();
-		S6M_OptionSet_Fill(&opReply->optionSet, cppOpReply.getOptionSet());
+		S6M_OptionSet_Fill(&opReply->optionSet, &cppOpReply.options);
 		
 		*popReply = opReply;
 		return bb.getUsed();

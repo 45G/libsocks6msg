@@ -6,7 +6,7 @@ namespace S6M
 {
 
 Request::Request(ByteBuffer *bb)
-	: optionSet(OptionSet::M_REQ)
+	: options(OptionSet::M_REQ)
 {
 	Version::check(bb);
 	
@@ -17,7 +17,7 @@ Request::Request(ByteBuffer *bb)
 	
 	address = Address(addrType, bb);
 	
-	optionSet = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
+	options = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
 }
 
 void Request::pack(ByteBuffer *bb) const
@@ -25,14 +25,14 @@ void Request::pack(ByteBuffer *bb) const
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	rawRequest->version = SOCKS6_VERSION;
 	rawRequest->commandCode = commandCode;
-	rawRequest->optionsLength = htons(optionSet.packedSize());
+	rawRequest->optionsLength = htons(options.packedSize());
 	rawRequest->port = htons(port);
 	rawRequest->padding = 0;
 	rawRequest->addressType = address.getType();
 	
 	address.pack(bb);
 	
-	optionSet.pack(bb);
+	options.pack(bb);
 }
 
 size_t Request::pack(uint8_t *buf, size_t bufSize) const
@@ -44,7 +44,7 @@ size_t Request::pack(uint8_t *buf, size_t bufSize) const
 
 size_t Request::packedSize() const
 {
-	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + optionSet.packedSize();
+	return Version::packedSize() + sizeof (SOCKS6Request) + address.packedSize() + options.packedSize();
 }
 
 }

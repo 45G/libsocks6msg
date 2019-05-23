@@ -15,11 +15,11 @@ class Request
 	Address address;
 	uint16_t port;
 	
-	OptionSet optionSet;
-	
 public:
+	OptionSet options;
+	
 	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port)
-		: commandCode(commandCode), address(address), port(port), optionSet(OptionSet::M_REQ) {}
+		: commandCode(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
 	
 	Request(ByteBuffer *bb);
 	
@@ -42,16 +42,6 @@ public:
 	uint16_t getPort() const
 	{
 		return port;
-	}
-	
-	OptionSet *getOptionSet()
-	{
-		return &optionSet;
-	}
-
-	const OptionSet *getOptionSet() const
-	{
-		return &optionSet;
 	}
 };
 

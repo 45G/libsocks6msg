@@ -6,17 +6,17 @@ namespace S6M
 {
 
 AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode)
-	: replyCode(replyCode), optionSet(OptionSet::M_AUTH_REP) {}
+	: replyCode(replyCode), options(OptionSet::M_AUTH_REP) {}
 
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
-	: optionSet(OptionSet::M_AUTH_REP)
+	: options(OptionSet::M_AUTH_REP)
 {
 	Version::check(bb);
 	
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	replyCode = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
 	
-	optionSet = OptionSet(bb, OptionSet::M_AUTH_REP, ntohs(rawAuthReply->optionsLength));
+	options = OptionSet(bb, OptionSet::M_AUTH_REP, ntohs(rawAuthReply->optionsLength));
 }
 
 void AuthenticationReply::pack(ByteBuffer *bb) const
@@ -24,9 +24,9 @@ void AuthenticationReply::pack(ByteBuffer *bb) const
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	rawAuthReply->version = SOCKS6_VERSION;
 	rawAuthReply->type = replyCode;
-	rawAuthReply->optionsLength = htons(optionSet.packedSize());
+	rawAuthReply->optionsLength = htons(options.packedSize());
 	
-	optionSet.pack(bb);
+	options.pack(bb);
 }
 
 size_t AuthenticationReply::pack(uint8_t *buf, size_t bufSize) const
@@ -38,7 +38,7 @@ size_t AuthenticationReply::pack(uint8_t *buf, size_t bufSize) const
 
 size_t AuthenticationReply::packedSize() const
 {
-	return Version::packedSize() + sizeof (SOCKS6AuthReply) + optionSet.packedSize();
+	return Version::packedSize() + sizeof (SOCKS6AuthReply) + options.packedSize();
 }
 
 }

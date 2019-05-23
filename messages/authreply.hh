@@ -10,10 +10,10 @@ namespace S6M
 class AuthenticationReply
 {
 	SOCKS6AuthReplyCode replyCode;
-	
-	OptionSet optionSet;
-	
-public:
+
+public:	
+	OptionSet options;
+
 	AuthenticationReply(SOCKS6AuthReplyCode replyCode);
 	
 	AuthenticationReply(ByteBuffer *bb);
@@ -27,16 +27,6 @@ public:
 	SOCKS6AuthReplyCode getReplyCode() const
 	{
 		return replyCode;
-	}
-	
-	OptionSet *getOptionSet()
-	{
-		return &optionSet;
-	}
-	
-	const OptionSet *getOptionSet() const
-	{
-		return &optionSet;
 	}
 };
 

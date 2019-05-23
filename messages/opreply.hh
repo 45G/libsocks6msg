@@ -15,11 +15,11 @@ class OperationReply
 	Address address;
 	uint16_t port;
 	
-	OptionSet optionSet;
-	
 public:
+	OptionSet options;
+	
 	OperationReply(SOCKS6OperationReplyCode code, Address address, uint16_t port)
-		: code(code), address(address), port(port), optionSet(OptionSet::M_OP_REP) {}
+		: code(code), address(address), port(port), options(OptionSet::M_OP_REP) {}
 	
 	OperationReply(ByteBuffer *bb);
 	
@@ -42,16 +42,6 @@ public:
 	uint16_t getPort() const
 	{
 		return port;
-	}
-	
-	OptionSet *getOptionSet()
-	{
-		return &optionSet;
-	}
-
-	const OptionSet *getOptionSet() const
-	{
-		return &optionSet;
 	}
 };
 
