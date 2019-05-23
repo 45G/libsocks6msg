@@ -26,14 +26,31 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 #define COMMIT(FIELD, WHAT) \
 	ensureVacant(FIELD); \
 	(FIELD).reset(WHAT); \
-	owner->registerOption((FIELD).get());
+	try \
+	{ \
+		owner->registerOption((FIELD).get()); \
+	} \
+	catch (...) \
+	{ \
+		(FIELD).reset(); \
+		throw; \
+	}
 
 #define COMMIT2(FIELD1, FIELD2, WHAT) \
 	ensureVacant(FIELD1); \
 	ensureVacant(FIELD2); \
 	(FIELD1).reset(WHAT); \
 	(FIELD2) = (FIELD1); \
-	owner->registerOption((FIELD1).get());
+	try \
+	{ \
+		owner->registerOption((FIELD1).get()); \
+	} \
+	catch (...) \
+	{ \
+		(FIELD1).reset(); \
+		(FIELD2).reset(); \
+		throw; \
+	}
 
 void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
 {
