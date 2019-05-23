@@ -12,10 +12,13 @@ extern "C"
 /**
  * @brief SOCKS6_VERSION
  * This value will be 6 when standardized.
- * Currently, it gets incremented whenever the wire format changes, to ensure that different versions of this library never speak to each other.
- * The current wire format is post-draft-6.
+ * It gets modified when the wire format changes, to avoid having different versions of this library speak to each other.
+ * 100 + draft revision: accurately represents draft revision (subject to API changes; not subject to protocol changes)
+ * 200 + draft revision: builds upon draft revision (subject to API and protocol changes)
+ * 255: no particular draft revision
+ * currently: post-draft-06 (206)
  */
-#define SOCKS6_VERSION 10
+#define SOCKS6_VERSION 206
 
 #define SOCKS6_PWAUTH_VERSION 1
 
