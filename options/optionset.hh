@@ -274,7 +274,7 @@ class OptionSet: public OptionSetBase
 	
 	void registerOption(Option *option)
 	{
-		if (packedSize() + option->packedSize() <= SOCKS6_OPTIONS_LENGTH_MAX)
+		if (packedSize() + option->packedSize() > SOCKS6_OPTIONS_LENGTH_MAX)
 			throw std::length_error("Option would not fit");
 		options.push_back(option);
 		optionsSize += option->packedSize();
