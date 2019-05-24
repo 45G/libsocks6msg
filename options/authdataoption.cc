@@ -64,7 +64,7 @@ void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, Op
 	try
 	{
 		ByteBuffer bb(opt->methodData, expectedDataSize);
-		Padded<UserPasswordRequest> req(&bb);
+		PaddedRequest req(&bb);
 		
 		if (bb.getUsed() != expectedDataSize)
 			throw invalid_argument("Spurious bytes at the end of the option");

@@ -28,7 +28,9 @@ public:
 
 class UsernamePasswdReqOption: public AuthDataOption
 {
-	Padded<UserPasswordRequest, sizeof(SOCKS6AuthDataOption)> req;
+	typedef Padded<UserPasswordRequest, sizeof(SOCKS6AuthDataOption)> PaddedRequest;
+	
+	PaddedRequest req;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
