@@ -175,11 +175,11 @@ void IdempotenceOptionSet::setReply(SOCKS6TokenExpenditureCode code)
 	COMMIT(replyOpt, new TokenExpenditureReplyOption(code));
 }
 
-template<typename T>
+template <typename T>
 StackOptionPair<T>::StackOptionPair(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
 
-template<typename T>
+template <typename T>
 void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
 {
 	enforceMode(M_REQ, M_AUTH_REP);
@@ -197,7 +197,7 @@ void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
 	}
 }
 
-template<typename T>
+template <typename T>
 boost::optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
 {
 	enforceMode(M_REQ, M_AUTH_REP);
