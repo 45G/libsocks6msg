@@ -102,7 +102,7 @@ void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *opti
 {
 	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(optBase, false);
 	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-	uint8_t backlog = ntohs(opt->backlog);
+	uint16_t backlog = ntohs(opt->backlog);
 	
 	optionSet->stack.backlog.set(leg, backlog);
 }
