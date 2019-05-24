@@ -18,11 +18,11 @@ extern "C"
  * 255: no particular draft revision
  * currently: post-draft-06 (206)
  */
-#define SOCKS6_VERSION 206
+#define SOCKS6_VERSION (206)
 
-#define SOCKS6_PWAUTH_VERSION 1
+#define SOCKS6_PWAUTH_VERSION (1)
 
-#define SOCKS6_ALIGNMENT 4
+#define SOCKS6_ALIGNMENT (4)
 
 struct SOCKS6Version
 {
@@ -244,7 +244,7 @@ struct SOCKS6BacklogOption
 	uint16_t                 backlog;
 } __attribute__((packed));
 
-#define SOCKS6_BACKLOG_MIN 1
+#define SOCKS6_BACKLOG_MIN (1)
 
 struct SOCKS6AuthMethodAdvertOption
 {
@@ -290,7 +290,7 @@ struct SOCKS6WindowAdvertOption
 	uint32_t            windowSize;
 } __attribute__((packed));
 
-#define SOCKS6_TOKEN_WINDOW_MIN 1
+#define SOCKS6_TOKEN_WINDOW_MIN (1)
 #define SOCKS6_TOKEN_WINDOW_MAX ((1UL << 31) - 1)
 
 struct SOCKS6TokenExpenditureOption
