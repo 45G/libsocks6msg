@@ -1,6 +1,7 @@
 #include "request.hh"
 #include "version.hh"
 #include "sanity.hh"
+#include "restrictedint.hh"
 
 namespace S6M
 {
@@ -17,7 +18,9 @@ Request::Request(ByteBuffer *bb)
 	
 	address = Address(addrType, bb);
 	
-	options = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
+	OptionsLength optionsLength(ntohs(rawRequest->optionsLength));
+	
+	options = OptionSet(bb, OptionSet::M_REQ, optionsLength);
 }
 
 void Request::pack(ByteBuffer *bb) const

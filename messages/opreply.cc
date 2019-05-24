@@ -1,6 +1,7 @@
 #include "opreply.hh"
 #include "sanity.hh"
 #include "version.hh"
+#include "restrictedint.hh"
 
 namespace S6M
 {
@@ -18,7 +19,9 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	address = Address(addrType, bb);
 	
-	options = OptionSet(bb, OptionSet::M_OP_REP, ntohs(rawOpReply->optionsLength));
+	OptionsLength optionsLength(ntohs(rawOpReply->optionsLength));
+	
+	options = OptionSet(bb, OptionSet::M_OP_REP, optionsLength);
 }
 
 void OperationReply::pack(ByteBuffer *bb) const

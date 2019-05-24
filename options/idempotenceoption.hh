@@ -2,13 +2,16 @@
 #define SOCKS6MSG_IDEMPOTENCEOPTION_HH
 
 #include "option.hh"
+#include "restrictedint.hh"
 
 namespace S6M
 {
 
+using WindowSize = BoundedInt<uint32_t, SOCKS6_TOKEN_WINDOW_MIN, SOCKS6_TOKEN_WINDOW_MAX>;
+
 class TokenWindowRequestOption: public Option
 {
-	uint32_t winSize;
+	WindowSize winSize;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
@@ -18,7 +21,8 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	TokenWindowRequestOption(uint32_t winSize);
+	TokenWindowRequestOption(uint32_t winSize)
+		: Option(SOCKS6_OPTION_IDEMPOTENCE_REQ), winSize(winSize) {}
 
 	uint32_t getWinSize() const
 	{
@@ -29,7 +33,7 @@ public:
 class TokenWindowAdvertOption: public Option
 {
 	uint32_t winBase;
-	uint32_t winSize;
+	WindowSize winSize;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
@@ -39,7 +43,8 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize);
+	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
+		: Option(SOCKS6_OPTION_IDEMPOTENCE_WND), winBase(winBase), winSize(winSize) {}
 
 	uint32_t getWinBase() const
 	{

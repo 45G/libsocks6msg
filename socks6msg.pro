@@ -47,7 +47,8 @@ HEADERS += \
     options/sessionoption.hh \
     util/byteorder.hh \
     util/exceptions.hh \
-    fields/padded.hh
+    fields/padded.hh \
+    util/restrictedint.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg

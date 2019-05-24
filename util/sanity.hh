@@ -37,8 +37,6 @@ SOCKS6AddressType enumCast<SOCKS6AddressType>(int val);
 template <>
 SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val);
 
-void tokenWindowSanity(uint32_t winSize);
-
 }
 
 #endif // SOCKS6MSG_SANITY_HH

@@ -110,12 +110,6 @@ SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
 	throw invalid_argument("Bad address type");
 }
 
-void tokenWindowSanity(uint32_t winSize)
-{
-	if (winSize < SOCKS6_TOKEN_WINDOW_MIN || winSize > SOCKS6_TOKEN_WINDOW_MAX)
-		throw invalid_argument("Bad window size");
-}
-
 template<>
 SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val)
 {
