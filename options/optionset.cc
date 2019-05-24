@@ -78,7 +78,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 
 		try
 		{
-			opt = bb->get<SOCKS6Option>();
+			opt = optsBB.get<SOCKS6Option>();
 
 			/* bad option length wrecks remaining options */
 			optLen = ntohs(opt->len);
@@ -87,7 +87,7 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 			if (optLen % 4 != 0)
 				throw length_error("Option not aligned");
 
-			bb->get<uint8_t>(optLen - sizeof(SOCKS6Option));
+			optsBB.get<uint8_t>(optLen - sizeof(SOCKS6Option));
 		}
 		catch (length_error &)
 		{
