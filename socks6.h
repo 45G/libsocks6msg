@@ -216,6 +216,7 @@ struct SOCKS6TOSOption
 {
 	struct SOCKS6StackOption stackOptionHead;
 	uint8_t                  tos;
+	uint8_t                  padding[1];
 } __attribute__((packed));
 
 struct SOCKS6TFOOption
@@ -228,6 +229,7 @@ struct SOCKS6MPOption
 {
 	struct SOCKS6StackOption stackOptionHead;
 	uint8_t                  availability;
+	uint8_t                  padding[1];
 } __attribute__((packed));
 
 enum SOCKS6MPAvailability

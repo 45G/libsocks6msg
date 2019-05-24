@@ -69,7 +69,7 @@ public:
 	
 	virtual size_t packedSize() const
 	{
-		return sizeof(SOCKS6StackOption) + sizeof(V);
+		return sizeof(RawOption);
 	}
 
 	StackOptionBase(SOCKS6StackLeg leg, V value)
