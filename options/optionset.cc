@@ -74,14 +74,13 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	while (optsBB.getUsed() < optsBB.getTotalSize())
 	{
 		SOCKS6Option *opt;
-		size_t optLen;
 
 		try
 		{
 			opt = optsBB.get<SOCKS6Option>();
 
 			/* bad option length wrecks remaining options */
-			optLen = ntohs(opt->len);
+			size_t optLen = ntohs(opt->len);
 			if (optLen < sizeof(SOCKS6Option))
 				throw length_error("Option too short");
 			if (optLen % 4 != 0)
