@@ -72,39 +72,24 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 	}
 }
 
-void TOSOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+void TOSOption::stackParse(RawOption *opt, OptionSet *optionSet)
 {
-	SOCKS6TOSOption *opt = rawOptCast<SOCKS6TOSOption>(optBase, false);
-	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-
-	optionSet->stack.tos.set(leg, opt->tos);
+	optionSet->stack.tos.set((SOCKS6StackLeg)opt->stackOptionHead.leg, opt->value);
 }
 
-void TFOOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+void TFOOption::stackParse(RawOption *opt, OptionSet *optionSet)
 {
-	SOCKS6TFOOption *opt = rawOptCast<SOCKS6TFOOption>(optBase, false);
-	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-	uint16_t payloadSize = ntohs(opt->payloadLen);
-	
-	optionSet->stack.tfo.set(leg, payloadSize);
+	optionSet->stack.tfo.set((SOCKS6StackLeg)opt->stackOptionHead.leg, ntohs(opt->value));
 }
 
-void MPOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+void MPOption::stackParse(RawOption *opt, OptionSet *optionSet)
 {
-	SOCKS6MPOption *opt = rawOptCast<SOCKS6MPOption>(optBase, false);
-	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-	SOCKS6MPAvailability avail = enumCast<SOCKS6MPAvailability>(opt->availability);
-	
-	optionSet->stack.mp.set(leg, avail);
+	optionSet->stack.mp.set((SOCKS6StackLeg)opt->stackOptionHead.leg, enumCast<SOCKS6MPAvailability>(opt->value));
 }
 
-void BacklogOption::incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+void BacklogOption::stackParse(RawOption *opt, OptionSet *optionSet)
 {
-	SOCKS6BacklogOption *opt = rawOptCast<SOCKS6BacklogOption>(optBase, false);
-	SOCKS6StackLeg leg = (SOCKS6StackLeg)opt->stackOptionHead.leg;
-	uint16_t backlog = ntohs(opt->backlog);
-	
-	optionSet->stack.backlog.set(leg, backlog);
+	optionSet->stack.backlog.set((SOCKS6StackLeg)opt->stackOptionHead.leg, ntohs(opt->value));
 }
 
 BacklogOption::BacklogOption(SOCKS6StackLeg leg, uint16_t backlog)

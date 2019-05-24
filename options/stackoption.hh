@@ -4,6 +4,8 @@
 #include "option.hh"
 #include "byteorder.hh"
 #include "padded.hh"
+#include "sanity.hh"
+#include "restrictedint.hh"
 
 namespace S6M
 {
@@ -39,7 +41,7 @@ public:
 		: Option(SOCKS6_OPTION_STACK), leg(leg), level(level), code(code) {}
 };
 
-template <SOCKS6StackLevel LVL, SOCKS6StackOptionCode C, typename V, typename RAW, SOCKS6StackLeg LR = SOCKS6_STACK_LEG_BOTH>
+template <typename T, SOCKS6StackLevel LVL, SOCKS6StackOptionCode C, typename V, typename RAW, SOCKS6StackLeg LR = SOCKS6_STACK_LEG_BOTH>
 class StackOptionBase: public StackOption
 {
 	V value;
@@ -78,6 +80,14 @@ public:
 		if (LR != SOCKS6_STACK_LEG_BOTH && leg != LR)
 			throw std::invalid_argument("Bad leg");
 	}
+	
+	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
+	{
+		RawOption *opt = rawOptCast<RawOption>(optBase, false);
+		enumCast<SOCKS6StackLeg>(opt->stackOptionHead.leg);
+		
+		T:: stackParse(opt, optionSet);
+	}
 
 	V getValue() const
 	{
@@ -85,34 +95,34 @@ public:
 	}
 };
 
-class TOSOption: public StackOptionBase<SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t, uint8_t>
+class TOSOption: public StackOptionBase<TOSOption, SOCKS6_STACK_LEVEL_IP, SOCKS6_STACK_CODE_TOS, uint8_t, uint8_t>
 {
 public:
-	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
+	static void stackParse(RawOption *opt, OptionSet *optionSet);
 
 	using StackOptionBase::StackOptionBase;
 };
 
-class TFOOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class TFOOption: public StackOptionBase<TFOOption, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_TFO, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
-	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
+	static void stackParse(RawOption *opt, OptionSet *optionSet);
 
 	using StackOptionBase::StackOptionBase;
 };
 
-class MPOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, SOCKS6MPAvailability, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPOption: public StackOptionBase<MPOption, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, SOCKS6MPAvailability, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
-	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
+	static void stackParse(RawOption *opt, OptionSet *optionSet);
 
 	using StackOptionBase::StackOptionBase;
 };
 
-class BacklogOption: public StackOptionBase<SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class BacklogOption: public StackOptionBase<BacklogOption, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_BACKLOG, uint16_t, uint16_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
-	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet);
+	static void stackParse(RawOption *opt, OptionSet *optionSet);
 
 	BacklogOption(SOCKS6StackLeg leg, uint16_t backlog);
 };
