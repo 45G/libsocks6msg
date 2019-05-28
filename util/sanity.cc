@@ -25,21 +25,6 @@ SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 }
 
 template <>
-SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val)
-{
-	SOCKS6TokenExpenditureCode conv = (SOCKS6TokenExpenditureCode)val;
-	
-	switch (conv)
-	{
-	case SOCKS6_TOK_EXPEND_SUCCESS:
-	case SOCKS6_TOK_EXPEND_FAILURE:
-		return conv;
-	}
-	
-	throw invalid_argument("Bad token expenditure code");
-}
-
-template <>
 SOCKS6RequestCode enumCast<SOCKS6RequestCode>(int val)
 {
 	SOCKS6RequestCode conv = (SOCKS6RequestCode)val;

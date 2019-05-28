@@ -129,7 +129,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->idempotence.token = cppSet->idempotence.getToken().get_value_or(0);
 	cSet->idempotence.windowBase = *(cppSet->idempotence.advertisedBase());
 	cSet->idempotence.windowSize = cppSet->idempotence.advertisedSize();
-	cSet->idempotence.replyCode = cppSet->idempotence.getReply().get_value_or((SOCKS6TokenExpenditureCode)0);
+	cSet->idempotence.reply = cppSet->idempotence.getReply() == boost::none;
+	cSet->idempotence.accepted = cppSet->idempotence.getReply().get_value_or(false);
 	
 	int i = 0;
 	cSet->knownMethods = new SOCKS6Method[cppSet->authMethods.getAdvertised()->size()];
@@ -190,8 +191,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->idempotence.setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
 		cppSet->idempotence.advertise(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
-	if (cSet->idempotence.replyCode > 0)
-		cppSet->idempotence.setReply(cSet->idempotence.replyCode);
+	if (cSet->idempotence.reply)
+		cppSet->idempotence.setReply(cSet->idempotence.accepted);
 	
 	if (cSet->knownMethods != nullptr)
 	{

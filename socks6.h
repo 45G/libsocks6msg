@@ -138,27 +138,28 @@ struct SOCKS6Option
 
 enum SOCKS6OptionKind
 {
-	SOCKS6_OPTION_STACK                    = 1,
+	SOCKS6_OPTION_STACK                     = 1,
 
-	SOCKS6_OPTION_AUTH_METHOD_ADVERT       = 2,
-	SOCKS6_OPTION_AUTH_METHOD_SELECT       = 3,
+	SOCKS6_OPTION_AUTH_METHOD_ADVERT        = 2,
+	SOCKS6_OPTION_AUTH_METHOD_SELECT        = 3,
 
-	SOCKS6_OPTION_AUTH_DATA                = 4,
+	SOCKS6_OPTION_AUTH_DATA                 = 4,
 
-	SOCKS6_OPTION_SESSION_REQUEST          = 5,
-	SOCKS6_OPTION_SESSION_ID               = 6,
-	SOCKS6_OPTION_SESSION_UNTRUSTED        = 7,
-	SOCKS6_OPTION_SESSION_OK               = 8,
-	SOCKS6_OPTION_SESSION_INVALID          = 9,
-	SOCKS6_OPTION_SESSION_TEARDOWN         = 10,
+	SOCKS6_OPTION_SESSION_REQUEST           = 5,
+	SOCKS6_OPTION_SESSION_ID                = 6,
+	SOCKS6_OPTION_SESSION_UNTRUSTED         = 7,
+	SOCKS6_OPTION_SESSION_OK                = 8,
+	SOCKS6_OPTION_SESSION_INVALID           = 9,
+	SOCKS6_OPTION_SESSION_TEARDOWN          = 10,
 
-	SOCKS6_OPTION_IDEMPOTENCE_REQ          = 11,
-	SOCKS6_OPTION_IDEMPOTENCE_WND          = 12,
-	SOCKS6_OPTION_IDEMPOTENCE_EXPEND       = 13,
-	SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REPLY = 14,
+	SOCKS6_OPTION_IDEMPOTENCE_REQ           = 11,
+	SOCKS6_OPTION_IDEMPOTENCE_WND           = 12,
+	SOCKS6_OPTION_IDEMPOTENCE_EXPEND        = 13,
+	SOCKS6_OPTION_IDEMPOTENCE_EXPEND_ACCEPT = 14,
+	SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REJECT = 15,
 
-	SOCKS6_OPTION_VENDOR_MIN               = 64512,
-	SOCKS6_OPTION_VENDOR_MAX               = 65535,
+	SOCKS6_OPTION_VENDOR_MIN                = 64512,
+	SOCKS6_OPTION_VENDOR_MAX                = 65535,
 };
 
 struct SOCKS6StackOption
@@ -298,18 +299,6 @@ struct SOCKS6TokenExpenditureOption
 	struct SOCKS6Option optionHead;
 	uint32_t            token;
 } __attribute__((packed));
-
-struct SOCKS6TokenExpenditureReplyOption
-{
-	struct SOCKS6Option optionHead;
-	uint8_t             code;
-} __attribute__((packed));
-
-enum SOCKS6TokenExpenditureCode
-{
-	SOCKS6_TOK_EXPEND_SUCCESS = 1,
-	SOCKS6_TOK_EXPEND_FAILURE = 2,
-};
 
 struct SOCKS6AssocInit
 {

@@ -20,9 +20,6 @@ template <>
 SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val);
 
 template <>
-SOCKS6TokenExpenditureCode enumCast<SOCKS6TokenExpenditureCode>(int val);
-
-template <>
 SOCKS6RequestCode enumCast<SOCKS6RequestCode>(int val);
 
 template <>

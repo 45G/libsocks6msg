@@ -43,7 +43,8 @@ struct S6M_OptionSet
 		uint32_t windowBase;
 		uint32_t windowSize;
 		
-		enum SOCKS6TokenExpenditureCode replyCode;
+		int reply;
+		int accepted;
 	} idempotence;
 	
 	enum SOCKS6Method *knownMethods;

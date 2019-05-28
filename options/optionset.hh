@@ -108,7 +108,7 @@ class IdempotenceOptionSet: public OptionSetBase
 	std::unique_ptr<TokenWindowRequestOption>      requestOpt;
 	std::unique_ptr<TokenExpenditureRequestOption> expenditureOpt;
 	std::unique_ptr<TokenWindowAdvertOption>       windowOpt;
-	std::unique_ptr<TokenExpenditureReplyOption>   replyOpt;
+	std::unique_ptr<Option>                        replyOpt;
 	
 public:
 	IdempotenceOptionSet(OptionSet *owner);
@@ -147,13 +147,15 @@ public:
 		return windowOpt->getWinSize();
 	}
 	
-	void setReply(SOCKS6TokenExpenditureCode code);
+	void setReply(bool accepted);
 	
-	boost::optional<SOCKS6TokenExpenditureCode> getReply() const
+	boost::optional<bool> getReply() const
 	{
-		if (replyOpt == nullptr)
-			return {};
-		return replyOpt->getCode();
+		if (reinterpret_cast<const TokenExpenditureAcceptedOption *>(replyOpt.get()) != nullptr)
+			return true;
+		if (reinterpret_cast<const TokenExpenditureRejectedOption *>(replyOpt.get()) != nullptr)
+			return false;
+		return {};
 	}
 };
 

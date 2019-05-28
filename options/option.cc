@@ -73,8 +73,11 @@ void Option::incrementalParse(void *buf, OptionSet *optionSet)
 	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND:
 		TokenExpenditureRequestOption::incrementalParse(opt, optionSet);
 		break;
-	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REPLY:
-		TokenExpenditureReplyOption::incrementalParse(opt, optionSet);
+	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND_ACCEPT:
+		TokenExpenditureAcceptedOption::incrementalParse(opt, optionSet);
+		break;
+	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REJECT:
+		TokenExpenditureRejectedOption::incrementalParse(opt, optionSet);
 		break;
 		
 	default:

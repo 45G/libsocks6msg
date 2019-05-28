@@ -24,6 +24,7 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 }
 
 #define COMMIT(FIELD, WHAT) \
+{ \
 	ensureVacant(FIELD); \
 	(FIELD).reset(WHAT); \
 	try \
@@ -34,9 +35,11 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 	{ \
 		(FIELD).reset(); \
 		throw; \
-	}
+	} \
+}
 
 #define COMMIT2(FIELD1, FIELD2, WHAT) \
+{ \
 	ensureVacant(FIELD1); \
 	ensureVacant(FIELD2); \
 	(FIELD1).reset(WHAT); \
@@ -50,7 +53,8 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 		(FIELD1).reset(); \
 		(FIELD2).reset(); \
 		throw; \
-	}
+	} \
+}
 
 void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
 {
@@ -169,10 +173,17 @@ void IdempotenceOptionSet::advertise(uint32_t base, uint32_t size)
 	COMMIT(windowOpt, new TokenWindowAdvertOption(base, size));
 }
 
-void IdempotenceOptionSet::setReply(SOCKS6TokenExpenditureCode code)
+void IdempotenceOptionSet::setReply(bool accepted)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(replyOpt, new TokenExpenditureReplyOption(code));
+	if (accepted)
+	{
+		COMMIT(replyOpt, new TokenExpenditureAcceptedOption());
+	}
+	else
+	{
+		COMMIT(replyOpt, new TokenExpenditureRejectedOption());
+	}
 }
 
 template <typename T>

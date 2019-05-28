@@ -78,25 +78,22 @@ public:
 	}
 };
 
-class TokenExpenditureReplyOption: public Option
+class TokenExpenditureAcceptedOption: public SimpleOptionBase<TokenExpenditureAcceptedOption>
 {
-	SOCKS6TokenExpenditureCode code;
-	
-protected:
-	virtual void fill(uint8_t *buf) const;
-	
 public:
-	virtual size_t packedSize() const;
-	
-	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
-	
-	TokenExpenditureReplyOption(SOCKS6TokenExpenditureCode code)
-		: Option(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REPLY), code(code) {}
+	TokenExpenditureAcceptedOption()
+		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_ACCEPT) {}
 
-	SOCKS6TokenExpenditureCode getCode() const
-	{
-		return code;
-	}
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+};
+
+class TokenExpenditureRejectedOption: public SimpleOptionBase<TokenExpenditureRejectedOption>
+{
+public:
+	TokenExpenditureRejectedOption()
+		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REJECT) {}
+
+	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
 }

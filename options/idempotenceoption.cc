@@ -77,25 +77,14 @@ void TokenExpenditureRequestOption::incrementalParse(SOCKS6Option *optBase, Opti
 	optionSet->idempotence.setToken(ntohl(opt->token));
 }
 
-size_t TokenExpenditureReplyOption::packedSize() const
+void TokenExpenditureAcceptedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	return sizeof(SOCKS6TokenExpenditureReplyOption);
+	optionSet->idempotence.setReply(true);
 }
 
-void TokenExpenditureReplyOption::fill(uint8_t *buf) const
+void TokenExpenditureRejectedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
-	Option::fill(buf);
-	
-	SOCKS6TokenExpenditureReplyOption *opt = reinterpret_cast<SOCKS6TokenExpenditureReplyOption *>(buf);
-	
-	opt->code = code;
-}
-
-void TokenExpenditureReplyOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
-{
-	SOCKS6TokenExpenditureReplyOption *opt = rawOptCast<SOCKS6TokenExpenditureReplyOption>(optBase, false);
-	
-	optionSet->idempotence.setReply(enumCast<SOCKS6TokenExpenditureCode>(opt->code));
+	optionSet->idempotence.setReply(false);
 }
 
 }
