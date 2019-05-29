@@ -10,7 +10,7 @@ namespace S6M
 class SessionRequestOption: public SimpleOptionBase<SessionRequestOption, SOCKS6_OPTION_SESSION_REQUEST>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 class SessionIDOption: public Option
@@ -36,25 +36,25 @@ public:
 class SessionTeardownOption: public SimpleOptionBase<SessionTeardownOption, SOCKS6_OPTION_SESSION_TEARDOWN>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 class SessionOKOption: public SimpleOptionBase<SessionOKOption, SOCKS6_OPTION_SESSION_OK>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 class SessionInvalidOption: public SimpleOptionBase<SessionInvalidOption, SOCKS6_OPTION_SESSION_INVALID>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 class SessionUntrustedOption: public SimpleOptionBase<SessionUntrustedOption, SOCKS6_OPTION_SESSION_UNTRUSTED>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 }

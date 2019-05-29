@@ -77,12 +77,12 @@ void IdempotenceExpenditureOption::incrementalParse(SOCKS6Option *optBase, Optio
 	optionSet->idempotence.setToken(ntohl(opt->token));
 }
 
-void IdempotenceAcceptedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void IdempotenceAcceptedOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->idempotence.setReply(true);
 }
 
-void IdempotenceRejectedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void IdempotenceRejectedOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->idempotence.setReply(false);
 }

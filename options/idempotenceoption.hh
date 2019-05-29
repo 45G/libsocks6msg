@@ -81,13 +81,13 @@ public:
 class IdempotenceAcceptedOption: public SimpleOptionBase<IdempotenceAcceptedOption, SOCKS6_OPTION_IDEMPOTENCE_ACCEPT>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 class IdempotenceRejectedOption: public SimpleOptionBase<IdempotenceRejectedOption, SOCKS6_OPTION_IDEMPOTENCE_REJECT>
 {
 public:
-	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 }

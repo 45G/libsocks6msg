@@ -73,10 +73,10 @@ public:
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 	{
 		rawOptCast<SOCKS6Option>(optBase, false);
-		T::simpleParse(optBase, optionSet);
+		T::simpleParse(optionSet);
 	}
 
-	static void simpleParse(SOCKS6Option *optBase, OptionSet *optionSet);
+	static void simpleParse(OptionSet *optionSet);
 };
 
 }

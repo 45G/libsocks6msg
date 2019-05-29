@@ -6,7 +6,7 @@ using namespace std;
 namespace S6M
 {
 
-void SessionRequestOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void SessionRequestOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->session.request();
 }
@@ -47,22 +47,22 @@ void SessionIDOption::incrementalParse(SOCKS6Option *buf, OptionSet *optionSet)
 	optionSet->session.setID(move(ticket));
 }
 
-void SessionTeardownOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void SessionTeardownOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->session.tearDown();
 }
 
-void SessionOKOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void SessionOKOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->session.signalOK();
 }
 
-void SessionInvalidOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void SessionInvalidOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->session.signalReject();
 }
 
-void SessionUntrustedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void SessionUntrustedOption::simpleParse(OptionSet *optionSet)
 {
 	optionSet->session.setUntrusted();
 }
