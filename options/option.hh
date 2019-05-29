@@ -58,11 +58,12 @@ public:
 	virtual ~Option();
 };
 
-template <typename T>
+template <typename T, SOCKS6OptionKind K>
 class SimpleOptionBase: public Option
 {
 public:
-	using Option::Option;
+	SimpleOptionBase()
+		: Option(K) {}
 
 	virtual size_t packedSize() const
 	{

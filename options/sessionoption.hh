@@ -7,12 +7,9 @@
 namespace S6M
 {
 
-class SessionRequestOption: public SimpleOptionBase<SessionRequestOption>
+class SessionRequestOption: public SimpleOptionBase<SessionRequestOption, SOCKS6_OPTION_SESSION_REQUEST>
 {
 public:
-	SessionRequestOption()
-		: SimpleOptionBase(SOCKS6_OPTION_SESSION_REQUEST) {}
-	
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
@@ -36,39 +33,27 @@ public:
 	static void incrementalParse(SOCKS6Option *buf, OptionSet *optionSet);
 };
 
-class SessionTeardownOption: public SimpleOptionBase<SessionTeardownOption>
+class SessionTeardownOption: public SimpleOptionBase<SessionTeardownOption, SOCKS6_OPTION_SESSION_TEARDOWN>
 {
 public:
-	SessionTeardownOption()
-		: SimpleOptionBase(SOCKS6_OPTION_SESSION_TEARDOWN) {}
-	
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionOKOption: public SimpleOptionBase<SessionOKOption>
+class SessionOKOption: public SimpleOptionBase<SessionOKOption, SOCKS6_OPTION_SESSION_OK>
 {
 public:
-	SessionOKOption()
-		: SimpleOptionBase(SOCKS6_OPTION_SESSION_OK) {}
-	
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionInvalidOption: public SimpleOptionBase<SessionInvalidOption>
+class SessionInvalidOption: public SimpleOptionBase<SessionInvalidOption, SOCKS6_OPTION_SESSION_INVALID>
 {
 public:
-	SessionInvalidOption()
-		: SimpleOptionBase(SOCKS6_OPTION_SESSION_INVALID) {}
-	
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class SessionUntrustedOption: public SimpleOptionBase<SessionUntrustedOption>
+class SessionUntrustedOption: public SimpleOptionBase<SessionUntrustedOption, SOCKS6_OPTION_SESSION_UNTRUSTED>
 {
 public:
-	SessionUntrustedOption()
-		: SimpleOptionBase(SOCKS6_OPTION_SESSION_UNTRUSTED) {}
-	
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 

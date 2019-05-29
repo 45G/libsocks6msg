@@ -78,21 +78,15 @@ public:
 	}
 };
 
-class IdempotenceAcceptedOption: public SimpleOptionBase<IdempotenceAcceptedOption>
+class IdempotenceAcceptedOption: public SimpleOptionBase<IdempotenceAcceptedOption, SOCKS6_OPTION_IDEMPOTENCE_ACCEPT>
 {
 public:
-	IdempotenceAcceptedOption()
-		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_ACCEPT) {}
-
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class IdempotenceRejectedOption: public SimpleOptionBase<IdempotenceRejectedOption>
+class IdempotenceRejectedOption: public SimpleOptionBase<IdempotenceRejectedOption, SOCKS6_OPTION_IDEMPOTENCE_REJECT>
 {
 public:
-	IdempotenceRejectedOption()
-		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_REJECT) {}
-
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
