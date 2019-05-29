@@ -65,19 +65,19 @@ void Option::incrementalParse(void *buf, OptionSet *optionSet)
 		break;
 
 	case SOCKS6_OPTION_IDEMPOTENCE_REQ:
-		TokenWindowRequestOption::incrementalParse(opt, optionSet);
+		IdempotenceRequestOption::incrementalParse(opt, optionSet);
 		break;
 	case SOCKS6_OPTION_IDEMPOTENCE_WND:
-		TokenWindowAdvertOption::incrementalParse(opt, optionSet);
+		IdempotenceWindowOption::incrementalParse(opt, optionSet);
 		break;
 	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND:
-		TokenExpenditureRequestOption::incrementalParse(opt, optionSet);
+		IdempotenceExpenditureOption::incrementalParse(opt, optionSet);
 		break;
-	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND_ACCEPT:
-		TokenExpenditureAcceptedOption::incrementalParse(opt, optionSet);
+	case SOCKS6_OPTION_IDEMPOTENCE_ACCEPT:
+		IdempotenceAcceptedOption::incrementalParse(opt, optionSet);
 		break;
-	case SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REJECT:
-		TokenExpenditureRejectedOption::incrementalParse(opt, optionSet);
+	case SOCKS6_OPTION_IDEMPOTENCE_REJECT:
+		IdempotenceRejectedOption::incrementalParse(opt, optionSet);
 		break;
 		
 	default:

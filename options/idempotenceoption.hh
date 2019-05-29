@@ -7,9 +7,9 @@
 namespace S6M
 {
 
-using WindowSize = BoundedInt<uint32_t, SOCKS6_TOKEN_WINDOW_MIN, SOCKS6_TOKEN_WINDOW_MAX>;
+typedef BoundedInt<uint32_t, SOCKS6_TOKEN_WINDOW_MIN, SOCKS6_TOKEN_WINDOW_MAX> WindowSize;
 
-class TokenWindowRequestOption: public Option
+class IdempotenceRequestOption: public Option
 {
 	WindowSize winSize;
 	
@@ -21,7 +21,7 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	TokenWindowRequestOption(uint32_t winSize)
+	IdempotenceRequestOption(uint32_t winSize)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE_REQ), winSize(winSize) {}
 
 	uint32_t getWinSize() const
@@ -30,7 +30,7 @@ public:
 	}
 };
 
-class TokenWindowAdvertOption: public Option
+class IdempotenceWindowOption: public Option
 {
 	uint32_t winBase;
 	WindowSize winSize;
@@ -43,7 +43,7 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	TokenWindowAdvertOption(uint32_t winBase, uint32_t winSize)
+	IdempotenceWindowOption(uint32_t winBase, uint32_t winSize)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE_WND), winBase(winBase), winSize(winSize) {}
 
 	uint32_t getWinBase() const
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-class TokenExpenditureRequestOption: public Option
+class IdempotenceExpenditureOption: public Option
 {
 	uint32_t token;
 	
@@ -69,7 +69,7 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	TokenExpenditureRequestOption(uint32_t token)
+	IdempotenceExpenditureOption(uint32_t token)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE_EXPEND), token(token) {}
 
 	uint32_t getToken() const
@@ -78,20 +78,20 @@ public:
 	}
 };
 
-class TokenExpenditureAcceptedOption: public SimpleOptionBase<TokenExpenditureAcceptedOption>
+class IdempotenceAcceptedOption: public SimpleOptionBase<IdempotenceAcceptedOption>
 {
 public:
-	TokenExpenditureAcceptedOption()
-		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_ACCEPT) {}
+	IdempotenceAcceptedOption()
+		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_ACCEPT) {}
 
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };
 
-class TokenExpenditureRejectedOption: public SimpleOptionBase<TokenExpenditureRejectedOption>
+class IdempotenceRejectedOption: public SimpleOptionBase<IdempotenceRejectedOption>
 {
 public:
-	TokenExpenditureRejectedOption()
-		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_EXPEND_REJECT) {}
+	IdempotenceRejectedOption()
+		: SimpleOptionBase(SOCKS6_OPTION_IDEMPOTENCE_REJECT) {}
 
 	static void simpleParse(SOCKS6Option *, OptionSet *optionSet);
 };

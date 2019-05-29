@@ -8,7 +8,7 @@ using namespace std;
 namespace S6M
 {
 
-void TokenWindowRequestOption::fill(uint8_t *buf) const
+void IdempotenceRequestOption::fill(uint8_t *buf) const
 {
 	Option::fill(buf);
 	
@@ -17,12 +17,12 @@ void TokenWindowRequestOption::fill(uint8_t *buf) const
 	opt->windowSize = htonl(winSize);
 }
 
-size_t TokenWindowRequestOption::packedSize() const
+size_t IdempotenceRequestOption::packedSize() const
 {
 	return sizeof(SOCKS6WindowRequestOption);
 }
 
-void TokenWindowRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+void IdempotenceRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 {
 	SOCKS6WindowRequestOption *opt = rawOptCast<SOCKS6WindowRequestOption>(optBase, false);
 	
@@ -31,12 +31,12 @@ void TokenWindowRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet
 	optionSet->idempotence.request(winSize);
 }
 
-size_t TokenWindowAdvertOption::packedSize() const
+size_t IdempotenceWindowOption::packedSize() const
 {
 	return sizeof(SOCKS6WindowAdvertOption);
 }
 
-void TokenWindowAdvertOption::fill(uint8_t *buf) const
+void IdempotenceWindowOption::fill(uint8_t *buf) const
 {
 	Option::fill(buf);
 	
@@ -46,7 +46,7 @@ void TokenWindowAdvertOption::fill(uint8_t *buf) const
 	opt->windowSize = htonl(winSize);
 }
 
-void TokenWindowAdvertOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+void IdempotenceWindowOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 {
 	SOCKS6WindowAdvertOption *opt = rawOptCast<SOCKS6WindowAdvertOption>(optBase, false);
 	
@@ -56,12 +56,12 @@ void TokenWindowAdvertOption::incrementalParse(SOCKS6Option *optBase, OptionSet 
 	optionSet->idempotence.advertise(winBase, winSize);
 }
 
-size_t TokenExpenditureRequestOption::packedSize() const
+size_t IdempotenceExpenditureOption::packedSize() const
 {
 	return sizeof(SOCKS6TokenExpenditureOption);
 }
 
-void TokenExpenditureRequestOption::fill(uint8_t *buf) const
+void IdempotenceExpenditureOption::fill(uint8_t *buf) const
 {
 	Option::fill(buf);
 	
@@ -70,19 +70,19 @@ void TokenExpenditureRequestOption::fill(uint8_t *buf) const
 	opt->token = htonl(token);
 }
 
-void TokenExpenditureRequestOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
+void IdempotenceExpenditureOption::incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet)
 {
 	SOCKS6TokenExpenditureOption *opt = rawOptCast<SOCKS6TokenExpenditureOption>(optBase, false);
 	
 	optionSet->idempotence.setToken(ntohl(opt->token));
 }
 
-void TokenExpenditureAcceptedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void IdempotenceAcceptedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
 	optionSet->idempotence.setReply(true);
 }
 
-void TokenExpenditureRejectedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
+void IdempotenceRejectedOption::simpleParse(SOCKS6Option *, OptionSet *optionSet)
 {
 	optionSet->idempotence.setReply(false);
 }

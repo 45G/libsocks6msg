@@ -158,19 +158,19 @@ IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
 void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);
-	COMMIT(requestOpt, new TokenWindowRequestOption(size));
+	COMMIT(requestOpt, new IdempotenceRequestOption(size));
 }
 
 void IdempotenceOptionSet::setToken(uint32_t token)
 {
 	enforceMode(M_REQ);
-	COMMIT(expenditureOpt, new TokenExpenditureRequestOption(token));
+	COMMIT(expenditureOpt, new IdempotenceExpenditureOption(token));
 }
 
 void IdempotenceOptionSet::advertise(uint32_t base, uint32_t size)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(windowOpt, new TokenWindowAdvertOption(base, size));
+	COMMIT(windowOpt, new IdempotenceWindowOption(base, size));
 }
 
 void IdempotenceOptionSet::setReply(bool accepted)
@@ -178,11 +178,11 @@ void IdempotenceOptionSet::setReply(bool accepted)
 	enforceMode(M_AUTH_REP);
 	if (accepted)
 	{
-		COMMIT(replyOpt, new TokenExpenditureAcceptedOption());
+		COMMIT(replyOpt, new IdempotenceAcceptedOption());
 	}
 	else
 	{
-		COMMIT(replyOpt, new TokenExpenditureRejectedOption());
+		COMMIT(replyOpt, new IdempotenceRejectedOption());
 	}
 }
 

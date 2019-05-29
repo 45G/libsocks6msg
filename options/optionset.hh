@@ -105,9 +105,9 @@ public:
 
 class IdempotenceOptionSet: public OptionSetBase
 {
-	std::unique_ptr<TokenWindowRequestOption>      requestOpt;
-	std::unique_ptr<TokenExpenditureRequestOption> expenditureOpt;
-	std::unique_ptr<TokenWindowAdvertOption>       windowOpt;
+	std::unique_ptr<IdempotenceRequestOption>      requestOpt;
+	std::unique_ptr<IdempotenceExpenditureOption> expenditureOpt;
+	std::unique_ptr<IdempotenceWindowOption>       windowOpt;
 	std::unique_ptr<Option>                        replyOpt;
 	
 public:
@@ -151,9 +151,9 @@ public:
 	
 	boost::optional<bool> getReply() const
 	{
-		if (reinterpret_cast<const TokenExpenditureAcceptedOption *>(replyOpt.get()) != nullptr)
+		if (reinterpret_cast<const IdempotenceAcceptedOption *>(replyOpt.get()) != nullptr)
 			return true;
-		if (reinterpret_cast<const TokenExpenditureRejectedOption *>(replyOpt.get()) != nullptr)
+		if (reinterpret_cast<const IdempotenceRejectedOption *>(replyOpt.get()) != nullptr)
 			return false;
 		return {};
 	}
