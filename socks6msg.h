@@ -59,7 +59,7 @@ struct S6M_OptionSet
 	{
 		const char *username;
 		const char *passwd;
-	} userPasswd;
+	} userPassword;
 };
 
 struct S6M_Request

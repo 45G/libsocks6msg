@@ -261,10 +261,10 @@ public:
 	
 	void select(SOCKS6Method method);
 	
-	boost::optional<SOCKS6Method> getSelected() const
+	SOCKS6Method getSelected() const
 	{
 		if (selectOption == nullptr)
-			return {};
+			return SOCKS6_METHOD_NOAUTH;
 		return selectOption->getMethod();
 	}
 };

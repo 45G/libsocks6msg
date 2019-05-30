@@ -147,11 +147,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	
 	if (cppSet->userPassword.getUsername() != nullptr && cppSet->userPassword.getUsername()->length() > 0)
 	{
-		cSet->userPasswd.username = cppSet->userPassword.getUsername()->c_str();
-		if (cSet->userPasswd.username == nullptr)
+		cSet->userPassword.username = cppSet->userPassword.getUsername()->c_str();
+		if (cSet->userPassword.username == nullptr)
 			throw bad_alloc();
-		cSet->userPasswd.username = cppSet->userPassword.getPassword()->c_str();
-		if (cSet->userPasswd.passwd == nullptr)
+		cSet->userPassword.username = cppSet->userPassword.getPassword()->c_str();
+		if (cSet->userPassword.passwd == nullptr)
 			throw bad_alloc();
 	}
 }
@@ -203,8 +203,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->authMethods.advertise(methods, cSet->authMethods.initialDataLen);
 	}
 	
-	if (cSet->userPasswd.username != nullptr || cSet->userPasswd.passwd != nullptr)
-		cppSet->userPassword.setCredentials(move(string(cSet->userPasswd.username)), move(string(cSet->userPasswd.passwd)));
+	if (cSet->userPassword.username != nullptr || cSet->userPassword.passwd != nullptr)
+		cppSet->userPassword.setCredentials(move(string(cSet->userPassword.username)), move(string(cSet->userPassword.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
