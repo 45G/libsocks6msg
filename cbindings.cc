@@ -133,25 +133,25 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	cSet->idempotence.accepted = cppSet->idempotence.getReply().get_value_or(false);
 	
 	int i = 0;
-	cSet->knownMethods = new SOCKS6Method[cppSet->authMethods.getAdvertised()->size()];
+	cSet->authMethods.known = new SOCKS6Method[cppSet->authMethods.getAdvertised()->size()];
 	BOOST_FOREACH(SOCKS6Method method, *(cppSet->authMethods.getAdvertised()))
 	{
 		if (method == SOCKS6_METHOD_NOAUTH)
 			continue;
 		
-		cSet->knownMethods[i] = method;
+		cSet->authMethods.known[i] = method;
 		i++;
 	}
-	cSet->knownMethods[i] = SOCKS6_METHOD_NOAUTH;
-	cSet->initialDataLen = cppSet->authMethods.getInitialDataLen();
+	cSet->authMethods.known[i] = SOCKS6_METHOD_NOAUTH;
+	cSet->authMethods.initialDataLen = cppSet->authMethods.getInitialDataLen();
 	
-	if (cppSet->userPasswd.getUsername() != nullptr && cppSet->userPasswd.getUsername()->length() > 0)
+	if (cppSet->userPassword.getUsername() != nullptr && cppSet->userPassword.getUsername()->length() > 0)
 	{
-		cSet->userPasswdAuth.username = cppSet->userPasswd.getUsername()->c_str();
-		if (cSet->userPasswdAuth.username == nullptr)
+		cSet->userPasswd.username = cppSet->userPassword.getUsername()->c_str();
+		if (cSet->userPasswd.username == nullptr)
 			throw bad_alloc();
-		cSet->userPasswdAuth.username = cppSet->userPasswd.getPassword()->c_str();
-		if (cSet->userPasswdAuth.passwd == nullptr)
+		cSet->userPasswd.username = cppSet->userPassword.getPassword()->c_str();
+		if (cSet->userPasswd.passwd == nullptr)
 			throw bad_alloc();
 	}
 }
@@ -194,22 +194,22 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.reply)
 		cppSet->idempotence.setReply(cSet->idempotence.accepted);
 	
-	if (cSet->knownMethods != nullptr)
+	if (cSet->authMethods.known != nullptr)
 	{
 		set<SOCKS6Method> methods;
 		
-		for (int i = 0; i < cSet->knownMethodCount; i++)
-			methods.insert((SOCKS6Method)cSet->knownMethods[i]);
-		cppSet->authMethods.advertise(methods, cSet->initialDataLen);
+		for (int i = 0; i < cSet->authMethods.knownMethodCount; i++)
+			methods.insert((SOCKS6Method)cSet->authMethods.known[i]);
+		cppSet->authMethods.advertise(methods, cSet->authMethods.initialDataLen);
 	}
 	
-	if (cSet->userPasswdAuth.username != nullptr || cSet->userPasswdAuth.passwd != nullptr)
-		cppSet->userPasswd.setCredentials(move(string(cSet->userPasswdAuth.username)), move(string(cSet->userPasswdAuth.passwd)));
+	if (cSet->userPasswd.username != nullptr || cSet->userPasswd.passwd != nullptr)
+		cppSet->userPassword.setCredentials(move(string(cSet->userPasswd.username)), move(string(cSet->userPasswd.passwd)));
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
 {
-	delete optionSet->knownMethods;
+	delete optionSet->authMethods.known;
 	delete optionSet->stackOptions;
 }
 
@@ -275,8 +275,8 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 		req = new S6M_RequestExtended();
 		memset((S6M_Request *)req, 0, sizeof(S6M_Request));
 		req->cppAddr = *(cppReq.getAddress());
-		req->cppUsername = *cppReq.options.userPasswd.getUsername();
-		req->cppPasswd = *cppReq.options.userPasswd.getPassword();
+		req->cppUsername = *cppReq.options.userPassword.getUsername();
+		req->cppPasswd = *cppReq.options.userPassword.getPassword();
 		
 		req->code = cppReq.getCommandCode();
 		S6M_Addr_Fill(&req->addr, cppReq.getAddress());
@@ -358,8 +358,8 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		
 		authReply = new S6M_AuthReplyExtended();
 		memset((S6M_AuthReply *)authReply, 0, sizeof(S6M_AuthReply));
-		authReply->cppUsername = *cppAuthReply.options.userPasswd.getUsername();
-		authReply->cppPasswd = *cppAuthReply.options.userPasswd.getPassword();
+		authReply->cppUsername = *cppAuthReply.options.userPassword.getUsername();
+		authReply->cppPasswd = *cppAuthReply.options.userPassword.getPassword();
 		
 		authReply->code = cppAuthReply.getReplyCode();
 		S6M_OptionSet_Fill(&authReply->optionSet, &cppAuthReply.options);
@@ -444,8 +444,8 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 		opReply = new S6M_OpReplyExtended();
 		memset((S6M_OpReply *)opReply, 0, sizeof(S6M_OpReply));
 		opReply->cppAddr = *(cppOpReply.getAddress());
-		opReply->cppUsername = *cppOpReply.options.userPasswd.getUsername();
-		opReply->cppPasswd = *cppOpReply.options.userPasswd.getPassword();
+		opReply->cppUsername = *cppOpReply.options.userPassword.getUsername();
+		opReply->cppPasswd = *cppOpReply.options.userPassword.getPassword();
 		
 		opReply->code = cppOpReply.getCode();
 		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddress());

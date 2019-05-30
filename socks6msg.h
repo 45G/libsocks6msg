@@ -47,15 +47,19 @@ struct S6M_OptionSet
 		int accepted;
 	} idempotence;
 	
-	enum SOCKS6Method *knownMethods;
-	int knownMethodCount;
-	uint16_t initialDataLen;
+	struct
+	{
+		enum SOCKS6Method *known;
+		int knownMethodCount;
+		uint16_t initialDataLen;
+		enum SOCKS6Method selected; //TODO
+	} authMethods;
 	
 	struct
 	{
 		const char *username;
 		const char *passwd;
-	} userPasswdAuth;
+	} userPasswd;
 };
 
 struct S6M_Request

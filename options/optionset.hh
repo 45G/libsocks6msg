@@ -283,11 +283,11 @@ class OptionSet: public OptionSetBase
 	}
 	
 public:
-	StackOptionSet       stack       { this };
-	SessionOptionSet     session     { this };
-	IdempotenceOptionSet idempotence { this };
-	UserPasswdOptionSet  userPasswd  { this };
-	AuthMethodOptionSet  authMethods { this };
+	StackOptionSet       stack        { this };
+	SessionOptionSet     session      { this };
+	IdempotenceOptionSet idempotence  { this };
+	UserPasswdOptionSet  userPassword { this };
+	AuthMethodOptionSet  authMethods  { this };
 
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
