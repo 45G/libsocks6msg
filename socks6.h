@@ -83,7 +83,7 @@ struct SOCKS6AuthReply
 enum SOCKS6AuthReplyCode
 {
 	SOCKS6_AUTH_REPLY_SUCCESS = 0,
-	SOCKS6_AUTH_REPLY_MORE    = 1,
+	SOCKS6_AUTH_REPLY_FAILURE = 1,
 };
 
 /**

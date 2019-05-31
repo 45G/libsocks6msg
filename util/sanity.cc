@@ -72,7 +72,7 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 	switch (conv)
 	{
 	case SOCKS6_AUTH_REPLY_SUCCESS:
-	case SOCKS6_AUTH_REPLY_MORE:
+	case SOCKS6_AUTH_REPLY_FAILURE:
 		return conv;
 	}
 	
