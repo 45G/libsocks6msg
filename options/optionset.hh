@@ -133,10 +133,10 @@ public:
 	
 	void advertise(uint32_t base, uint32_t size);
 	
-	boost::optional<uint32_t> advertisedBase() const
+	uint32_t advertisedBase() const
 	{
 		if (windowOpt == nullptr)
-			return {};
+			return 0;
 		return windowOpt->getWinBase();
 	}
 	
