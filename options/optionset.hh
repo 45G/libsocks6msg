@@ -69,7 +69,7 @@ public:
 		return teardownOpt != nullptr;
 	}
 	
-	void setID(const std::vector<uint8_t> &ticket);
+	void setID(const std::vector<uint8_t> &id);
 	
 	const std::vector<uint8_t> *getID() const
 	{
@@ -105,10 +105,10 @@ public:
 
 class IdempotenceOptionSet: public OptionSetBase
 {
-	std::unique_ptr<IdempotenceRequestOption>      requestOpt;
+	std::unique_ptr<IdempotenceRequestOption>     requestOpt;
 	std::unique_ptr<IdempotenceExpenditureOption> expenditureOpt;
-	std::unique_ptr<IdempotenceWindowOption>       windowOpt;
-	std::unique_ptr<Option>                        replyOpt;
+	std::unique_ptr<IdempotenceWindowOption>      windowOpt;
+	std::unique_ptr<Option>                       replyOpt;
 	
 public:
 	IdempotenceOptionSet(OptionSet *owner);
