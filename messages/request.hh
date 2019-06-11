@@ -20,6 +20,9 @@ public:
 	
 	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port)
 		: commandCode(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
+
+	Request()
+		: Request(SOCKS6_REQUEST_NOOP, Address(), 0) {}
 	
 	Request(ByteBuffer *bb);
 	
@@ -28,15 +31,30 @@ public:
 	size_t pack(uint8_t *buf, size_t bufSize) const;
 	
 	size_t packedSize() const;
+
+	void setCommandCode(SOCKS6RequestCode commandCode)
+	{
+		this->commandCode = commandCode;
+	}
 	
 	SOCKS6RequestCode getCommandCode() const
 	{
 		return commandCode;
 	}
 	
+	void setAddress(const Address &address)
+	{
+		this->address = address;
+	}
+
 	const Address *getAddress() const
 	{
 		return &address;
+	}
+
+	void setPort(uint16_t port)
+	{
+		this->port = port;
 	}
 	
 	uint16_t getPort() const
