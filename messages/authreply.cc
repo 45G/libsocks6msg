@@ -6,9 +6,6 @@
 namespace S6M
 {
 
-AuthenticationReply::AuthenticationReply(SOCKS6AuthReplyCode replyCode)
-	: replyCode(replyCode), options(OptionSet::M_AUTH_REP) {}
-
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	: options(OptionSet::M_AUTH_REP)
 {
