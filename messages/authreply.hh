@@ -16,9 +16,6 @@ public:
 
 	AuthenticationReply(SOCKS6AuthReplyCode replyCode)
 		: replyCode(replyCode), options(OptionSet::M_AUTH_REP) {}
-
-	AuthenticationReply()
-		: AuthenticationReply(SOCKS6_AUTH_REPLY_FAILURE) {}
 	
 	AuthenticationReply(ByteBuffer *bb);
 	

@@ -20,9 +20,6 @@ public:
 	
 	OperationReply(SOCKS6OperationReplyCode code, Address address = Address(), uint16_t port = 0)
 		: code(code), address(address), port(port), options(OptionSet::M_OP_REP) {}
-
-	OperationReply()
-		: OperationReply(SOCKS6_OPERATION_REPLY_FAILURE) {}
 	
 	OperationReply(ByteBuffer *bb);
 	
