@@ -10,7 +10,7 @@ namespace S6M
 
 class Request
 {
-	SOCKS6RequestCode commandCode;
+	SOCKS6RequestCode code;
 	
 	Address address;
 	uint16_t port;
@@ -19,7 +19,7 @@ public:
 	OptionSet options;
 	
 	Request(SOCKS6RequestCode commandCode, Address address = Address(), uint16_t port = 0)
-		: commandCode(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
+		: code(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
 	
 	Request(ByteBuffer *bb);
 	
@@ -29,14 +29,14 @@ public:
 	
 	size_t packedSize() const;
 
-	void setCommandCode(SOCKS6RequestCode commandCode)
+	void setCode(SOCKS6RequestCode code)
 	{
-		this->commandCode = commandCode;
+		this->code = code;
 	}
 	
-	SOCKS6RequestCode getCommandCode() const
+	SOCKS6RequestCode getCode() const
 	{
-		return commandCode;
+		return code;
 	}
 	
 	void setAddress(const Address &address)

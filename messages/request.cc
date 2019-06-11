@@ -12,7 +12,7 @@ Request::Request(ByteBuffer *bb)
 	Version::check(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	commandCode = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
+	code = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
 	port = ntohs(rawRequest->port);
 	SOCKS6AddressType addrType = enumCast<SOCKS6AddressType>(rawRequest->addressType);
 	
@@ -27,7 +27,7 @@ void Request::pack(ByteBuffer *bb) const
 {
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	rawRequest->version = SOCKS6_VERSION;
-	rawRequest->commandCode = commandCode;
+	rawRequest->commandCode = code;
 	rawRequest->optionsLength = htons(options.packedSize());
 	rawRequest->port = htons(port);
 	rawRequest->padding = 0;

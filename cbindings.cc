@@ -278,7 +278,7 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 		req->cppUsername = *cppReq.options.userPassword.getUsername();
 		req->cppPasswd = *cppReq.options.userPassword.getPassword();
 		
-		req->code = cppReq.getCommandCode();
+		req->code = cppReq.getCode();
 		S6M_Addr_Fill(&req->addr, cppReq.getAddress());
 		req->port = cppReq.getPort();
 		S6M_OptionSet_Fill(&req->optionSet, &cppReq.options);
@@ -361,7 +361,7 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		authReply->cppUsername = *cppAuthReply.options.userPassword.getUsername();
 		authReply->cppPasswd = *cppAuthReply.options.userPassword.getPassword();
 		
-		authReply->code = cppAuthReply.getReplyCode();
+		authReply->code = cppAuthReply.getCode();
 		S6M_OptionSet_Fill(&authReply->optionSet, &cppAuthReply.options);
 		
 		*pauthReply = authReply;

@@ -9,13 +9,13 @@ namespace S6M
 
 class AuthenticationReply
 {
-	SOCKS6AuthReplyCode replyCode;
+	SOCKS6AuthReplyCode code;
 
 public:	
 	OptionSet options;
 
 	AuthenticationReply(SOCKS6AuthReplyCode replyCode)
-		: replyCode(replyCode), options(OptionSet::M_AUTH_REP) {}
+		: code(replyCode), options(OptionSet::M_AUTH_REP) {}
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
@@ -25,14 +25,14 @@ public:
 	
 	size_t packedSize() const;
 	
-	void setReplyCode(SOCKS6AuthReplyCode replyCode)
+	void setCode(SOCKS6AuthReplyCode code)
 	{
-		this->replyCode = replyCode;
+		this->code = code;
 	}
 
-	SOCKS6AuthReplyCode getReplyCode() const
+	SOCKS6AuthReplyCode getCode() const
 	{
-		return replyCode;
+		return code;
 	}
 };
 
