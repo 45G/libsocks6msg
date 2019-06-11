@@ -38,6 +38,10 @@ public:
 			for (int i = 0; i < 4; i++)
 				ipv6.__in6_u.__u6_addr32[i] = 0;
 		}
+		else
+		{
+			throw std::invalid_argument("Bad type");
+		}
 	}
 	
 	Address(in_addr ipv4)
