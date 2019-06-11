@@ -18,11 +18,11 @@ class Request
 public:
 	OptionSet options;
 	
-	Request(SOCKS6RequestCode commandCode, Address address, uint16_t port)
+	Request(SOCKS6RequestCode commandCode, Address address = Address(), uint16_t port = 0)
 		: commandCode(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
 
 	Request()
-		: Request(SOCKS6_REQUEST_NOOP, Address(), 0) {}
+		: Request(SOCKS6_REQUEST_NOOP) {}
 	
 	Request(ByteBuffer *bb);
 	

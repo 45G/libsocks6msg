@@ -14,7 +14,11 @@ class AuthenticationReply
 public:	
 	OptionSet options;
 
-	AuthenticationReply(SOCKS6AuthReplyCode replyCode);
+	AuthenticationReply(SOCKS6AuthReplyCode replyCode)
+		: replyCode(replyCode), options(OptionSet::M_AUTH_REP) {}
+
+	AuthenticationReply()
+		: AuthenticationReply(SOCKS6_AUTH_REPLY_FAILURE) {}
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
@@ -24,6 +28,11 @@ public:
 	
 	size_t packedSize() const;
 	
+	void setReplyCode(SOCKS6AuthReplyCode replyCode)
+	{
+		this->replyCode = replyCode;
+	}
+
 	SOCKS6AuthReplyCode getReplyCode() const
 	{
 		return replyCode;
