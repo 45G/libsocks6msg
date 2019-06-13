@@ -38,6 +38,12 @@ using namespace S6M;
 		(err) = S6M_ERR_UNSPEC; \
 	}
 
+struct S6M_Clutter
+{
+	list<string> strings;
+	list<vector<uint8_t>> vectors;
+};
+
 /*
  * S6m_Addr
  */
@@ -108,7 +114,6 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	fillStackOptions(&cppSet->stack.tfo,     &stackOpts);
 	fillStackOptions(&cppSet->stack.mp,      &stackOpts);
 	fillStackOptions(&cppSet->stack.backlog, &stackOpts);
-	
 	if (stackOpts.empty())
 	{
 		cSet->stack.options = new S6M_StackOption[stackOpts.size()];
@@ -123,6 +128,19 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	{
 		cSet = nullptr;
 	}
+	
+	if (cppSet->session.requested())
+		cSet->session.request = 1;
+	if (cppSet->session.tornDown())
+		cSet->session.tearDown = 1;
+//	if (cSet->session.idLength)
+//		cppSet->session.setID(vector<uint8_t>(cSet->session.id, cSet->session.id + cSet->session.idLength));
+	if (cppSet->session.isOK())
+		cSet->session.ok = 1;
+	if (cppSet->session.rejected())
+		cSet->session.rejected = 1;
+	if (cppSet->session.isUntrusted())
+		cSet->session.untrusted = 1;
 	
 	cSet->idempotence.request = cppSet->idempotence.requestedSize();
 	cSet->idempotence.spend = (bool)cppSet->idempotence.getToken();
@@ -154,7 +172,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 		if (cSet->userPassword.passwd == nullptr)
 			throw bad_alloc();
 	}
-	if (cppSet->userPassword.getReply())
+	if (cppSet->userPassword.getReply() != boost::none)
 	{
 		cSet->userPassword.replied = 1;
 		cSet->userPassword.success = cppSet->userPassword.getReply().get();
@@ -189,6 +207,19 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 			throw logic_error("Invalid option");
 		}
 	}
+	
+	if (cSet->session.request)
+		cppSet->session.request();
+	if (cSet->session.tearDown)
+		cppSet->session.tearDown();
+	if (cSet->session.idLength)
+		cppSet->session.setID(vector<uint8_t>(cSet->session.id, cSet->session.id + cSet->session.idLength));
+	if (cSet->session.ok)
+		cppSet->session.signalOK();
+	if (cSet->session.rejected)
+		cppSet->session.signalReject();
+	if (cSet->session.untrusted)
+		cppSet->session.setUntrusted();
 	
 	if (cSet->idempotence.request > 0)
 		cppSet->idempotence.request(cSet->idempotence.request);

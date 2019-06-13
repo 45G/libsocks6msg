@@ -38,6 +38,21 @@ struct S6M_OptionSet
 	
 	struct
 	{
+		int request;
+		
+		int tearDown;
+		
+		uint8_t *id;
+		int idLength;
+		
+		int ok;
+		int rejected;
+		
+		int untrusted;
+	} session;
+	
+	struct
+	{
 		uint32_t request;
 		
 		int spend;
