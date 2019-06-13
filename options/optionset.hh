@@ -225,7 +225,7 @@ public:
 	
 	void setReply(bool success);
 	
-	boost::optional<bool> getReply()
+	boost::optional<bool> getReply() const
 	{
 		if (reply == nullptr)
 			return {};

@@ -154,6 +154,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 		if (cSet->userPassword.passwd == nullptr)
 			throw bad_alloc();
 	}
+	if (cppSet->userPassword.getReply())
+	{
+		cSet->userPassword.replied = 1;
+		cSet->userPassword.success = cppSet->userPassword.getReply().get();
+	}
 }
 
 static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
@@ -205,6 +210,8 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	
 	if (cSet->userPassword.username != nullptr || cSet->userPassword.passwd != nullptr)
 		cppSet->userPassword.setCredentials(move(string(cSet->userPassword.username)), move(string(cSet->userPassword.passwd)));
+	if (cSet->userPassword.replied)
+		cppSet->userPassword.setReply(cSet->userPassword.success);
 }
 
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)

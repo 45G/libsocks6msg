@@ -59,6 +59,9 @@ struct S6M_OptionSet
 	{
 		const char *username;
 		const char *passwd;
+		
+		int replied;
+		int success;
 	} userPassword;
 };
 
