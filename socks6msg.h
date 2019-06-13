@@ -30,8 +30,11 @@ struct S6M_StackOption
 
 struct S6M_OptionSet
 {
-	S6M_StackOption *stackOptions;
-	int stackOptionCount;
+	struct
+	{
+		S6M_StackOption *options;
+		int count;
+	} stack;
 	
 	struct
 	{

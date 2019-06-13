@@ -111,11 +111,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 	
 	if (stackOpts.empty())
 	{
-		cSet->stackOptions = new S6M_StackOption[stackOpts.size()];
+		cSet->stack.options = new S6M_StackOption[stackOpts.size()];
 		int i = 0;
 		BOOST_FOREACH(S6M_StackOption opt, stackOpts)
 		{
-			cSet->stackOptions[i] = opt;
+			cSet->stack.options[i] = opt;
 			i++;
 		}
 	}
@@ -163,9 +163,9 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet)
 
 static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 {
-	for (int i = 0; i < cSet->stackOptionCount; i++)
+	for (int i = 0; i < cSet->stack.count; i++)
 	{
-		S6M_StackOption *option = &cSet->stackOptions[i];
+		S6M_StackOption *option = &cSet->stack.options[i];
 		if (option->level == SOCKS6_STACK_LEVEL_IP)
 		{
 			if (option->code == SOCKS6_STACK_CODE_TOS)
@@ -217,7 +217,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 static void S6M_OptionSet_Cleanup(S6M_OptionSet *optionSet)
 {
 	delete optionSet->authMethods.known;
-	delete optionSet->stackOptions;
+	delete optionSet->stack.options;
 }
 
 /*
