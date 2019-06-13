@@ -70,7 +70,7 @@ struct S6M_OptionSet
 		enum SOCKS6Method *known;
 		int knownMethodCount;
 		uint16_t initialDataLen;
-		enum SOCKS6Method selected; //TODO
+		enum SOCKS6Method selected;
 	} authMethods;
 	
 	struct
