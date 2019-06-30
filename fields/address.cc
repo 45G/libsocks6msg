@@ -70,6 +70,9 @@ Address::Address(SOCKS6AddressType type, ByteBuffer *bb)
 	case SOCKS6_ADDR_DOMAIN:
 		domain = Padded<String>(bb);
 		break;
+
+	default:
+		throw BadAddressTypeException();
 	}
 }
 

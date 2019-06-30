@@ -1,5 +1,5 @@
-#include <stdexcept>
 #include "sanity.hh"
+#include "exceptions.hh"
 
 #pragma GCC diagnostic error "-Wswitch"
 
@@ -92,7 +92,7 @@ SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
 		return conv;
 	}
 	
-	throw invalid_argument("Bad address type");
+	throw BadAddressTypeException();
 }
 
 template<>

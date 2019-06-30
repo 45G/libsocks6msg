@@ -13,21 +13,25 @@ using namespace std;
 using namespace S6M;
 
 #define S6M_CATCH(err) \
-	catch (invalid_argument &) \
-	{ \
-		(err) = S6M_ERR_INVALID; \
-	} \
 	catch (EndOfBufferException &) \
 	{ \
 		(err) = S6M_ERR_BUFFER; \
 	} \
-	catch (logic_error &) \
-	{ \
-		(err) = S6M_ERR_INVALID; \
-	} \
 	catch (BadVersionException &) \
 	{ \
 		(err) = S6M_ERR_OTHERVER; \
+	} \
+	catch (BadAddressTypeException &) \
+	{ \
+		(err) = S6M_ERR_ADDRTYPE; \
+	} \
+	catch (invalid_argument &) \
+	{ \
+		(err) = S6M_ERR_INVALID; \
+	} \
+	catch (logic_error &) \
+	{ \
+		(err) = S6M_ERR_INVALID; \
 	} \
 	catch (bad_alloc &) \
 	{ \

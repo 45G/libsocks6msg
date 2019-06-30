@@ -9,6 +9,7 @@
 #include "bytebuffer.hh"
 #include "string.hh"
 #include "padded.hh"
+#include "exceptions.hh"
 
 namespace S6M
 {
@@ -40,7 +41,7 @@ public:
 		}
 		else
 		{
-			throw std::invalid_argument("Bad type");
+			throw BadAddressTypeException();
 		}
 	}
 	

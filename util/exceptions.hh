@@ -28,6 +28,13 @@ public:
 		: length_error("End of buffer") {}
 };
 
+class BadAddressTypeException: public std::invalid_argument
+{
+public:
+	BadAddressTypeException()
+		: invalid_argument("Bad address type") {}
+};
+
 }
 
 #endif // SOCKS6MSG_EXCEPTION_HH
