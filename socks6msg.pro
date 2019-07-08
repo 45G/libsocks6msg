@@ -23,7 +23,8 @@ SOURCES += \
     messages/request.cc \
     messages/usrpasswd.cc \
     messages/version.cc \
-    options/sessionoption.cc
+    options/sessionoption.cc \
+    options/resolutionoption.cc
 
 HEADERS += \
     socks6.h \
@@ -48,7 +49,8 @@ HEADERS += \
     util/byteorder.hh \
     util/exceptions.hh \
     fields/padded.hh \
-    util/restrictedint.hh
+    util/restrictedint.hh \
+    options/resolutionoption.hh
 
 unix {
     headers.path = /usr/local/include/socks6msg
