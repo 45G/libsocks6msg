@@ -92,11 +92,4 @@ void BacklogOption::stackParse(RawOption *opt, OptionSet *optionSet)
 	optionSet->stack.backlog.set((SOCKS6StackLeg)opt->stackOptionHead.leg, ntohs(opt->value));
 }
 
-BacklogOption::BacklogOption(SOCKS6StackLeg leg, uint16_t backlog)
-	: StackOptionBase(leg, backlog)
-{
-	if (backlog < SOCKS6_BACKLOG_MIN)
-		throw invalid_argument("Bad backlog size");
-}
-
 }

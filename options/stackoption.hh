@@ -124,7 +124,7 @@ class BacklogOption: public StackOptionBase<BacklogOption, SOCKS6_STACK_LEVEL_TC
 public:
 	static void stackParse(RawOption *opt, OptionSet *optionSet);
 
-	BacklogOption(SOCKS6StackLeg leg, uint16_t backlog);
+	using StackOptionBase::StackOptionBase;
 };
 
 }

@@ -245,8 +245,6 @@ struct SOCKS6BacklogOption
 	uint16_t                 backlog;
 } __attribute__((packed));
 
-#define SOCKS6_BACKLOG_MIN (1)
-
 struct SOCKS6AuthMethodAdvertOption
 {
 	struct SOCKS6Option optionHead;
