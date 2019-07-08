@@ -15,6 +15,7 @@
 #include "authmethodoption.hh"
 #include "authdataoption.hh"
 #include "sessionoption.hh"
+#include "resolutionoption.hh"
 
 namespace S6M
 {
@@ -269,6 +270,60 @@ public:
 	}
 };
 
+class ResolutionOptionSet: public OptionSetBase
+{
+	std::unique_ptr<ResolutionRequestOption> requestOption;
+	std::unique_ptr<IPv4ResolutionOption>    ipv4Option;
+	std::unique_ptr<IPv6ResolutionOption>    ipv6Option;
+	std::unique_ptr<DomainResolutionOption>  domainOption;
+
+public:
+	ResolutionOptionSet(OptionSet *owner);
+
+	void request();
+
+	bool requested() const
+	{
+		return requestOption.get() != nullptr;
+	}
+
+	void setIPv4(const std::list<in_addr> &ipv4);
+
+	const std::list<in_addr> *getIPv4()
+	{
+		static const std::list<in_addr> EMPTY_LIST;
+
+		if (ipv4Option.get() == nullptr)
+			return &EMPTY_LIST;
+
+		return ipv4Option.get()->getAddresses();
+	}
+
+	void setIPv6(const std::list<in6_addr> &ipv6);
+
+	const std::list<in6_addr> *getIPv6()
+	{
+		static const std::list<in6_addr> EMPTY_LIST;
+
+		if (ipv6Option.get() == nullptr)
+			return &EMPTY_LIST;
+
+		return ipv6Option.get()->getAddresses();
+	}
+
+	void setDomains(const std::list<std::string> &domains);
+
+	const std::list<std::string> *getDomains()
+	{
+		static const std::list<std::string> EMPTY_LIST;
+
+		if (domainOption.get() == nullptr)
+			return &EMPTY_LIST;
+
+		return domainOption.get()->getAddresses();
+	}
+};
+
 class OptionSet: public OptionSetBase
 {
 	std::list<Option *> options;
@@ -288,6 +343,7 @@ public:
 	IdempotenceOptionSet idempotence  { this };
 	UserPasswdOptionSet  userPassword { this };
 	AuthMethodOptionSet  authMethods  { this };
+	ResolutionOptionSet  resolution   { this };
 
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
@@ -313,6 +369,7 @@ public:
 	friend class StackOptionPair;
 	friend class UserPasswdOptionSet;
 	friend class AuthMethodOptionSet;
+	friend class ResolutionOptionSet;
 };
 
 }
