@@ -64,3 +64,6 @@ unix {
     }
     INSTALLS += target
 }
+
+DISTFILES += \
+    README.md
