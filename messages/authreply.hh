@@ -7,15 +7,14 @@
 namespace S6M
 {
 
-class AuthenticationReply
+struct AuthenticationReply
 {
 	SOCKS6AuthReplyCode code;
 
-public:	
-	OptionSet options;
+	OptionSet options { OptionSet::M_AUTH_REP };
 
 	AuthenticationReply(SOCKS6AuthReplyCode replyCode)
-		: code(replyCode), options(OptionSet::M_AUTH_REP) {}
+		: code(replyCode) {}
 	
 	AuthenticationReply(ByteBuffer *bb);
 	
@@ -24,16 +23,6 @@ public:
 	size_t pack(uint8_t *buf, size_t bufSize) const;
 	
 	size_t packedSize() const;
-	
-	void setCode(SOCKS6AuthReplyCode code)
-	{
-		this->code = code;
-	}
-
-	SOCKS6AuthReplyCode getCode() const
-	{
-		return code;
-	}
 };
 
 }

@@ -56,22 +56,22 @@ struct S6M_PrivateClutter
  * S6m_Addr
  */
 
-static void S6M_Addr_Fill(S6M_Address *cAddr, const Address *cppAddr, S6M_PrivateClutter *clutter)
+static void S6M_Addr_Fill(S6M_Address *cAddr, const Address &cppAddr, S6M_PrivateClutter *clutter)
 {
-	cAddr->type = cppAddr->getType();
+	cAddr->type = cppAddr.getType();
 	
-	switch (cppAddr->getType())
+	switch (cppAddr.getType())
 	{
 	case SOCKS6_ADDR_IPV4:
-		cAddr->ipv4 = cppAddr->getIPv4();
+		cAddr->ipv4 = cppAddr.getIPv4();
 		break;
 		
 	case SOCKS6_ADDR_IPV6:
-		cAddr->ipv6 = cppAddr->getIPv6();
+		cAddr->ipv6 = cppAddr.getIPv6();
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		clutter->domain = *(cppAddr->getDomain());
+		clutter->domain = *(cppAddr.getDomain());
 		cAddr->domain = clutter->domain.c_str();
 		break;
 	}
@@ -316,9 +316,9 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 		req = new S6M_RequestExtended();
 		memset((S6M_Request *)req, 0, sizeof(S6M_Request));
 		
-		req->code = cppReq.getCode();
-		S6M_Addr_Fill(&req->addr, cppReq.getAddress(), &req->clutter);
-		req->port = cppReq.getPort();
+		req->code = cppReq.code;
+		S6M_Addr_Fill(&req->addr, cppReq.address, &req->clutter);
+		req->port = cppReq.port;
 		S6M_OptionSet_Fill(&req->optionSet, &cppReq.options, &req->clutter);
 		
 		*preq = req;
@@ -395,7 +395,7 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 		authReply = new S6M_AuthReplyExtended();
 		memset((S6M_AuthReply *)authReply, 0, sizeof(S6M_AuthReply));
 		
-		authReply->code = cppAuthReply.getCode();
+		authReply->code = cppAuthReply.code;
 		S6M_OptionSet_Fill(&authReply->optionSet, &cppAuthReply.options, &authReply->clutter);
 		
 		*pauthReply = authReply;
@@ -475,9 +475,9 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 		opReply = new S6M_OpReplyExtended();
 		memset((S6M_OpReply *)opReply, 0, sizeof(S6M_OpReply));
 		
-		opReply->code = cppOpReply.getCode();
-		S6M_Addr_Fill(&opReply->addr, cppOpReply.getAddress(), &opReply->clutter);
-		opReply->port = cppOpReply.getPort();
+		opReply->code = cppOpReply.code;
+		S6M_Addr_Fill(&opReply->addr, cppOpReply.address, &opReply->clutter);
+		opReply->port = cppOpReply.port;
 		S6M_OptionSet_Fill(&opReply->optionSet, &cppOpReply.options, &opReply->clutter);
 		
 		*popReply = opReply;
@@ -550,8 +550,8 @@ ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 		ByteBuffer bb(buf, size);
 		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended(&bb);
 		
-		pwReq->username = pwReq->cppReq.getUsername()->c_str();
-		pwReq->passwd = pwReq->cppReq.getPassword()->c_str();
+		pwReq->username = pwReq->cppReq.username->getStr()->c_str();
+		pwReq->passwd   = pwReq->cppReq.password->getStr()->c_str();
 		
 		*ppwReq = pwReq;
 		return bb.getUsed();
@@ -605,7 +605,7 @@ ssize_t S6M_PasswdReply_parse(uint8_t *buf, size_t size, S6M_PasswdReply **ppwRe
 		UserPasswordReply rep(&bb);
 		
 		S6M_PasswdReply *pwReply = new S6M_PasswdReply();
-		pwReply->success = rep.isSuccessful();
+		pwReply->success = rep.success;
 		
 		*ppwReply = pwReply;
 		return bb.getUsed();

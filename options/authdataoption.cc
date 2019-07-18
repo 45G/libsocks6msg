@@ -69,7 +69,7 @@ void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, Op
 		if (bb.getUsed() != expectedDataSize)
 			throw invalid_argument("Spurious bytes at the end of the option");
 		
-		optionSet->userPassword.setCredentials(*req.getUsername(), *req.getPassword());
+		optionSet->userPassword.setCredentials(*req.username->getStr(), *req.password->getStr());
 	}
 	catch (length_error &)
 	{

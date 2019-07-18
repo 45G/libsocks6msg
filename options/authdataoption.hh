@@ -44,12 +44,12 @@ public:
 
 	const std::string *getUsername() const
 	{
-		return req.getUsername();
+		return req.username->getStr();
 	}
 
 	const std::string *getPassword() const
 	{
-		return req.getPassword();
+		return req.password->getStr();
 	}
 };
 

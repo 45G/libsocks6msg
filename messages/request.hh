@@ -8,18 +8,17 @@
 namespace S6M
 {
 
-class Request
+struct Request
 {
 	SOCKS6RequestCode code;
 	
 	Address address;
 	uint16_t port;
 	
-public:
-	OptionSet options;
+	OptionSet options { OptionSet::M_REQ };
 	
 	Request(SOCKS6RequestCode commandCode, Address address = Address(), uint16_t port = 0)
-		: code(commandCode), address(address), port(port), options(OptionSet::M_REQ) {}
+		: code(commandCode), address(address), port(port) {}
 	
 	Request(ByteBuffer *bb);
 	
@@ -28,36 +27,6 @@ public:
 	size_t pack(uint8_t *buf, size_t bufSize) const;
 	
 	size_t packedSize() const;
-
-	void setCode(SOCKS6RequestCode code)
-	{
-		this->code = code;
-	}
-	
-	SOCKS6RequestCode getCode() const
-	{
-		return code;
-	}
-	
-	void setAddress(const Address &address)
-	{
-		this->address = address;
-	}
-
-	const Address *getAddress() const
-	{
-		return &address;
-	}
-
-	void setPort(uint16_t port)
-	{
-		this->port = port;
-	}
-	
-	uint16_t getPort() const
-	{
-		return port;
-	}
 };
 
 }
