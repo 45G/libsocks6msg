@@ -40,16 +40,6 @@ struct SOCKS6Request
 	uint8_t  address[0];
 } __attribute__((packed));
 
-struct SOCKS6IPv4Address
-{
-	uint32_t ipv4Address;
-} __attribute__((packed));
-
-struct SOCKS6IPv6Address
-{
-	uint8_t ipv6Address[16];
-} __attribute__((packed));
-
 struct SOCKS6DomainAddress
 {
 	uint8_t len;
