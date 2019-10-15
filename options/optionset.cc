@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <boost/foreach.hpp>
 #include "optionset.hh"
 
 
@@ -107,10 +106,8 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 
 void OptionSet::pack(ByteBuffer *bb) const
 {
-	BOOST_FOREACH(Option *option, options)
-	{
+	for (Option *option: options)
 		option->pack(bb);
-	}
 }
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)

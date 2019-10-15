@@ -1,6 +1,5 @@
 #include <arpa/inet.h>
 #include <list>
-#include <boost/foreach.hpp>
 #include "option.hh"
 #include "stackoption.hh"
 #include "idempotenceoption.hh"

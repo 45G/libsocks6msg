@@ -2,7 +2,6 @@
 #include <string.h>
 #include <list>
 #include <set>
-#include <boost/foreach.hpp>
 #include <memory>
 #include <stdexcept>
 #include "socks6msg.h"
@@ -125,11 +124,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	{
 		clutter->stackOpts.reserve(stackOpts.size());
 		int i = 0;
-		BOOST_FOREACH(S6M_StackOption opt, stackOpts)
-		{
-			clutter->stackOpts[i] = opt;
-			i++;
-		}
+		for (const S6M_StackOption &opt: stackOpts)
+			clutter->stackOpts[i++] = opt;
 		cSet->stack.options = clutter->stackOpts.data();
 	}
 	else
@@ -165,10 +161,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	if (!cppSet->authMethods.getAdvertised()->empty())
 	{
 		clutter->knownMethods.reserve(cppSet->authMethods.getAdvertised()->size());
-		BOOST_FOREACH(SOCKS6Method method, *(cppSet->authMethods.getAdvertised()))
-		{
+		for (SOCKS6Method method: *(cppSet->authMethods.getAdvertised()))
 			clutter->knownMethods.push_back(method);
-		}
 		cSet->authMethods.known = clutter->knownMethods.data();
 	}
 	cSet->authMethods.initialDataLen = cppSet->authMethods.getInitialDataLen();

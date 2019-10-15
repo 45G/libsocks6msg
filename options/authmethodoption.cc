@@ -1,5 +1,4 @@
 #include <arpa/inet.h>
-#include <boost/foreach.hpp>
 #include "authmethodoption.hh"
 #include "optionset.hh"
 #include "padded.hh"
@@ -23,11 +22,8 @@ void AuthMethodAdvertOption::fill(uint8_t *buf) const
 	opt->initialDataLen = htons(initialDataLen);
 
 	int i = 0;
-	BOOST_FOREACH(SOCKS6Method method, methods)
-	{
-		opt->methods[i] = method;
-		i++;
-	}
+	for (SOCKS6Method method: methods)
+		opt->methods[i++] = method;
 	
 	for (int j = 0; j < (int)paddingOf(unpaddedSize()); j++)
 		opt->methods[i + j] = 0;

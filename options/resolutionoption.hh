@@ -3,7 +3,6 @@
 
 #include <list>
 #include <unordered_set>
-#include <boost/foreach.hpp>
 #include "option.hh"
 #include "string.hh"
 #include "padded.hh"
