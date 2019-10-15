@@ -60,14 +60,14 @@ public:
 	
 	bool requested() const
 	{
-		return dynamic_cast<SessionRequestOption *>(mandatoryOpt.get()) != nullptr;
+		return dynamic_cast<SessionRequestOption *>(mandatoryOpt.get());
 	}
 	
 	void tearDown();
 	
 	bool tornDown() const
 	{
-		return teardownOpt != nullptr;
+		return (bool)teardownOpt;
 	}
 	
 	void setID(const std::vector<uint8_t> &id);
@@ -86,21 +86,21 @@ public:
 	
 	bool isOK() const
 	{
-		return dynamic_cast<SessionOKOption *>(mandatoryOpt.get()) != nullptr;
+		return dynamic_cast<SessionOKOption *>(mandatoryOpt.get());
 	}
 	
 	void signalReject();
 	
 	bool rejected() const
 	{
-		return dynamic_cast<SessionInvalidOption *>(mandatoryOpt.get()) != nullptr;
+		return dynamic_cast<SessionInvalidOption *>(mandatoryOpt.get());
 	}
 	
 	void setUntrusted();
 	
 	bool isUntrusted() const
 	{
-		return untrustedOpt != nullptr;
+		return (bool)untrustedOpt;
 	}
 };
 
@@ -152,9 +152,9 @@ public:
 	
 	boost::optional<bool> getReply() const
 	{
-		if (dynamic_cast<const IdempotenceAcceptedOption *>(replyOpt.get()) != nullptr)
+		if (dynamic_cast<const IdempotenceAcceptedOption *>(replyOpt.get()))
 			return true;
-		if (dynamic_cast<const IdempotenceRejectedOption *>(replyOpt.get()) != nullptr)
+		if (dynamic_cast<const IdempotenceRejectedOption *>(replyOpt.get()))
 			return false;
 		return {};
 	}
@@ -284,7 +284,7 @@ public:
 
 	bool requested() const
 	{
-		return requestOption.get() != nullptr;
+		return (bool)requestOption;
 	}
 
 	void setIPv4(const std::list<in_addr> &ipv4);
