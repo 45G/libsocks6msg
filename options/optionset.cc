@@ -11,14 +11,14 @@ namespace S6M
 template <typename T>
 void ensureVacant(const std::unique_ptr<T> &ptr)
 {
-	if (ptr.get() != nullptr)
+	if (ptr)
 		throw std::logic_error("Option already in place");
 }
 
 template <typename T>
 void ensureVacant(const std::shared_ptr<T> &ptr)
 {
-	if (ptr.get() != nullptr)
+	if (ptr)
 		throw std::logic_error("Option already in place");
 }
 
