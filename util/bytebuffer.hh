@@ -31,7 +31,6 @@ public:
 		return used;
 	}
 	
-	
 	size_t getTotalSize() const
 	{
 		return totalSize;

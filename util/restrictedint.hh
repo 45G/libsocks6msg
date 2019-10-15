@@ -11,6 +11,8 @@ namespace S6M
 template <typename T, T MIN, T MAX>
 class BoundedInt
 {
+	static_assert (MIN <= MAX, "MIN must be le MAX");
+	
 	T value;
 	
 public:
@@ -20,7 +22,6 @@ public:
 	BoundedInt(T value)
 		: value(value)
 	{
-		static_assert (MIN <= MAX, "MIN must be le MAX");
 		if (value < MIN || value > MAX)
 			throw std::range_error("Value out of bounds");
 	}
