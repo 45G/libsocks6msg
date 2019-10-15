@@ -8,7 +8,7 @@
 #include <set>
 #include <algorithm>
 #include <memory>
-#include <boost/optional/optional.hpp>
+#include <boost/optional.hpp>
 #include "option.hh"
 #include "stackoption.hh"
 #include "idempotenceoption.hh"
