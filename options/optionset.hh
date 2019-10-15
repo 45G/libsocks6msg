@@ -77,7 +77,7 @@ public:
 		enforceMode(M_REQ, M_AUTH_REP);
 		
 		SessionIDOption *opt = dynamic_cast<SessionIDOption *>(mandatoryOpt.get());
-		if (opt == nullptr)
+		if (!opt)
 			return nullptr;
 		return opt->getTicket();
 	}
@@ -118,7 +118,7 @@ public:
 	
 	uint32_t requestedSize() const
 	{
-		if (requestOpt == nullptr)
+		if (!requestOpt)
 			return 0;
 		return requestOpt->getWinSize();
 	}
@@ -127,7 +127,7 @@ public:
 	
 	boost::optional<uint32_t> getToken() const
 	{
-		if (expenditureOpt == nullptr)
+		if (!expenditureOpt)
 			return {};
 		return expenditureOpt->getToken();
 	}
@@ -136,14 +136,14 @@ public:
 	
 	uint32_t advertisedBase() const
 	{
-		if (windowOpt == nullptr)
+		if (!windowOpt)
 			return 0;
 		return windowOpt->getWinBase();
 	}
 	
 	uint32_t advertisedSize() const
 	{
-		if (windowOpt == nullptr)
+		if (!windowOpt)
 			return 0;
 		return windowOpt->getWinSize();
 	}
@@ -212,14 +212,14 @@ public:
 	
 	const std::string *getUsername() const
 	{
-		if (req == nullptr)
+		if (!req)
 			return nullptr;
 		return req->getUsername();
 	}
 	
 	const std::string *getPassword() const
 	{
-		if (req == nullptr)
+		if (!req)
 			return nullptr;
 		return req->getPassword();
 	}
@@ -228,7 +228,7 @@ public:
 	
 	boost::optional<bool> getReply() const
 	{
-		if (reply == nullptr)
+		if (!reply)
 			return {};
 		return reply->isSuccessful();
 	}
@@ -245,7 +245,7 @@ public:
 	const std::set<SOCKS6Method> *getAdvertised() const
 	{
 		static const std::set<SOCKS6Method> EMPTY_SET;
-		if (advertOption == nullptr)
+		if (!advertOption)
 			return &EMPTY_SET;
 		
 		return advertOption->getMethods();
@@ -255,7 +255,7 @@ public:
 
 	uint16_t getInitialDataLen() const
 	{
-		if (advertOption == nullptr)
+		if (!advertOption)
 			return 0;
 		return advertOption->getInitialDataLen();
 	}
@@ -264,7 +264,7 @@ public:
 	
 	SOCKS6Method getSelected() const
 	{
-		if (selectOption == nullptr)
+		if (!selectOption)
 			return SOCKS6_METHOD_NOAUTH;
 		return selectOption->getMethod();
 	}
@@ -293,7 +293,7 @@ public:
 	{
 		static const std::list<in_addr> EMPTY_LIST;
 
-		if (ipv4Option.get() == nullptr)
+		if (!ipv4Option)
 			return &EMPTY_LIST;
 
 		return ipv4Option.get()->getAddresses();
@@ -305,7 +305,7 @@ public:
 	{
 		static const std::list<in6_addr> EMPTY_LIST;
 
-		if (ipv6Option.get() == nullptr)
+		if (!ipv6Option)
 			return &EMPTY_LIST;
 
 		return ipv6Option.get()->getAddresses();
@@ -317,7 +317,7 @@ public:
 	{
 		static const std::list<std::string> EMPTY_LIST;
 
-		if (domainOption.get() == nullptr)
+		if (!domainOption)
 			return &EMPTY_LIST;
 
 		return domainOption.get()->getAddresses();

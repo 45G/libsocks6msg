@@ -212,12 +212,12 @@ boost::optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) c
 	switch(leg)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		if (clientProxy.get() == nullptr)
+		if (!clientProxy)
 			return {};
 		return clientProxy->getValue();
 		
 	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		if (proxyRemote.get() == nullptr)
+		if (!proxyRemote)
 			return {};
 		return clientProxy->getValue();
 		
