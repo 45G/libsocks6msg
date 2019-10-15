@@ -137,7 +137,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 		cSet->session.request = 1;
 	if (cppSet->session.tornDown())
 		cSet->session.tearDown = 1;
-	if (cppSet->session.getID() != nullptr)
+	if (cppSet->session.getID())
 	{
 		clutter->sessionID = *(cppSet->session.getID());
 		cSet->session.id = clutter->sessionID.data();
@@ -168,7 +168,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	cSet->authMethods.initialDataLen = cppSet->authMethods.getInitialDataLen();
 	cSet->authMethods.selected = cppSet->authMethods.getSelected();
 	
-	if (cppSet->userPassword.getUsername() != nullptr && cppSet->userPassword.getUsername()->length() > 0)
+	if (cppSet->userPassword.getUsername() && cppSet->userPassword.getUsername()->length() > 0)
 	{
 		clutter->username = *(cppSet->userPassword.getUsername());
 		clutter->password = *(cppSet->userPassword.getPassword());
@@ -233,7 +233,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.reply)
 		cppSet->idempotence.setReply(cSet->idempotence.accepted);
 	
-	if (cSet->authMethods.known != nullptr)
+	if (cSet->authMethods.known)
 	{
 		set<SOCKS6Method> methods;
 		
@@ -244,7 +244,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->authMethods.selected != SOCKS6_METHOD_NOAUTH)
 		cppSet->authMethods.select(cSet->authMethods.selected);
 	
-	if (cSet->userPassword.username != nullptr || cSet->userPassword.passwd != nullptr)
+	if (cSet->userPassword.username || cSet->userPassword.passwd)
 		cppSet->userPassword.setCredentials(string(cSet->userPassword.username), string(cSet->userPassword.passwd));
 	if (cSet->userPassword.replied)
 		cppSet->userPassword.setReply(cSet->userPassword.success);
@@ -320,7 +320,7 @@ ssize_t S6M_Request_parse(uint8_t *buf, size_t size, S6M_Request **preq)
 	}
 	S6M_CATCH(err);
 	
-	if (req != nullptr)
+	if (req)
 		S6M_Request_free(req);
 	return err;
 }
@@ -397,7 +397,7 @@ ssize_t S6M_AuthReply_parse(uint8_t *buf, size_t size, S6M_AuthReply **pauthRepl
 	}
 	S6M_CATCH(err);
 	
-	if (authReply != nullptr)
+	if (authReply)
 		S6M_AuthReply_free(authReply);
 	return err;
 }
@@ -479,7 +479,7 @@ ssize_t S6M_OpReply_parse(uint8_t *buf, size_t size, S6M_OpReply **popReply)
 	}
 	S6M_CATCH(err);
 	
-	if (opReply != nullptr)
+	if (opReply)
 		S6M_OpReply_free(opReply);
 	return err;
 }
