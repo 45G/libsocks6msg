@@ -152,9 +152,9 @@ public:
 	
 	boost::optional<bool> getReply() const
 	{
-		if (reinterpret_cast<const IdempotenceAcceptedOption *>(replyOpt.get()) != nullptr)
+		if (dynamic_cast<const IdempotenceAcceptedOption *>(replyOpt.get()) != nullptr)
 			return true;
-		if (reinterpret_cast<const IdempotenceRejectedOption *>(replyOpt.get()) != nullptr)
+		if (dynamic_cast<const IdempotenceRejectedOption *>(replyOpt.get()) != nullptr)
 			return false;
 		return {};
 	}
