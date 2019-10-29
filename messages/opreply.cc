@@ -7,7 +7,6 @@ namespace S6M
 {
 
 OperationReply::OperationReply(ByteBuffer *bb)
-	: options(OptionSet::M_OP_REP)
 {
 	Version::check(bb);
 	
