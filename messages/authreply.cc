@@ -7,7 +7,6 @@ namespace S6M
 {
 
 AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
-	: options(OptionSet::M_AUTH_REP)
 {
 	Version::check(bb);
 	

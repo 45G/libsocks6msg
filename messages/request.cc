@@ -7,7 +7,6 @@ namespace S6M
 {
 
 Request::Request(ByteBuffer *bb)
-	: options(OptionSet::M_REQ)
 {
 	Version::check(bb);
 	
