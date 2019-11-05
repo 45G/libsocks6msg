@@ -7,11 +7,8 @@
 namespace S6M
 {
 
-class Version
+struct Version
 {
-	Version() {}
-	
-public:
 	static void check(ByteBuffer *bb);
 
 	static void parse(ByteBuffer *bb);
