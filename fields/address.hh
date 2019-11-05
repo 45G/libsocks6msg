@@ -4,7 +4,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <vector>
-#include <boost/optional.hpp>
+#include <optional>
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "string.hh"
@@ -20,7 +20,7 @@ class Address
 	
 	in_addr ipv4;
 	in6_addr ipv6;
-	boost::optional<Padded<String>> domain;
+	std::optional<Padded<String>> domain;
 	
 public:
 	size_t packedSize() const;

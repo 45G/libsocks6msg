@@ -152,11 +152,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	
 	cSet->idempotence.request = cppSet->idempotence.requestedSize();
 	cSet->idempotence.spend = (bool)cppSet->idempotence.getToken();
-	cSet->idempotence.token = cppSet->idempotence.getToken().get_value_or(0);
+	cSet->idempotence.token = cppSet->idempotence.getToken().value_or(0);
 	cSet->idempotence.windowBase = cppSet->idempotence.getAdvertised().first;
 	cSet->idempotence.windowSize = cppSet->idempotence.getAdvertised().second;
-	cSet->idempotence.reply = cppSet->idempotence.getReply() == boost::none;
-	cSet->idempotence.accepted = cppSet->idempotence.getReply().get_value_or(false);
+	cSet->idempotence.reply = cppSet->idempotence.getReply().has_value();
+	cSet->idempotence.accepted = cppSet->idempotence.getReply().value_or(false);
 	
 	if (!cppSet->authMethods.getAdvertised()->empty())
 	{
@@ -175,10 +175,10 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 		cSet->userPassword.username = clutter->username.c_str();
 		cSet->userPassword.passwd = clutter->password.c_str();
 	}
-	if (cppSet->userPassword.getReply() != boost::none)
+	if (cppSet->userPassword.getReply().has_value())
 	{
 		cSet->userPassword.replied = 1;
-		cSet->userPassword.success = cppSet->userPassword.getReply().get();
+		cSet->userPassword.success = (bool)cppSet->userPassword.getReply();
 	}
 }
 

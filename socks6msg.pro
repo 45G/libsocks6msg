@@ -1,7 +1,7 @@
 TARGET = socks6msg
 TEMPLATE = lib
 CONFIG += staticlib
-CONFIG += console c++11
+CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 

@@ -3,7 +3,6 @@
 
 
 using namespace std;
-using namespace boost;
 
 namespace S6M
 {
@@ -206,7 +205,7 @@ void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
 }
 
 template <typename T>
-boost::optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
+optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
 {
 	enforceMode(M_REQ, M_AUTH_REP);
 	switch(leg)

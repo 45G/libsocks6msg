@@ -8,7 +8,7 @@
 #include <set>
 #include <algorithm>
 #include <memory>
-#include <boost/optional.hpp>
+#include <optional>
 #include "option.hh"
 #include "stackoption.hh"
 #include "idempotenceoption.hh"
@@ -125,7 +125,7 @@ public:
 	
 	void setToken(uint32_t token);
 	
-	boost::optional<uint32_t> getToken() const
+	std::optional<uint32_t> getToken() const
 	{
 		if (!expenditureOpt)
 			return {};
@@ -143,7 +143,7 @@ public:
 	
 	void setReply(bool accepted);
 	
-	boost::optional<bool> getReply() const
+	std::optional<bool> getReply() const
 	{
 		if (dynamic_cast<const IdempotenceAcceptedOption *>(replyOpt.get()))
 			return true;
@@ -166,7 +166,7 @@ public:
 	
 	void set(SOCKS6StackLeg leg, typename OPT::Value value);
 	
-	boost::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const;
+	std::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const;
 	
 	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
 	void set(typename OPT::Value value)
@@ -176,7 +176,7 @@ public:
 	}
 	
 	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
-	boost::optional<typename OPT::Value> get() const
+	std::optional<typename OPT::Value> get() const
 	{
 		static_assert (LEG != SOCKS6_STACK_LEG_BOTH, "Option is not restricted to one leg");
 		return get(OPT::LEG_RESTRICT);
@@ -219,7 +219,7 @@ public:
 	
 	void setReply(bool success);
 	
-	boost::optional<bool> getReply() const
+	std::optional<bool> getReply() const
 	{
 		if (!reply)
 			return {};
