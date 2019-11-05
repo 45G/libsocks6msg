@@ -96,15 +96,15 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 template <typename SET>
 static void fillStackOptions(const SET *set, list<S6M_StackOption> *stackOpts)
 {
-	SOCKS6StackLeg legs[] = { SOCKS6_STACK_LEG_CLIENT_PROXY, SOCKS6_STACK_LEG_PROXY_REMOTE };
+	static const vector<SOCKS6StackLeg> LEGS = { SOCKS6_STACK_LEG_CLIENT_PROXY, SOCKS6_STACK_LEG_PROXY_REMOTE };
 	
-	for (int i = 0; i < 2; i++)
+	for (SOCKS6StackLeg leg: LEGS)
 	{
-		auto value = set->get(legs[i]);
+		auto value = set->get(leg);
 		if (!value)
 			continue;
 		
-		S6M_StackOption opt { legs[i], SET::Option::LEVEL, SET::Option::CODE, (int)value.get() };
+		S6M_StackOption opt { leg, SET::Option::LEVEL, SET::Option::CODE, (int)value.get() };
 		stackOpts->push_back(opt);
 	}
 }
