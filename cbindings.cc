@@ -229,7 +229,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.spend)
 		cppSet->idempotence.setToken(cSet->idempotence.token);
 	if (cSet->idempotence.windowSize > 0)
-		cppSet->idempotence.advertise(cSet->idempotence.windowBase, cSet->idempotence.windowSize);
+		cppSet->idempotence.advertise({ cSet->idempotence.windowBase, cSet->idempotence.windowSize });
 	if (cSet->idempotence.reply)
 		cppSet->idempotence.setReply(cSet->idempotence.accepted);
 	

@@ -53,7 +53,7 @@ void IdempotenceWindowOption::incrementalParse(SOCKS6Option *optBase, OptionSet 
 	uint32_t winBase = ntohl(opt->windowBase);
 	uint32_t winSize = ntohl(opt->windowSize);
 	
-	optionSet->idempotence.advertise(winBase, winSize);
+	optionSet->idempotence.advertise({ winBase, winSize });
 }
 
 size_t IdempotenceExpenditureOption::packedSize() const

@@ -43,8 +43,8 @@ public:
 	
 	static void incrementalParse(SOCKS6Option *optBase, OptionSet *optionSet);
 	
-	IdempotenceWindowOption(uint32_t winBase, uint32_t winSize)
-		: Option(SOCKS6_OPTION_IDEMPOTENCE_WND), winBase(winBase), winSize(winSize) {}
+	IdempotenceWindowOption(std::pair<uint32_t, uint32_t> window)
+		: Option(SOCKS6_OPTION_IDEMPOTENCE_WND), winBase(window.first), winSize(window.second) {}
 	
 	std::pair<uint32_t, uint32_t> getWindow() const
 	{

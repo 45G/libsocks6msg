@@ -164,10 +164,10 @@ void IdempotenceOptionSet::setToken(uint32_t token)
 	COMMIT(expenditureOpt, new IdempotenceExpenditureOption(token));
 }
 
-void IdempotenceOptionSet::advertise(uint32_t base, uint32_t size)
+void IdempotenceOptionSet::advertise(std::pair<uint32_t, uint32_t> window)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(windowOpt, new IdempotenceWindowOption(base, size));
+	COMMIT(windowOpt, new IdempotenceWindowOption(window));
 }
 
 void IdempotenceOptionSet::setReply(bool accepted)

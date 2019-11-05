@@ -132,7 +132,7 @@ public:
 		return expenditureOpt->getToken();
 	}
 	
-	void advertise(uint32_t base, uint32_t size);
+	void advertise(std::pair<uint32_t, uint32_t> window);
 	
 	std::pair<uint32_t, uint32_t> getAdvertised() const
 	{
