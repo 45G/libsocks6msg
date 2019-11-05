@@ -2,7 +2,7 @@
 #define SOCKS6MSG_USRPASSWD_HH
 
 #include <string>
-#include <boost/optional.hpp>
+#include <optional>
 #include "bytebuffer.hh"
 #include "string.hh"
 
@@ -17,8 +17,8 @@ protected:
 
 struct UserPasswordRequest: public UserPasswordBase
 {
-	boost::optional<String> username;
-	boost::optional<String> password;
+	std::optional<String> username;
+	std::optional<String> password;
 	
 	UserPasswordRequest(const std::string &username, const std::string &password)
 		: username(username), password(password) {}

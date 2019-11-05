@@ -10,7 +10,6 @@
 #include "sanity.hh"
 
 using namespace std;
-using namespace boost;
 
 namespace S6M
 {

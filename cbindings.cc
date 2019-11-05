@@ -104,7 +104,7 @@ static void fillStackOptions(const SET *set, list<S6M_StackOption> *stackOpts)
 		if (!value)
 			continue;
 		
-		S6M_StackOption opt { leg, SET::Option::LEVEL, SET::Option::CODE, (int)value.get() };
+		S6M_StackOption opt { leg, SET::Option::LEVEL, SET::Option::CODE, value.value() };
 		stackOpts->push_back(opt);
 	}
 }
@@ -178,7 +178,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	if (cppSet->userPassword.getReply().has_value())
 	{
 		cSet->userPassword.replied = 1;
-		cSet->userPassword.success = (bool)cppSet->userPassword.getReply();
+		cSet->userPassword.success = cppSet->userPassword.getReply().value();
 	}
 }
 
