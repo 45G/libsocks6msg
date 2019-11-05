@@ -134,18 +134,11 @@ public:
 	
 	void advertise(uint32_t base, uint32_t size);
 	
-	uint32_t advertisedBase() const
+	std::pair<uint32_t, uint32_t> getAdvertised() const
 	{
 		if (!windowOpt)
-			return 0;
-		return windowOpt->getWinBase();
-	}
-	
-	uint32_t advertisedSize() const
-	{
-		if (!windowOpt)
-			return 0;
-		return windowOpt->getWinSize();
+			return { 0, 0 };
+		return windowOpt->getWindow();
 	}
 	
 	void setReply(bool accepted);

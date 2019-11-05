@@ -153,8 +153,8 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	cSet->idempotence.request = cppSet->idempotence.requestedSize();
 	cSet->idempotence.spend = (bool)cppSet->idempotence.getToken();
 	cSet->idempotence.token = cppSet->idempotence.getToken().get_value_or(0);
-	cSet->idempotence.windowBase = cppSet->idempotence.advertisedBase();
-	cSet->idempotence.windowSize = cppSet->idempotence.advertisedSize();
+	cSet->idempotence.windowBase = cppSet->idempotence.getAdvertised().first;
+	cSet->idempotence.windowSize = cppSet->idempotence.getAdvertised().second;
 	cSet->idempotence.reply = cppSet->idempotence.getReply() == boost::none;
 	cSet->idempotence.accepted = cppSet->idempotence.getReply().get_value_or(false);
 	

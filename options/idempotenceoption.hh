@@ -45,15 +45,10 @@ public:
 	
 	IdempotenceWindowOption(uint32_t winBase, uint32_t winSize)
 		: Option(SOCKS6_OPTION_IDEMPOTENCE_WND), winBase(winBase), winSize(winSize) {}
-
-	uint32_t getWinBase() const
+	
+	std::pair<uint32_t, uint32_t> getWindow() const
 	{
-		return winBase;
-	}
-
-	uint32_t getWinSize() const
-	{
-		return winSize;
+		return { winBase, winSize };
 	}
 };
 
