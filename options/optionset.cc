@@ -8,23 +8,16 @@ namespace S6M
 {
 
 template <typename T>
-void ensureVacant(const std::unique_ptr<T> &ptr)
+T &vacant(T &t)
 {
-	if (ptr)
+	if (t)
 		throw std::logic_error("Option already in place");
-}
-
-template <typename T>
-void ensureVacant(const std::shared_ptr<T> &ptr)
-{
-	if (ptr)
-		throw std::logic_error("Option already in place");
+	return t;
 }
 
 #define COMMIT(FIELD, WHAT) \
 { \
-	ensureVacant(FIELD); \
-	(FIELD).reset(WHAT); \
+	vacant(FIELD).reset(WHAT); \
 	try \
 	{ \
 		owner->registerOption((FIELD).get()); \
@@ -38,8 +31,8 @@ void ensureVacant(const std::shared_ptr<T> &ptr)
 
 #define COMMIT2(FIELD1, FIELD2, WHAT) \
 { \
-	ensureVacant(FIELD1); \
-	ensureVacant(FIELD2); \
+	vacant(FIELD1); \
+	vacant(FIELD2); \
 	(FIELD1).reset(WHAT); \
 	(FIELD2) = (FIELD1); \
 	try \
