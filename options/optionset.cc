@@ -43,15 +43,15 @@ T &vacant(T &t)
 	} \
 }
 
-#define COMMIT2(FIELD1, FIELD2, WHAT) \
+#define COMMIT_OPT2(FIELD1, FIELD2, WHAT) \
 { \
 	vacant(FIELD1); \
 	vacant(FIELD2); \
-	(FIELD1).reset(WHAT); \
+	(FIELD1) = (WHAT); \
 	(FIELD2) = (FIELD1); \
 	try \
 	{ \
-		owner->registerOption((FIELD1).get()); \
+		owner->registerOption(&(FIELD1).value()); \
 	} \
 	catch (...) \
 	{ \
@@ -200,13 +200,13 @@ void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
 	switch(leg)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		COMMIT(clientProxy, new T(leg, value));
+		COMMIT_OPT(clientProxy, T(leg, value));
 		return;
 	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		COMMIT(proxyRemote, new T(leg, value));
+		COMMIT_OPT(proxyRemote, T(leg, value));
 		return;
 	case SOCKS6_STACK_LEG_BOTH:
-		COMMIT2(clientProxy, proxyRemote, new T(leg, value));
+		COMMIT_OPT2(clientProxy, proxyRemote, T(leg, value));
 		return;
 	}
 }

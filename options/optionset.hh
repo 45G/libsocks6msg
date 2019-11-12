@@ -155,8 +155,8 @@ public:
 template <typename OPT>
 class StackOptionPair: public OptionSetBase
 {
-	std::shared_ptr<OPT> clientProxy;
-	std::shared_ptr<OPT> proxyRemote;
+	std::optional<OPT> clientProxy;
+	std::optional<OPT> proxyRemote;
 	
 public:
 	typedef OPT Option;
