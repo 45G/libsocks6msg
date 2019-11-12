@@ -48,9 +48,9 @@ public:
 
 class SessionOptionSet: public OptionSetBase
 {
-	std::unique_ptr<Option>                 mandatoryOpt; //Request or ID or OK or Invalid
-	std::unique_ptr<SessionTeardownOption>  teardownOpt;
-	std::unique_ptr<SessionUntrustedOption> untrustedOpt;
+	std::unique_ptr<Option>               mandatoryOpt; //Request or ID or OK or Invalid
+	std::optional<SessionTeardownOption>  teardownOpt;
+	std::optional<SessionUntrustedOption> untrustedOpt;
 	
 public:
 	SessionOptionSet(OptionSet *owner);
@@ -105,10 +105,10 @@ public:
 
 class IdempotenceOptionSet: public OptionSetBase
 {
-	std::unique_ptr<IdempotenceRequestOption>     requestOpt;
-	std::unique_ptr<IdempotenceExpenditureOption> expenditureOpt;
-	std::unique_ptr<IdempotenceWindowOption>      windowOpt;
-	std::unique_ptr<Option>                       replyOpt;
+	std::optional<IdempotenceRequestOption>     requestOpt;
+	std::optional<IdempotenceExpenditureOption> expenditureOpt;
+	std::optional<IdempotenceWindowOption>      windowOpt;
+	std::unique_ptr<Option>                     replyOpt;
 	
 public:
 	IdempotenceOptionSet(OptionSet *owner);
@@ -195,8 +195,8 @@ public:
 
 class UserPasswdOptionSet: public OptionSetBase
 {
-	std::unique_ptr<UsernamePasswdReqOption>   req;
-	std::unique_ptr<UsernamePasswdReplyOption> reply;
+	std::optional<UsernamePasswdReqOption>   req;
+	std::optional<UsernamePasswdReplyOption> reply;
 public:
 	UserPasswdOptionSet(OptionSet *owner);
 	
@@ -228,8 +228,8 @@ public:
 
 class AuthMethodOptionSet: public OptionSetBase
 {
-	std::unique_ptr<AuthMethodAdvertOption> advertOption;
-	std::unique_ptr<AuthMethodSelectOption> selectOption;
+	std::optional<AuthMethodAdvertOption> advertOption;
+	std::optional<AuthMethodSelectOption> selectOption;
 	
 public:
 	AuthMethodOptionSet(OptionSet *owner);

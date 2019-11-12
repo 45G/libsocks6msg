@@ -15,6 +15,20 @@ T &vacant(T &t)
 	return t;
 }
 
+#define COMMIT_OPT(FIELD, WHAT) \
+{ \
+	vacant(FIELD) = (WHAT); \
+	try \
+	{ \
+		owner->registerOption(&(FIELD).value()); \
+	} \
+	catch (...) \
+	{ \
+		(FIELD).reset(); \
+		throw; \
+	} \
+}
+
 #define COMMIT(FIELD, WHAT) \
 { \
 	vacant(FIELD).reset(WHAT); \
@@ -114,7 +128,7 @@ void SessionOptionSet::request()
 void SessionOptionSet::tearDown()
 {
 	enforceMode(M_REQ);
-	COMMIT(teardownOpt, new SessionTeardownOption());
+	COMMIT_OPT(teardownOpt, SessionTeardownOption());
 }
 
 void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
@@ -138,7 +152,7 @@ void SessionOptionSet::signalReject()
 void SessionOptionSet::setUntrusted()
 {
 	enforceMode(M_REQ);
-	COMMIT(untrustedOpt, new SessionUntrustedOption());
+	COMMIT_OPT(untrustedOpt, SessionUntrustedOption());
 }
 
 IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
@@ -147,19 +161,19 @@ IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
 void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);
-	COMMIT(requestOpt, new IdempotenceRequestOption(size));
+	COMMIT_OPT(requestOpt, IdempotenceRequestOption(size));
 }
 
 void IdempotenceOptionSet::setToken(uint32_t token)
 {
 	enforceMode(M_REQ);
-	COMMIT(expenditureOpt, new IdempotenceExpenditureOption(token));
+	COMMIT_OPT(expenditureOpt, IdempotenceExpenditureOption(token));
 }
 
 void IdempotenceOptionSet::advertise(std::pair<uint32_t, uint32_t> window)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(windowOpt, new IdempotenceWindowOption(window));
+	COMMIT_OPT(windowOpt, IdempotenceWindowOption(window));
 }
 
 void IdempotenceOptionSet::setReply(bool accepted)
@@ -233,13 +247,13 @@ UserPasswdOptionSet::UserPasswdOptionSet(OptionSet *owner)
 void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
 {
 	enforceMode(M_REQ);
-	COMMIT(req, new UsernamePasswdReqOption(user, passwd));
+	COMMIT_OPT(req, UsernamePasswdReqOption(user, passwd));
 }
 
 void UserPasswdOptionSet::setReply(bool success)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(reply, new UsernamePasswdReplyOption(success));
+	COMMIT_OPT(reply, UsernamePasswdReplyOption(success));
 }
 
 AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
@@ -248,13 +262,13 @@ AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
 void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 {
 	enforceMode(M_REQ);
-	COMMIT(advertOption, new AuthMethodAdvertOption(initialDataLen, methods));
+	COMMIT_OPT(advertOption, AuthMethodAdvertOption(initialDataLen, methods));
 }
 
 void AuthMethodOptionSet::select(SOCKS6Method method)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(selectOption, new AuthMethodSelectOption(method));
+	COMMIT_OPT(selectOption, AuthMethodSelectOption(method));
 }
 
 }
