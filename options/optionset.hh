@@ -203,16 +203,16 @@ class UserPasswdOptionSet: public OptionSetBase
 public:
 	UserPasswdOptionSet(OptionSet *owner);
 	
-	void setCredentials(std::shared_ptr<std::string> user, std::shared_ptr<std::string> passwd);
+	void setCredentials(const std::string &user, const std::string &passwd);
 	
-	std::shared_ptr<std::string> getUsername() const
+	const std::string *getUsername() const
 	{
 		if (!req)
 			return nullptr;
 		return req->getUsername();
 	}
 	
-	std::shared_ptr<std::string> getPassword() const
+	const std::string *getPassword() const
 	{
 		if (!req)
 			return nullptr;

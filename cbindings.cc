@@ -43,12 +43,12 @@ using namespace S6M;
 
 struct S6M_PrivateClutter
 {
-	shared_ptr<string> domain;
+	string domain;
 	vector<S6M_StackOption> stackOpts;
 	vector<uint8_t> sessionID;
 	vector<SOCKS6Method> knownMethods;
-	shared_ptr<string> username;
-	shared_ptr<string> password;
+	string username;
+	string password;
 };
 
 /*
@@ -70,8 +70,8 @@ static void S6M_Addr_Fill(S6M_Address *cAddr, const Address &cppAddr, S6M_Privat
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		clutter->domain = cppAddr.getDomain();
-		cAddr->domain = clutter->domain->c_str();
+		clutter->domain = *(cppAddr.getDomain());
+		cAddr->domain = clutter->domain.c_str();
 		break;
 	}
 }
@@ -87,7 +87,7 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(make_shared<string>(cAddr->domain));
+		return Address(move(string(cAddr->domain)));
 	}
 	
 	throw invalid_argument("Bad address type");
@@ -170,10 +170,10 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	
 	if (cppSet->userPassword.getUsername() && cppSet->userPassword.getUsername()->length() > 0)
 	{
-		clutter->username = cppSet->userPassword.getUsername();
-		clutter->password = cppSet->userPassword.getPassword();
-		cSet->userPassword.username = clutter->username->c_str();
-		cSet->userPassword.passwd = clutter->password->c_str();
+		clutter->username = *(cppSet->userPassword.getUsername());
+		clutter->password = *(cppSet->userPassword.getPassword());
+		cSet->userPassword.username = clutter->username.c_str();
+		cSet->userPassword.passwd = clutter->password.c_str();
 	}
 	if (cppSet->userPassword.getReply().has_value())
 	{
@@ -245,7 +245,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->authMethods.select(cSet->authMethods.selected);
 	
 	if (cSet->userPassword.username || cSet->userPassword.passwd)
-		cppSet->userPassword.setCredentials(make_shared<string>(cSet->userPassword.username), make_shared<string>(cSet->userPassword.passwd));
+		cppSet->userPassword.setCredentials(string(cSet->userPassword.username), string(cSet->userPassword.passwd));
 	if (cSet->userPassword.replied)
 		cppSet->userPassword.setReply(cSet->userPassword.success);
 }
@@ -508,7 +508,7 @@ ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(make_shared<string>(pwReq->username), make_shared<string>(pwReq->passwd));
+		UserPasswordRequest req(move(string(pwReq->username)), move(string(pwReq->passwd)));
 		
 		return req.packedSize();
 	}
@@ -525,7 +525,7 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(make_shared<string>(pwReq->username), make_shared<string>(pwReq->passwd));
+		UserPasswordRequest req(move(string(pwReq->username)), move(string(pwReq->passwd)));
 		req.pack(&bb);
 		
 		return bb.getUsed();
