@@ -253,7 +253,7 @@ template class StackOptionPair<BacklogOption>;
 UserPasswdOptionSet::UserPasswdOptionSet(OptionSet *owner)
 	: OptionSetBase(owner, owner->mode) {}
 
-void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
+void UserPasswdOptionSet::setCredentials(std::shared_ptr<std::string> user, std::shared_ptr<std::string> passwd)
 {
 	enforceMode(M_REQ);
 	COMMIT_OPT(req, UsernamePasswdReqOption(user, passwd));

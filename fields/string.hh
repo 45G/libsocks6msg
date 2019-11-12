@@ -11,23 +11,23 @@ namespace S6M
 
 class String
 {
-	std::string str;
+	std::shared_ptr<std::string> str;
 	
 public:
-	String(const std::string &str);
+	String(std::shared_ptr<std::string> str);
 	
 	String(ByteBuffer *bb);
 	
 	size_t packedSize() const
 	{
-		return 1 + str.length();
+		return 1 + str->length();
 	}
 	
 	void pack(ByteBuffer *bb) const;
 	
-	const std::string *getStr() const
+	std::shared_ptr<std::string> getStr() const
 	{
-		return &str;
+		return str;
 	}
 };
 

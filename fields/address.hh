@@ -34,7 +34,7 @@ public:
 	Address(in6_addr ipv6)
 		: type(SOCKS6_ADDR_IPV6), u(ipv6) {}
 	
-	Address(const std::string &domain)
+	Address(std::shared_ptr<std::string> domain)
 		: type(SOCKS6_ADDR_DOMAIN), u(domain) {}
 	
 	Address(SOCKS6AddressType type, ByteBuffer *bb);
@@ -54,7 +54,7 @@ public:
 		return std::get<in6_addr>(u);
 	}
 	
-	const std::string *getDomain() const
+	std::shared_ptr<std::string> getDomain() const
 	{
 		return std::get<Padded<String>>(u).getStr();
 	}
