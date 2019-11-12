@@ -5,7 +5,6 @@
 #include "idempotenceoption.hh"
 #include "authmethodoption.hh"
 #include "authdataoption.hh"
-#include "resolutionoption.hh"
 #include "optionset.hh"
 #include "sanity.hh"
 
@@ -79,19 +78,6 @@ void Option::incrementalParse(void *buf, OptionSet *optionSet)
 		IdempotenceRejectedOption::incrementalParse(opt, optionSet);
 		break;
 
-	case SOCKS6_OPTION_RESOLVE_REQ:
-		ResolutionRequestOption::incrementalParse(opt, optionSet);
-		break;
-	case SOCKS6_OPTION_RESOLVE_IPv4:
-		IPv4ResolutionOption::incrementalParse(opt, optionSet);
-		break;
-	case SOCKS6_OPTION_RESOLVE_IPv6:
-		IPv6ResolutionOption::incrementalParse(opt, optionSet);
-		break;
-	case SOCKS6_OPTION_RESOLVE_DOMAIN:
-		DomainResolutionOption::incrementalParse(opt, optionSet);
-		break;
-		
 	default:
 		throw invalid_argument("Unknown kind");
 	}

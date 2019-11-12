@@ -24,7 +24,6 @@ SOURCES += \
     messages/usrpasswd.cc \
     messages/version.cc \
     options/sessionoption.cc \
-    options/resolutionoption.cc \
     messages/datagramheader.cc
 
 HEADERS += \
@@ -51,7 +50,6 @@ HEADERS += \
     util/exceptions.hh \
     fields/padded.hh \
     util/restrictedint.hh \
-    options/resolutionoption.hh \
     messages/datagramheader.hh
 
 unix {

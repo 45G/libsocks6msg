@@ -257,31 +257,4 @@ void AuthMethodOptionSet::select(SOCKS6Method method)
 	COMMIT(selectOption, new AuthMethodSelectOption(method));
 }
 
-ResolutionOptionSet::ResolutionOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
-
-void ResolutionOptionSet::request()
-{
-	enforceMode(M_REQ);
-	COMMIT(requestOption, new ResolutionRequestOption());
-}
-
-void ResolutionOptionSet::setIPv4(const std::list<in_addr> &ipv4)
-{
-	enforceMode(M_OP_REP);
-	COMMIT(ipv4Option, new IPv4ResolutionOption(ipv4));
-}
-
-void ResolutionOptionSet::setIPv6(const std::list<in6_addr> &ipv6)
-{
-	enforceMode(M_OP_REP);
-	COMMIT(ipv6Option, new IPv6ResolutionOption(ipv6));
-}
-
-void ResolutionOptionSet::setDomains(const std::list<string> &domains)
-{
-	enforceMode(M_OP_REP);
-	COMMIT(domainOption, new DomainResolutionOption(domains));
-}
-
 }
