@@ -17,7 +17,7 @@ size_t Address::packedSize() const
 		return sizeof(in6_addr);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return (*domain).packedSize();
+		return get<Padded<String>>(u).packedSize();
 	}
 	
 	/* never happens */
@@ -31,19 +31,19 @@ void Address::pack(ByteBuffer *bb)  const
 	case SOCKS6_ADDR_IPV4:
 	{
 		in_addr *rawIPv4 = bb->get<in_addr>();
-		*rawIPv4 = ipv4;
+		*rawIPv4 = get<in_addr>(u);
 		break;
 	}
 		
 	case SOCKS6_ADDR_IPV6:
 	{
 		in6_addr *rawIPv6 = bb->get<in6_addr>();
-		*rawIPv6 = ipv6;
+		*rawIPv6 = get<in6_addr>(u);
 		break;
 	}
 		
 	case SOCKS6_ADDR_DOMAIN:
-		(*domain).pack(bb);
+		get<Padded<String>>(u).pack(bb);
 		break;
 	}
 }
@@ -55,20 +55,18 @@ Address::Address(SOCKS6AddressType type, ByteBuffer *bb)
 	{
 	case SOCKS6_ADDR_IPV4:
 	{
-		in_addr *rawIPv4 = bb->get<in_addr>();
-		ipv4 = *rawIPv4;
+		u = *bb->get<in_addr>();
 		break;
 	}
 		
 	case SOCKS6_ADDR_IPV6:
 	{
-		in6_addr *rawIPv6 = bb->get<in6_addr>();
-		ipv6 = *rawIPv6;
+		u = *bb->get<in6_addr>();
 		break;
 	}
 		
 	case SOCKS6_ADDR_DOMAIN:
-		domain = Padded<String>(bb);
+		u = Padded<String>(bb);
 		break;
 
 	default:

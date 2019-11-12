@@ -5,6 +5,7 @@
 #include <netinet/ip6.h>
 #include <vector>
 #include <optional>
+#include <variant>
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "string.hh"
@@ -16,43 +17,25 @@ namespace S6M
 
 class Address
 {
-	SOCKS6AddressType type;
+	SOCKS6AddressType type = SOCKS6_ADDR_IPV4;
 	
-	in_addr ipv4;
-	in6_addr ipv6;
-	std::optional<Padded<String>> domain;
+	std::variant<in_addr, in6_addr, Padded<String>> u = in_addr({ 0 });
 	
 public:
 	size_t packedSize() const;
 	
 	void pack(ByteBuffer *bb) const;
 	
-	Address(SOCKS6AddressType type = SOCKS6_ADDR_IPV4)
-		: type(type)
-	{
-		if (type == SOCKS6_ADDR_IPV4)
-		{
-			ipv4.s_addr = 0;
-		}
-		else if (type == SOCKS6_ADDR_IPV6)
-		{
-			for (int i = 0; i < 4; i++)
-				ipv6.__in6_u.__u6_addr32[i] = 0;
-		}
-		else
-		{
-			throw BadAddressTypeException();
-		}
-	}
+	Address() = default;
 	
 	Address(in_addr ipv4)
-		: type(SOCKS6_ADDR_IPV4), ipv4(ipv4) {}
+		: type(SOCKS6_ADDR_IPV4), u(ipv4) {}
 	
 	Address(in6_addr ipv6)
-		: type(SOCKS6_ADDR_IPV6), ipv6(ipv6) {}
+		: type(SOCKS6_ADDR_IPV6), u(ipv6) {}
 	
 	Address(const std::string &domain)
-		: type(SOCKS6_ADDR_DOMAIN), domain(domain) {}
+		: type(SOCKS6_ADDR_DOMAIN), u(domain) {}
 	
 	Address(SOCKS6AddressType type, ByteBuffer *bb);
 	
@@ -63,17 +46,17 @@ public:
 	
 	in_addr getIPv4() const
 	{
-		return ipv4;
+		return std::get<in_addr>(u);
 	}
 	
 	in6_addr getIPv6() const
 	{
-		return ipv6;
+		return std::get<in6_addr>(u);
 	}
 	
 	const std::string *getDomain() const
 	{
-		return (*domain).getStr();
+		return std::get<Padded<String>>(u).getStr();
 	}
 };
 
