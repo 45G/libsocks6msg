@@ -7,8 +7,8 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include <memory>
 #include <optional>
+#include <variant>
 #include "option.hh"
 #include "stackoption.hh"
 #include "idempotenceoption.hh"
@@ -48,7 +48,8 @@ public:
 
 class SessionOptionSet: public OptionSetBase
 {
-	std::unique_ptr<Option>               mandatoryOpt; //Request or ID or OK or Invalid
+	std::variant<std::monostate, SessionRequestOption, SessionIDOption, SessionOKOption, SessionInvalidOption> mandatoryOpt;
+
 	std::optional<SessionTeardownOption>  teardownOpt;
 	std::optional<SessionUntrustedOption> untrustedOpt;
 	
@@ -59,7 +60,7 @@ public:
 	
 	bool requested() const
 	{
-		return dynamic_cast<SessionRequestOption *>(mandatoryOpt.get());
+		return std::holds_alternative<SessionRequestOption>(mandatoryOpt);
 	}
 	
 	void tearDown();
@@ -75,7 +76,7 @@ public:
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
 		
-		SessionIDOption *opt = dynamic_cast<SessionIDOption *>(mandatoryOpt.get());
+		const SessionIDOption *opt = std::get_if<SessionIDOption>(&mandatoryOpt);
 		if (!opt)
 			return nullptr;
 		return opt->getTicket();
@@ -85,14 +86,14 @@ public:
 	
 	bool isOK() const
 	{
-		return dynamic_cast<SessionOKOption *>(mandatoryOpt.get());
+		return std::holds_alternative<SessionOKOption>(mandatoryOpt);
 	}
 	
 	void signalReject();
 	
 	bool rejected() const
 	{
-		return dynamic_cast<SessionInvalidOption *>(mandatoryOpt.get());
+		return std::holds_alternative<SessionInvalidOption>(mandatoryOpt);
 	}
 	
 	void setUntrusted();
@@ -107,8 +108,10 @@ class IdempotenceOptionSet: public OptionSetBase
 {
 	std::optional<IdempotenceRequestOption>     requestOpt;
 	std::optional<IdempotenceExpenditureOption> expenditureOpt;
-	std::optional<IdempotenceWindowOption>      windowOpt;
-	std::unique_ptr<Option>                     replyOpt;
+
+	std::optional<IdempotenceWindowOption> windowOpt;
+
+	std::variant<std::monostate, IdempotenceAcceptedOption, IdempotenceRejectedOption> replyOpt;
 	
 public:
 	IdempotenceOptionSet(OptionSet *owner);
@@ -144,9 +147,9 @@ public:
 	
 	std::optional<bool> getReply() const
 	{
-		if (dynamic_cast<const IdempotenceAcceptedOption *>(replyOpt.get()))
+		if (std::holds_alternative<IdempotenceAcceptedOption>(replyOpt))
 			return true;
-		if (dynamic_cast<const IdempotenceRejectedOption *>(replyOpt.get()))
+		if (std::holds_alternative< IdempotenceRejectedOption>(replyOpt))
 			return false;
 		return {};
 	}

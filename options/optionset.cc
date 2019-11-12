@@ -15,26 +15,20 @@ T &vacant(T &t)
 	return t;
 }
 
+template <typename T>
+T &vacantVariant(T &t)
+{
+	if (!holds_alternative<monostate>(t))
+		throw std::logic_error("Option already in place");
+	return t;
+}
+
 #define COMMIT_OPT(FIELD, WHAT) \
 { \
 	vacant(FIELD) = (WHAT); \
 	try \
 	{ \
 		owner->registerOption(&(FIELD).value()); \
-	} \
-	catch (...) \
-	{ \
-		(FIELD).reset(); \
-		throw; \
-	} \
-}
-
-#define COMMIT(FIELD, WHAT) \
-{ \
-	vacant(FIELD).reset(WHAT); \
-	try \
-	{ \
-		owner->registerOption((FIELD).get()); \
 	} \
 	catch (...) \
 	{ \
@@ -57,6 +51,21 @@ T &vacant(T &t)
 	{ \
 		(FIELD1).reset(); \
 		(FIELD2).reset(); \
+		throw; \
+	} \
+}
+
+#define COMMIT_VARIANT(FIELD, TYPE, WHAT) \
+{ \
+	vacantVariant(FIELD); \
+	(FIELD) = (WHAT); \
+	try \
+	{ \
+		owner->registerOption(get_if<TYPE>(&FIELD)); \
+	} \
+	catch (...) \
+	{ \
+		(FIELD) = monostate(); \
 		throw; \
 	} \
 }
@@ -122,7 +131,7 @@ SessionOptionSet::SessionOptionSet(OptionSet *owner)
 void SessionOptionSet::request()
 {
 	enforceMode(M_REQ);
-	COMMIT(mandatoryOpt, new SessionRequestOption());
+	COMMIT_VARIANT(mandatoryOpt, SessionRequestOption, SessionRequestOption());
 }
 
 void SessionOptionSet::tearDown()
@@ -134,19 +143,19 @@ void SessionOptionSet::tearDown()
 void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
 {
 	enforceMode(M_REQ, M_AUTH_REP);
-	COMMIT(mandatoryOpt, new SessionIDOption(ticket));
+	COMMIT_VARIANT(mandatoryOpt, SessionIDOption, SessionIDOption(ticket));
 }
 
 void SessionOptionSet::signalOK()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(mandatoryOpt, new SessionOKOption());
+	COMMIT_VARIANT(mandatoryOpt, SessionOKOption, SessionOKOption());
 }
 
 void SessionOptionSet::signalReject()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT(mandatoryOpt, new SessionInvalidOption());
+	COMMIT_VARIANT(mandatoryOpt, SessionInvalidOption, SessionInvalidOption());
 }
 
 void SessionOptionSet::setUntrusted()
@@ -181,11 +190,11 @@ void IdempotenceOptionSet::setReply(bool accepted)
 	enforceMode(M_AUTH_REP);
 	if (accepted)
 	{
-		COMMIT(replyOpt, new IdempotenceAcceptedOption());
+		COMMIT_VARIANT(replyOpt, IdempotenceAcceptedOption, IdempotenceAcceptedOption());
 	}
 	else
 	{
-		COMMIT(replyOpt, new IdempotenceRejectedOption());
+		COMMIT_VARIANT(replyOpt, IdempotenceAcceptedOption, IdempotenceRejectedOption());
 	}
 }
 
