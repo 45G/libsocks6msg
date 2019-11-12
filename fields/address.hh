@@ -61,8 +61,8 @@ public:
 	
 	bool isZero() const
 	{
-		return ((type == SOCKS6_ADDR_IPV4 && std::get<in_addr>(u).s_addr   == INADDR_ANY) ||
-			(type == SOCKS6_ADDR_IPV6 && std::get<in6_addr>(u).s6_addr == in6addr_any.s6_addr));
+		return ( type == SOCKS6_ADDR_IPV4 && std::get<in_addr>(u).s_addr   == INADDR_ANY) ||
+			(type == SOCKS6_ADDR_IPV6 && std::get<in6_addr>(u).s6_addr == in6addr_any.s6_addr);
 	}
 };
 
