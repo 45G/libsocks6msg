@@ -128,7 +128,7 @@ enum S6M_Error
 	S6M_ERR_ALLOC       = -2,   /* malloc fail */
 	S6M_ERR_BUFFER      = -3,   /* reached end of buffer */
 	S6M_ERR_OTHERVER    = -4,   /* protocol version other than the one supported */
-	S6M_ERR_ADDRTYPE        = -5,   /* bad address type */
+	S6M_ERR_ADDRTYPE    = -5,   /* bad address type */
 	S6M_ERR_UNSPEC      = -100, /* unspecified error */
 };
 
