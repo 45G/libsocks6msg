@@ -5,6 +5,7 @@ SOCKS 6 message library
 
 You will need the following packages:
  * qt5-qmake
+ * Boost (libboost-dev(el))
  
 Afterwards, simply run:
 

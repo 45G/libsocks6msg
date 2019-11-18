@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <boost/intrusive/list.hpp>
 #include "socks6.h"
 #include "bytebuffer.hh"
 #include "usrpasswd.hh"
@@ -15,7 +16,7 @@ namespace S6M
 
 class OptionSet;
 
-class Option
+class Option: public boost::intrusive::list_base_hook<>
 {
 	SOCKS6OptionKind kind;
 	

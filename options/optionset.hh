@@ -267,23 +267,26 @@ public:
 
 class OptionSet: public OptionSetBase
 {
-	std::list<Option *> options;
-	size_t optionsSize = 0;
-	
-	void registerOption(Option *option)
-	{
-		if (packedSize() + option->packedSize() > SOCKS6_OPTIONS_LENGTH_MAX)
-			throw std::length_error("Option would not fit");
-		options.push_back(option);
-		optionsSize += option->packedSize();
-	}
-	
 public:
 	StackOptionSet       stack        { this };
 	SessionOptionSet     session      { this };
 	IdempotenceOptionSet idempotence  { this };
 	UserPasswdOptionSet  userPassword { this };
 	AuthMethodOptionSet  authMethods  { this };
+	
+private:
+	boost::intrusive::list<Option> options;
+	size_t optionsSize = 0;
+	
+	void registerOption(Option *option)
+	{
+		if (packedSize() + option->packedSize() > SOCKS6_OPTIONS_LENGTH_MAX)
+			throw std::length_error("Option would not fit");
+		options.push_back(*option);
+		optionsSize += option->packedSize();
+	}
+	
+public:
 
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}

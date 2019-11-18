@@ -121,8 +121,8 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 
 void OptionSet::pack(ByteBuffer *bb) const
 {
-	for (Option *option: options)
-		option->pack(bb);
+	for (const Option &option: options)
+		option.pack(bb);
 }
 
 SessionOptionSet::SessionOptionSet(OptionSet *owner)
