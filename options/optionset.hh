@@ -267,15 +267,7 @@ public:
 
 class OptionSet: public OptionSetBase
 {
-public:
-	StackOptionSet       stack        { this };
-	SessionOptionSet     session      { this };
-	IdempotenceOptionSet idempotence  { this };
-	UserPasswdOptionSet  userPassword { this };
-	AuthMethodOptionSet  authMethods  { this };
-	
-private:
-	boost::intrusive::list<Option> options;
+	boost::intrusive::list<Option, boost::intrusive::constant_time_size<false>> options;
 	size_t optionsSize = 0;
 	
 	void registerOption(Option *option)
@@ -287,7 +279,12 @@ private:
 	}
 	
 public:
-
+	StackOptionSet       stack        { this };
+	SessionOptionSet     session      { this };
+	IdempotenceOptionSet idempotence  { this };
+	UserPasswdOptionSet  userPassword { this };
+	AuthMethodOptionSet  authMethods  { this };
+	
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
 	
