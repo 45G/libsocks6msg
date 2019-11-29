@@ -25,9 +25,10 @@ struct S6M_Address
 
 struct S6M_StackOption
 {
-	enum SOCKS6StackLeg leg;
-	enum SOCKS6StackLevel level;
+	enum SOCKS6StackLeg        leg;
+	enum SOCKS6StackLevel      level;
 	enum SOCKS6StackOptionCode code;
+	
 	int value;
 };
 
@@ -36,7 +37,7 @@ struct S6M_OptionSet
 	struct
 	{
 		S6M_StackOption *options;
-		int count;
+		int             count;
 	} stack;
 	
 	struct
@@ -46,7 +47,7 @@ struct S6M_OptionSet
 		int tearDown;
 		
 		uint8_t *id;
-		int idLength;
+		int     idLength;
 		
 		int ok;
 		int rejected;
@@ -58,7 +59,7 @@ struct S6M_OptionSet
 	{
 		uint32_t request;
 		
-		int spend;
+		int      spend;
 		uint32_t token;
 		
 		uint32_t windowBase;
@@ -73,9 +74,10 @@ struct S6M_OptionSet
 		struct
 		{
 			enum SOCKS6Method *methods;
-			int count;
+			int               count;
 		} known;
 		uint16_t initialDataLen;
+		
 		enum SOCKS6Method selected;
 	} authMethods;
 	
@@ -94,7 +96,7 @@ struct S6M_Request
 	enum SOCKS6RequestCode code;
 	
 	struct S6M_Address addr;
-	uint16_t port;
+	uint16_t           port;
 	
 	struct S6M_OptionSet optionSet;
 };
@@ -111,7 +113,7 @@ struct S6M_OpReply
 	enum SOCKS6OperationReplyCode code;
 	
 	struct S6M_Address addr;
-	uint16_t port;
+	uint16_t           port;
 	
 	struct S6M_OptionSet optionSet;
 };
