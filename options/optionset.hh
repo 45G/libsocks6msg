@@ -41,6 +41,11 @@ protected:
 	
 	void enforceMode(Mode mode1, Mode mode2) const;
 	
+	template <typename T, typename L>
+	void commit(std::optional<T> &field, L lambda);
+	template <typename T, typename L>
+	void commit(std::optional<T> &field1, std::optional<T> &field2, L lambda);
+	
 public:
 	OptionSetBase(OptionSet *owner, Mode mode)
 		: owner(owner), mode(mode) {}
@@ -302,6 +307,7 @@ public:
 		return mode;
 	}
 	
+	friend class OptionSetBase;
 	friend class SessionOptionSet;
 	friend class IdempotenceOptionSet;
 	friend class StackOptionSet;

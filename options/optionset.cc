@@ -23,36 +23,37 @@ T &vacantVariant(T &t)
 	return t;
 }
 
-#define COMMIT_OPT(FIELD, WHAT) \
-{ \
-	vacant(FIELD) = (WHAT); \
-	try \
-	{ \
-		owner->registerOption(&(FIELD).value()); \
-	} \
-	catch (...) \
-	{ \
-		(FIELD).reset(); \
-		throw; \
-	} \
+template <typename T, typename L>
+void OptionSetBase::commit(optional<T> &field, L lambda)
+{
+	vacant(field) = lambda();
+	try
+	{
+		owner->registerOption(&field.value());
+	}
+	catch (...)
+	{
+		field.reset();
+		throw;
+	}
 }
 
-#define COMMIT_OPT2(FIELD1, FIELD2, WHAT) \
-{ \
-	vacant(FIELD1); \
-	vacant(FIELD2); \
-	(FIELD1) = (WHAT); \
-	(FIELD2) = (FIELD1); \
-	try \
-	{ \
-		owner->registerOption(&(FIELD1).value()); \
-	} \
-	catch (...) \
-	{ \
-		(FIELD1).reset(); \
-		(FIELD2).reset(); \
-		throw; \
-	} \
+template <typename T, typename L>
+void OptionSetBase::commit(optional<T> &field1, optional<T> &field2, L lambda)
+{
+	vacant(field1);
+	vacant(field2) = lambda();
+	field1 = field2;
+	try
+	{
+		owner->registerOption(&field1.value());
+	}
+	catch (...)
+	{
+		field1.reset();
+		field2.reset();
+		throw;
+	}
 }
 
 #define COMMIT_VARIANT(FIELD, TYPE, WHAT) \
@@ -137,7 +138,7 @@ void SessionOptionSet::request()
 void SessionOptionSet::tearDown()
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(teardownOpt, SessionTeardownOption());
+	commit(teardownOpt, [](){ return SessionTeardownOption(); });
 }
 
 void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
@@ -161,7 +162,7 @@ void SessionOptionSet::signalReject()
 void SessionOptionSet::setUntrusted()
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(untrustedOpt, SessionUntrustedOption());
+	commit(untrustedOpt, []() { return SessionUntrustedOption(); });
 }
 
 IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
@@ -170,19 +171,19 @@ IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
 void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(requestOpt, IdempotenceRequestOption(size));
+	commit(requestOpt, [=]() { return IdempotenceRequestOption(size); });
 }
 
 void IdempotenceOptionSet::setToken(uint32_t token)
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(expenditureOpt, IdempotenceExpenditureOption(token));
+	commit(expenditureOpt, [=]() { return IdempotenceExpenditureOption(token); });
 }
 
 void IdempotenceOptionSet::advertise(std::pair<uint32_t, uint32_t> window)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT_OPT(windowOpt, IdempotenceWindowOption(window));
+	commit(windowOpt, [=]() { return IdempotenceWindowOption(window); });
 }
 
 void IdempotenceOptionSet::setReply(bool accepted)
@@ -209,13 +210,13 @@ void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
 	switch(leg)
 	{
 	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		COMMIT_OPT(clientProxy, T(leg, value));
+		commit(clientProxy, [&]() { return T(leg, value); });
 		return;
 	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		COMMIT_OPT(proxyRemote, T(leg, value));
+		commit(proxyRemote, [&]() { return T(leg, value); });
 		return;
 	case SOCKS6_STACK_LEG_BOTH:
-		COMMIT_OPT2(clientProxy, proxyRemote, T(leg, value));
+		commit(clientProxy, proxyRemote, [&]() { return T(leg, value); });
 		return;
 	}
 }
@@ -256,13 +257,13 @@ UserPasswdOptionSet::UserPasswdOptionSet(OptionSet *owner)
 void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(req, UsernamePasswdReqOption(user, passwd));
+	commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
 }
 
 void UserPasswdOptionSet::setReply(bool success)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT_OPT(reply, UsernamePasswdReplyOption(success));
+	commit(reply, [=]() { return UsernamePasswdReplyOption(success); });
 }
 
 AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
@@ -271,13 +272,13 @@ AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
 void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 {
 	enforceMode(M_REQ);
-	COMMIT_OPT(advertOption, AuthMethodAdvertOption(initialDataLen, methods));
+	commit(advertOption, [&]() { return AuthMethodAdvertOption(initialDataLen, methods); });
 }
 
 void AuthMethodOptionSet::select(SOCKS6Method method)
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT_OPT(selectOption, AuthMethodSelectOption(method));
+	commit(selectOption, [=]() { return AuthMethodSelectOption(method); });
 }
 
 }
