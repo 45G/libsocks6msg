@@ -45,6 +45,8 @@ protected:
 	void commit(std::optional<T> &field, L lambda);
 	template <typename T, typename L>
 	void commit(std::optional<T> &field1, std::optional<T> &field2, L lambda);
+	template <typename V, typename L>
+	void commitVariant(V &field, L lambda);
 	
 public:
 	OptionSetBase(OptionSet *owner, Mode mode)

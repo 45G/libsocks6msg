@@ -56,19 +56,19 @@ void OptionSetBase::commit(optional<T> &field1, optional<T> &field2, L lambda)
 	}
 }
 
-#define COMMIT_VARIANT(FIELD, TYPE, WHAT) \
-{ \
-	vacantVariant(FIELD); \
-	(FIELD) = (WHAT); \
-	try \
-	{ \
-		owner->registerOption(get_if<TYPE>(&FIELD)); \
-	} \
-	catch (...) \
-	{ \
-		(FIELD) = monostate(); \
-		throw; \
-	} \
+template <typename V, typename L>
+void OptionSetBase::commitVariant(V &field, L lambda)
+{
+	vacantVariant(field) = lambda();
+	try
+	{
+		owner->registerOption(get_if<decltype(lambda())>(&field));
+	}
+	catch (...)
+	{
+		field = monostate();
+		throw;
+	}
 }
 
 void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
@@ -132,7 +132,7 @@ SessionOptionSet::SessionOptionSet(OptionSet *owner)
 void SessionOptionSet::request()
 {
 	enforceMode(M_REQ);
-	COMMIT_VARIANT(mandatoryOpt, SessionRequestOption, SessionRequestOption());
+	commitVariant(mandatoryOpt, []() { return SessionRequestOption(); });
 }
 
 void SessionOptionSet::tearDown()
@@ -144,19 +144,19 @@ void SessionOptionSet::tearDown()
 void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
 {
 	enforceMode(M_REQ, M_AUTH_REP);
-	COMMIT_VARIANT(mandatoryOpt, SessionIDOption, SessionIDOption(ticket));
+	commitVariant(mandatoryOpt, [&]() { return SessionIDOption(ticket); });
 }
 
 void SessionOptionSet::signalOK()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT_VARIANT(mandatoryOpt, SessionOKOption, SessionOKOption());
+	commitVariant(mandatoryOpt, []() { return SessionOKOption(); });
 }
 
 void SessionOptionSet::signalReject()
 {
 	enforceMode(M_AUTH_REP);
-	COMMIT_VARIANT(mandatoryOpt, SessionInvalidOption, SessionInvalidOption());
+	commitVariant(mandatoryOpt, []() { return SessionInvalidOption(); });
 }
 
 void SessionOptionSet::setUntrusted()
@@ -191,11 +191,11 @@ void IdempotenceOptionSet::setReply(bool accepted)
 	enforceMode(M_AUTH_REP);
 	if (accepted)
 	{
-		COMMIT_VARIANT(replyOpt, IdempotenceAcceptedOption, IdempotenceAcceptedOption());
+		commitVariant(replyOpt, []() { return IdempotenceAcceptedOption(); });
 	}
 	else
 	{
-		COMMIT_VARIANT(replyOpt, IdempotenceAcceptedOption, IdempotenceRejectedOption());
+		commitVariant(replyOpt, []() { return IdempotenceRejectedOption(); });
 	}
 }
 
