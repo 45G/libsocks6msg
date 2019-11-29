@@ -15,9 +15,12 @@ extern "C"
 struct S6M_Address
 {
 	enum SOCKS6AddressType type;
-	struct in_addr ipv4;
-	struct in6_addr ipv6;
-	const char *domain;
+	union
+	{
+		struct in_addr  ipv4;
+		struct in6_addr ipv6;
+		const char      *domain;
+	};
 };
 
 struct S6M_StackOption
@@ -67,8 +70,11 @@ struct S6M_OptionSet
 	
 	struct
 	{
-		enum SOCKS6Method *known;
-		int knownMethodCount;
+		struct
+		{
+			enum SOCKS6Method *methods;
+			int count;
+		} known;
 		uint16_t initialDataLen;
 		enum SOCKS6Method selected;
 	} authMethods;

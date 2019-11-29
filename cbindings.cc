@@ -163,7 +163,7 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 		clutter->knownMethods.reserve(cppSet->authMethods.getAdvertised()->size());
 		for (SOCKS6Method method: *(cppSet->authMethods.getAdvertised()))
 			clutter->knownMethods.push_back(method);
-		cSet->authMethods.known = clutter->knownMethods.data();
+		cSet->authMethods.known.methods = clutter->knownMethods.data();
 	}
 	cSet->authMethods.initialDataLen = cppSet->authMethods.getInitialDataLen();
 	cSet->authMethods.selected = cppSet->authMethods.getSelected();
@@ -233,12 +233,12 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->idempotence.reply)
 		cppSet->idempotence.setReply(cSet->idempotence.accepted);
 	
-	if (cSet->authMethods.known)
+	if (cSet->authMethods.known.methods)
 	{
 		set<SOCKS6Method> methods;
 		
-		for (int i = 0; i < cSet->authMethods.knownMethodCount; i++)
-			methods.insert((SOCKS6Method)cSet->authMethods.known[i]);
+		for (int i = 0; i < cSet->authMethods.known.count; i++)
+			methods.insert((SOCKS6Method)cSet->authMethods.known.methods[i]);
 		cppSet->authMethods.advertise(methods, cSet->authMethods.initialDataLen);
 	}
 	if (cSet->authMethods.selected != SOCKS6_METHOD_NOAUTH)
