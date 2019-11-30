@@ -459,16 +459,6 @@ struct OptionSet: public OptionSetBase, protected OptionList
 	{
 		return mode;
 	}
-	
-	friend class OptionSetBase;
-	friend class SessionOptionSet;
-	friend class IdempotenceOptionSet;
-	friend class StackOptionSet;
-	template <typename T>
-	friend class StackOptionPair;
-	friend class UserPasswdOptionSet;
-	friend class AuthMethodOptionSet;
-	friend class ResolutionOptionSet;
 };
 
 }
