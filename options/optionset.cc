@@ -42,28 +42,4 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	}
 }
 
-void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
-{
-	enforceMode(M_REQ);
-	commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
-}
-
-void UserPasswdOptionSet::setReply(bool success)
-{
-	enforceMode(M_AUTH_REP);
-	commit(reply, [=]() { return UsernamePasswdReplyOption(success); });
-}
-
-void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
-{
-	enforceMode(M_REQ);
-	commit(advertOption, [&]() { return AuthMethodAdvertOption(initialDataLen, methods); });
-}
-
-void AuthMethodOptionSet::select(SOCKS6Method method)
-{
-	enforceMode(M_AUTH_REP);
-	commit(selectOption, [=]() { return AuthMethodSelectOption(method); });
-}
-
 }

@@ -369,7 +369,11 @@ class UserPasswdOptionSet: public OptionSetBase
 public:
 	using OptionSetBase::OptionSetBase;
 	
-	void setCredentials(const std::string &user, const std::string &passwd);
+	void setCredentials(const std::string &user, const std::string &passwd)
+	{
+		enforceMode(M_REQ);
+		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
+	}
 	
 	const std::string *getUsername() const
 	{
@@ -385,7 +389,11 @@ public:
 		return req->getPassword();
 	}
 	
-	void setReply(bool success);
+	void setReply(bool success)
+	{
+		enforceMode(M_AUTH_REP);
+		commit(reply, [=]() { return UsernamePasswdReplyOption(success); });
+	}
 	
 	std::optional<bool> getReply() const
 	{
@@ -412,7 +420,11 @@ public:
 		return advertOption->getMethods();
 	}
 	
-	void advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen);
+	void advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
+	{
+		enforceMode(M_REQ);
+		commit(advertOption, [&]() { return AuthMethodAdvertOption(initialDataLen, methods); });
+	}
 
 	uint16_t getInitialDataLen() const
 	{
@@ -421,7 +433,11 @@ public:
 		return advertOption->getInitialDataLen();
 	}
 	
-	void select(SOCKS6Method method);
+	void select(SOCKS6Method method)
+	{
+		enforceMode(M_AUTH_REP);
+		commit(selectOption, [=]() { return AuthMethodSelectOption(method); });
+	}
 	
 	SOCKS6Method getSelected() const
 	{
