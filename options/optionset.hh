@@ -53,9 +53,17 @@ protected:
 	OptionSet *owner;
 	Mode mode;
 	
-	void enforceMode(Mode mode1) const;
+	void enforceMode(Mode mode1) const
+	{
+		if (mode != mode1)
+			throw std::logic_error("Option not available");
+	}
 	
-	void enforceMode(Mode mode1, Mode mode2) const;
+	void enforceMode(Mode mode1, Mode mode2) const
+	{
+		if (mode != mode1 && mode != mode2)
+			throw std::logic_error("Option not available");
+	}
 	
 	template <typename T, typename L>
 	void commit(std::optional<T> &field, L lambda);

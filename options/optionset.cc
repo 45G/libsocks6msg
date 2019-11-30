@@ -71,18 +71,6 @@ void OptionSetBase::commitVariant(V &field, L lambda)
 	}
 }
 
-void OptionSetBase::enforceMode(OptionSet::Mode mode1) const
-{
-	if (mode != mode1)
-		throw logic_error("Option not available");
-}
-
-void OptionSetBase::enforceMode(OptionSet::Mode mode1, OptionSet::Mode mode2) const
-{
-	if (mode != mode1 && mode != mode2)
-		throw logic_error("Option not available");
-}
-
 OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	: OptionSetBase(this, mode)
 {
