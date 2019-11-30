@@ -363,7 +363,11 @@ struct OptionSet: public OptionSetBase, protected OptionList
 	
 	OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength);
 	
-	void pack(ByteBuffer *bb) const;
+	void pack(ByteBuffer *bb) const
+	{
+		for (const Option &option: options)
+			option.pack(bb);
+	}
 	
 	size_t packedSize() const
 	{

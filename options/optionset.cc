@@ -44,12 +44,6 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	}
 }
 
-void OptionSet::pack(ByteBuffer *bb) const
-{
-	for (const Option &option: options)
-		option.pack(bb);
-}
-
 void SessionOptionSet::request()
 {
 	enforceMode(M_REQ);
