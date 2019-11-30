@@ -23,6 +23,22 @@ namespace S6M
 
 class OptionSet;
 
+class OptionList
+{
+protected:
+	boost::intrusive::list<Option, boost::intrusive::constant_time_size<false>> options;
+	size_t optionsSize = 0;
+	
+public:
+	void registerOption(Option *option)
+	{
+		if (optionsSize + option->packedSize() > SOCKS6_OPTIONS_LENGTH_MAX)
+			throw std::length_error("Option would not fit");
+		options.push_back(*option);
+		optionsSize += option->packedSize();
+	}
+};
+
 class OptionSetBase
 {
 public:
@@ -272,20 +288,8 @@ public:
 	}
 };
 
-class OptionSet: public OptionSetBase
+struct OptionSet: public OptionSetBase, protected OptionList
 {
-	boost::intrusive::list<Option, boost::intrusive::constant_time_size<false>> options;
-	size_t optionsSize = 0;
-	
-	void registerOption(Option *option)
-	{
-		if (packedSize() + option->packedSize() > SOCKS6_OPTIONS_LENGTH_MAX)
-			throw std::length_error("Option would not fit");
-		options.push_back(*option);
-		optionsSize += option->packedSize();
-	}
-	
-public:
 	StackOptionSet       stack        { this };
 	SessionOptionSet     session      { this };
 	IdempotenceOptionSet idempotence  { this };
