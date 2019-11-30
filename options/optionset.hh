@@ -63,12 +63,69 @@ protected:
 			throw std::logic_error("Option not available");
 	}
 	
+	template <typename T>
+	static T &vacant(T &t)
+	{
+		if (t)
+			throw std::logic_error("Option already in place");
+		return t;
+	}
+	
+	template <typename T>
+	static T &vacantVariant(T &t)
+	{
+		if (!std::holds_alternative<std::monostate>(t))
+			throw std::logic_error("Option already in place");
+		return t;
+	}
+	
 	template <typename T, typename L>
-	void commit(std::optional<T> &field, L lambda);
+	void commit(std::optional<T> &field, L lambda)
+	{
+		vacant(field) = lambda();
+		try
+		{
+			list->registerOption(&field.value());
+		}
+		catch (...)
+		{
+			field.reset();
+			throw;
+		}
+	}
+	
 	template <typename T, typename L>
-	void commit(std::optional<T> &field1, std::optional<T> &field2, L lambda);
+	void commit(std::optional<T> &field1, std::optional<T> &field2, L lambda)
+	{
+		vacant(field1);
+		vacant(field2) = lambda();
+		field1 = field2;
+		try
+		{
+			list->registerOption(&field1.value());
+		}
+		catch (...)
+		{
+			field1.reset();
+			field2.reset();
+			throw;
+		}
+	}
+	
 	template <typename V, typename L>
-	void commitVariant(V &field, L lambda);
+	void commitVariant(V &field, L lambda)
+	{
+		vacantVariant(field) = lambda();
+		try
+		{
+			list->registerOption(std::get_if<decltype(lambda())>(&field));
+		}
+		catch (...)
+		{
+			field = std::monostate();
+			throw;
+		}
+	}
 	
 public:
 	OptionSetBase(OptionList *list, Mode mode)
