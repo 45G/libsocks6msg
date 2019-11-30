@@ -447,7 +447,7 @@ public:
 	}
 };
 
-struct OptionSet: public OptionSetBase, protected OptionList
+struct OptionSet: protected OptionList, public OptionSetBase
 {
 	StackOptionSet       stack        { this, mode };
 	SessionOptionSet     session      { this, mode };
