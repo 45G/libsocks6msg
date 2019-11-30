@@ -42,51 +42,6 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	}
 }
 
-template <typename T>
-void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
-{
-	enforceMode(M_REQ, M_AUTH_REP);
-	switch(leg)
-	{
-	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		commit(clientProxy, [&]() { return T(leg, value); });
-		return;
-	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		commit(proxyRemote, [&]() { return T(leg, value); });
-		return;
-	case SOCKS6_STACK_LEG_BOTH:
-		commit(clientProxy, proxyRemote, [&]() { return T(leg, value); });
-		return;
-	}
-}
-
-template <typename T>
-optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
-{
-	enforceMode(M_REQ, M_AUTH_REP);
-	switch(leg)
-	{
-	case SOCKS6_STACK_LEG_CLIENT_PROXY:
-		if (!clientProxy)
-			return {};
-		return clientProxy->getValue();
-		
-	case SOCKS6_STACK_LEG_PROXY_REMOTE:
-		if (!proxyRemote)
-			return {};
-		return clientProxy->getValue();
-		
-	case SOCKS6_STACK_LEG_BOTH:
-		throw logic_error("Bad leg");
-	}
-	return {};
-}
-
-template class StackOptionPair<TOSOption>;
-template class StackOptionPair<TFOOption>;
-template class StackOptionPair<MPOption>;
-template class StackOptionPair<BacklogOption>;
-
 void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
 {
 	enforceMode(M_REQ);

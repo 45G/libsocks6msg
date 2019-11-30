@@ -299,9 +299,43 @@ public:
 	
 	using OptionSetBase::OptionSetBase;
 	
-	void set(SOCKS6StackLeg leg, typename OPT::Value value);
+	void set(SOCKS6StackLeg leg, typename OPT::Value value)
+	{
+		enforceMode(M_REQ, M_AUTH_REP);
+		switch(leg)
+		{
+		case SOCKS6_STACK_LEG_CLIENT_PROXY:
+			commit(clientProxy, [&]() { return OPT(leg, value); });
+			return;
+		case SOCKS6_STACK_LEG_PROXY_REMOTE:
+			commit(proxyRemote, [&]() { return OPT(leg, value); });
+			return;
+		case SOCKS6_STACK_LEG_BOTH:
+			commit(clientProxy, proxyRemote, [&]() { return OPT(leg, value); });
+			return;
+		}
+	}
 	
-	std::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const;
+	std::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const
+	{
+		enforceMode(M_REQ, M_AUTH_REP);
+		switch(leg)
+		{
+		case SOCKS6_STACK_LEG_CLIENT_PROXY:
+			if (!clientProxy)
+				return {};
+			return clientProxy->getValue();
+			
+		case SOCKS6_STACK_LEG_PROXY_REMOTE:
+			if (!proxyRemote)
+				return {};
+			return clientProxy->getValue();
+			
+		case SOCKS6_STACK_LEG_BOTH:
+			throw std::logic_error("Bad leg");
+		}
+		return {};
+	}
 	
 	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
 	void set(typename OPT::Value value)
