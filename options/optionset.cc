@@ -1,6 +1,4 @@
-#include <arpa/inet.h>
 #include "optionset.hh"
-
 
 using namespace std;
 
@@ -41,37 +39,6 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 			Option::incrementalParse(opt, this);
 		}
 		catch (invalid_argument &) {}
-	}
-}
-
-void IdempotenceOptionSet::request(uint32_t size)
-{
-	enforceMode(M_REQ);
-	commit(requestOpt, [=]() { return IdempotenceRequestOption(size); });
-}
-
-void IdempotenceOptionSet::setToken(uint32_t token)
-{
-	enforceMode(M_REQ);
-	commit(expenditureOpt, [=]() { return IdempotenceExpenditureOption(token); });
-}
-
-void IdempotenceOptionSet::advertise(std::pair<uint32_t, uint32_t> window)
-{
-	enforceMode(M_AUTH_REP);
-	commit(windowOpt, [=]() { return IdempotenceWindowOption(window); });
-}
-
-void IdempotenceOptionSet::setReply(bool accepted)
-{
-	enforceMode(M_AUTH_REP);
-	if (accepted)
-	{
-		commitVariant(replyOpt, []() { return IdempotenceAcceptedOption(); });
-	}
-	else
-	{
-		commitVariant(replyOpt, []() { return IdempotenceRejectedOption(); });
 	}
 }
 

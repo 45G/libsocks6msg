@@ -226,7 +226,11 @@ class IdempotenceOptionSet: public OptionSetBase
 public:
 	using OptionSetBase::OptionSetBase;
 	
-	void request(uint32_t size);
+	void request(uint32_t size)
+	{
+		enforceMode(M_REQ);
+		commit(requestOpt, [=]() { return IdempotenceRequestOption(size); });
+	}
 	
 	uint32_t requestedSize() const
 	{
@@ -235,7 +239,11 @@ public:
 		return requestOpt->getWinSize();
 	}
 	
-	void setToken(uint32_t token);
+	void setToken(uint32_t token)
+	{
+		enforceMode(M_REQ);
+		commit(expenditureOpt, [=]() { return IdempotenceExpenditureOption(token); });
+	}
 	
 	std::optional<uint32_t> getToken() const
 	{
@@ -244,7 +252,11 @@ public:
 		return expenditureOpt->getToken();
 	}
 	
-	void advertise(std::pair<uint32_t, uint32_t> window);
+	void advertise(std::pair<uint32_t, uint32_t> window)
+	{
+		enforceMode(M_AUTH_REP);
+		commit(windowOpt, [=]() { return IdempotenceWindowOption(window); });
+	}
 	
 	std::pair<uint32_t, uint32_t> getAdvertised() const
 	{
@@ -253,7 +265,18 @@ public:
 		return windowOpt->getWindow();
 	}
 	
-	void setReply(bool accepted);
+	void setReply(bool accepted)
+	{
+		enforceMode(M_AUTH_REP);
+		if (accepted)
+		{
+			commitVariant(replyOpt, []() { return IdempotenceAcceptedOption(); });
+		}
+		else
+		{
+			commitVariant(replyOpt, []() { return IdempotenceRejectedOption(); });
+		}
+	}
 	
 	std::optional<bool> getReply() const
 	{
