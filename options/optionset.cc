@@ -29,7 +29,7 @@ void OptionSetBase::commit(optional<T> &field, L lambda)
 	vacant(field) = lambda();
 	try
 	{
-		owner->registerOption(&field.value());
+		list->registerOption(&field.value());
 	}
 	catch (...)
 	{
@@ -46,7 +46,7 @@ void OptionSetBase::commit(optional<T> &field1, optional<T> &field2, L lambda)
 	field1 = field2;
 	try
 	{
-		owner->registerOption(&field1.value());
+		list->registerOption(&field1.value());
 	}
 	catch (...)
 	{
@@ -62,7 +62,7 @@ void OptionSetBase::commitVariant(V &field, L lambda)
 	vacantVariant(field) = lambda();
 	try
 	{
-		owner->registerOption(get_if<decltype(lambda())>(&field));
+		list->registerOption(get_if<decltype(lambda())>(&field));
 	}
 	catch (...)
 	{
@@ -114,9 +114,6 @@ void OptionSet::pack(ByteBuffer *bb) const
 		option.pack(bb);
 }
 
-SessionOptionSet::SessionOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
-
 void SessionOptionSet::request()
 {
 	enforceMode(M_REQ);
@@ -153,9 +150,6 @@ void SessionOptionSet::setUntrusted()
 	commit(untrustedOpt, []() { return SessionUntrustedOption(); });
 }
 
-IdempotenceOptionSet::IdempotenceOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
-
 void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);
@@ -186,10 +180,6 @@ void IdempotenceOptionSet::setReply(bool accepted)
 		commitVariant(replyOpt, []() { return IdempotenceRejectedOption(); });
 	}
 }
-
-template <typename T>
-StackOptionPair<T>::StackOptionPair(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
 
 template <typename T>
 void StackOptionPair<T>::set(SOCKS6StackLeg leg, typename T::Value value)
@@ -231,16 +221,10 @@ optional<typename T::Value> StackOptionPair<T>::get(SOCKS6StackLeg leg) const
 	return {};
 }
 
-StackOptionSet::StackOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
-
 template class StackOptionPair<TOSOption>;
 template class StackOptionPair<TFOOption>;
 template class StackOptionPair<MPOption>;
 template class StackOptionPair<BacklogOption>;
-
-UserPasswdOptionSet::UserPasswdOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
 
 void UserPasswdOptionSet::setCredentials(const string &user, const string &passwd)
 {
@@ -253,9 +237,6 @@ void UserPasswdOptionSet::setReply(bool success)
 	enforceMode(M_AUTH_REP);
 	commit(reply, [=]() { return UsernamePasswdReplyOption(success); });
 }
-
-AuthMethodOptionSet::AuthMethodOptionSet(OptionSet *owner)
-	: OptionSetBase(owner, owner->mode) {}
 
 void AuthMethodOptionSet::advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 {

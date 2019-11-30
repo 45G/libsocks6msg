@@ -21,8 +21,6 @@ namespace S6M
 
 //TODO: this is waaaaaay too bloated
 
-class OptionSet;
-
 class OptionList
 {
 protected:
@@ -50,7 +48,7 @@ public:
 	};
 	
 protected:
-	OptionSet *owner;
+	OptionList *list;
 	Mode mode;
 	
 	void enforceMode(Mode mode1) const
@@ -73,8 +71,8 @@ protected:
 	void commitVariant(V &field, L lambda);
 	
 public:
-	OptionSetBase(OptionSet *owner, Mode mode)
-		: owner(owner), mode(mode) {}
+	OptionSetBase(OptionList *list, Mode mode)
+		: list(list), mode(mode) {}
 };
 
 class SessionOptionSet: public OptionSetBase
@@ -85,7 +83,7 @@ class SessionOptionSet: public OptionSetBase
 	std::optional<SessionUntrustedOption> untrustedOpt;
 	
 public:
-	SessionOptionSet(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 	
 	void request();
 	
@@ -145,7 +143,7 @@ class IdempotenceOptionSet: public OptionSetBase
 	std::variant<std::monostate, IdempotenceAcceptedOption, IdempotenceRejectedOption> replyOpt;
 	
 public:
-	IdempotenceOptionSet(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 	
 	void request(uint32_t size);
 	
@@ -195,7 +193,7 @@ class StackOptionPair: public OptionSetBase
 public:
 	typedef OPT Option;
 	
-	StackOptionPair(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 	
 	void set(SOCKS6StackLeg leg, typename OPT::Value value);
 	
@@ -216,15 +214,14 @@ public:
 	}
 };
 
-class StackOptionSet: public OptionSetBase
+struct StackOptionSet: public OptionSetBase
 {
-public:
-	StackOptionPair<TOSOption>     tos     { owner };
-	StackOptionPair<TFOOption>     tfo     { owner };
-	StackOptionPair<MPOption>      mp      { owner };
-	StackOptionPair<BacklogOption> backlog { owner };
+	StackOptionPair<TOSOption>     tos     { list, mode };
+	StackOptionPair<TFOOption>     tfo     { list, mode };
+	StackOptionPair<MPOption>      mp      { list, mode };
+	StackOptionPair<BacklogOption> backlog { list, mode };
 	
-	StackOptionSet(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 };
 
 class UserPasswdOptionSet: public OptionSetBase
@@ -232,7 +229,7 @@ class UserPasswdOptionSet: public OptionSetBase
 	std::optional<UsernamePasswdReqOption>   req;
 	std::optional<UsernamePasswdReplyOption> reply;
 public:
-	UserPasswdOptionSet(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 	
 	void setCredentials(const std::string &user, const std::string &passwd);
 	
@@ -266,7 +263,7 @@ class AuthMethodOptionSet: public OptionSetBase
 	std::optional<AuthMethodSelectOption> selectOption;
 	
 public:
-	AuthMethodOptionSet(OptionSet *owner);
+	using OptionSetBase::OptionSetBase;
 	
 	const std::set<SOCKS6Method> *getAdvertised() const
 	{
@@ -298,11 +295,11 @@ public:
 
 struct OptionSet: public OptionSetBase, protected OptionList
 {
-	StackOptionSet       stack        { this };
-	SessionOptionSet     session      { this };
-	IdempotenceOptionSet idempotence  { this };
-	UserPasswdOptionSet  userPassword { this };
-	AuthMethodOptionSet  authMethods  { this };
+	StackOptionSet       stack        { this, mode };
+	SessionOptionSet     session      { this, mode };
+	IdempotenceOptionSet idempotence  { this, mode };
+	UserPasswdOptionSet  userPassword { this, mode };
+	AuthMethodOptionSet  authMethods  { this, mode };
 	
 	OptionSet(Mode mode)
 		: OptionSetBase(this, mode) {}
