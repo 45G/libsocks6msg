@@ -44,42 +44,6 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	}
 }
 
-void SessionOptionSet::request()
-{
-	enforceMode(M_REQ);
-	commitVariant(mandatoryOpt, []() { return SessionRequestOption(); });
-}
-
-void SessionOptionSet::tearDown()
-{
-	enforceMode(M_REQ);
-	commit(teardownOpt, [](){ return SessionTeardownOption(); });
-}
-
-void SessionOptionSet::setID(const std::vector<uint8_t> &ticket)
-{
-	enforceMode(M_REQ, M_AUTH_REP);
-	commitVariant(mandatoryOpt, [&]() { return SessionIDOption(ticket); });
-}
-
-void SessionOptionSet::signalOK()
-{
-	enforceMode(M_AUTH_REP);
-	commitVariant(mandatoryOpt, []() { return SessionOKOption(); });
-}
-
-void SessionOptionSet::signalReject()
-{
-	enforceMode(M_AUTH_REP);
-	commitVariant(mandatoryOpt, []() { return SessionInvalidOption(); });
-}
-
-void SessionOptionSet::setUntrusted()
-{
-	enforceMode(M_REQ);
-	commit(untrustedOpt, []() { return SessionUntrustedOption(); });
-}
-
 void IdempotenceOptionSet::request(uint32_t size)
 {
 	enforceMode(M_REQ);

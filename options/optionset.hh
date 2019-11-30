@@ -142,21 +142,33 @@ class SessionOptionSet: public OptionSetBase
 public:
 	using OptionSetBase::OptionSetBase;
 	
-	void request();
+	void request()
+	{
+		enforceMode(M_REQ);
+		commitVariant(mandatoryOpt, []() { return SessionRequestOption(); });
+	}
 	
 	bool requested() const
 	{
 		return std::holds_alternative<SessionRequestOption>(mandatoryOpt);
 	}
 	
-	void tearDown();
+	void tearDown()
+	{
+		enforceMode(M_REQ);
+		commit(teardownOpt, [](){ return SessionTeardownOption(); });
+	}
 	
 	bool tornDown() const
 	{
 		return (bool)teardownOpt;
 	}
 	
-	void setID(const std::vector<uint8_t> &id);
+	void setID(const std::vector<uint8_t> &id)
+	{
+		enforceMode(M_REQ, M_AUTH_REP);
+		commitVariant(mandatoryOpt, [&]() { return SessionIDOption(id); });
+	}
 	
 	const std::vector<uint8_t> *getID() const
 	{
@@ -168,21 +180,33 @@ public:
 		return opt->getTicket();
 	}
 	
-	void signalOK();
+	void signalOK()
+	{
+		enforceMode(M_AUTH_REP);
+		commitVariant(mandatoryOpt, []() { return SessionOKOption(); });
+	}
 	
 	bool isOK() const
 	{
 		return std::holds_alternative<SessionOKOption>(mandatoryOpt);
 	}
 	
-	void signalReject();
+	void signalReject()
+	{
+		enforceMode(M_AUTH_REP);
+		commitVariant(mandatoryOpt, []() { return SessionInvalidOption(); });
+	}
 	
 	bool rejected() const
 	{
 		return std::holds_alternative<SessionInvalidOption>(mandatoryOpt);
 	}
 	
-	void setUntrusted();
+	void setUntrusted()
+	{
+		enforceMode(M_REQ);
+		commit(untrustedOpt, []() { return SessionUntrustedOption(); });
+	}
 	
 	bool isUntrusted() const
 	{
