@@ -16,7 +16,6 @@ SOURCES += \
     options/authdataoption.cc \
     options/optionset.cc \
     fields/address.cc \
-    fields/string.cc \
     cbindings.cc \
     messages/authreply.cc \
     messages/opreply.cc \
