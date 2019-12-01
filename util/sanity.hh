@@ -29,9 +29,6 @@ template <>
 SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val);
 
 template <>
-SOCKS6AddressType enumCast<SOCKS6AddressType>(int val);
-
-template <>
 SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val);
 
 }

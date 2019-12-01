@@ -10,7 +10,7 @@ namespace S6M
 struct DatagramHeader
 {
 	uint64_t assocID;
-	Address address;
+	Address  address;
 	uint16_t port;
 
 	DatagramHeader(uint64_t assocID, Address address = Address(), uint16_t port = 0)

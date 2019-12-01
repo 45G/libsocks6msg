@@ -11,11 +11,10 @@ Request::Request(ByteBuffer *bb)
 	Version::check(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	code = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
-	port = ntohs(rawRequest->port);
-	SOCKS6AddressType addrType = enumCast<SOCKS6AddressType>(rawRequest->addressType);
 	
-	address = Address(addrType, bb);
+	code    = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
+	port    = ntohs(rawRequest->port);
+	address = Address((SOCKS6AddressType)rawRequest->addressType, bb);
 	
 	options = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
 }
@@ -23,12 +22,12 @@ Request::Request(ByteBuffer *bb)
 void Request::pack(ByteBuffer *bb) const
 {
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
-	rawRequest->version = SOCKS6_VERSION;
-	rawRequest->commandCode = code;
+	rawRequest->version       = SOCKS6_VERSION;
+	rawRequest->commandCode   = code;
 	rawRequest->optionsLength = htons(options.packedSize());
-	rawRequest->port = htons(port);
-	rawRequest->padding = 0;
-	rawRequest->addressType = address.getType();
+	rawRequest->port          = htons(port);
+	rawRequest->padding       = 0;
+	rawRequest->addressType   = address.getType();
 	
 	address.pack(bb);
 	

@@ -79,22 +79,6 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 	throw invalid_argument("Bad authentication reply code");
 }
 
-template <>
-SOCKS6AddressType enumCast<SOCKS6AddressType>(int val)
-{
-	SOCKS6AddressType conv = (SOCKS6AddressType)val;
-	
-	switch (conv)
-	{
-	case SOCKS6_ADDR_IPV4:
-	case SOCKS6_ADDR_IPV6:
-	case SOCKS6_ADDR_DOMAIN:
-		return conv;
-	}
-	
-	throw BadAddressTypeException();
-}
-
 template<>
 SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val)
 {

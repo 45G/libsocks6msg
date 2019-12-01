@@ -12,7 +12,7 @@ struct OperationReply
 {
 	SOCKS6OperationReplyCode code;
 	
-	Address address;
+	Address  address;
 	uint16_t port;
 	
 	OptionSet options { OptionSet::M_OP_REP };

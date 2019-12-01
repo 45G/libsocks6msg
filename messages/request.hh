@@ -12,7 +12,7 @@ struct Request
 {
 	SOCKS6RequestCode code;
 	
-	Address address;
+	Address  address;
 	uint16_t port;
 	
 	OptionSet options { OptionSet::M_REQ };

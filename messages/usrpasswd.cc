@@ -43,7 +43,7 @@ void UserPasswordReply::pack(ByteBuffer *bb) const
 	uint8_t *ver = bb->get<uint8_t>();
 	uint8_t *status = bb->get<uint8_t>();
 	
-	*ver = VERSION;
+	*ver    = VERSION;
 	*status = success ? 0x00 : 0x01;
 }
 
