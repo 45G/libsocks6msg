@@ -32,17 +32,6 @@ public:
 	}
 };
 
-class OptionsLength: public BoundedInt<uint16_t, 0, SOCKS6_OPTIONS_LENGTH_MAX>
-{
-public:
-	OptionsLength(uint16_t value)
-		: BoundedInt(value)
-	{
-		if (value % SOCKS6_ALIGNMENT != 0)
-			throw std::invalid_argument("Number must be multiple of 4");
-	}
-};
-
 }
 
 #endif // SOCKS6MSG_RESTRICTEDINT_HH

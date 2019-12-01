@@ -18,9 +18,7 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	address = Address(addrType, bb);
 	
-	OptionsLength optionsLength(ntohs(rawOpReply->optionsLength));
-	
-	options = OptionSet(bb, OptionSet::M_OP_REP, optionsLength);
+	options = OptionSet(bb, OptionSet::M_OP_REP, ntohs(rawOpReply->optionsLength));
 }
 
 void OperationReply::pack(ByteBuffer *bb) const

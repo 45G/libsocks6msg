@@ -17,9 +17,7 @@ Request::Request(ByteBuffer *bb)
 	
 	address = Address(addrType, bb);
 	
-	OptionsLength optionsLength(ntohs(rawRequest->optionsLength));
-	
-	options = OptionSet(bb, OptionSet::M_REQ, optionsLength);
+	options = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));
 }
 
 void Request::pack(ByteBuffer *bb) const

@@ -13,9 +13,7 @@ AuthenticationReply::AuthenticationReply(ByteBuffer *bb)
 	SOCKS6AuthReply *rawAuthReply = bb->get<SOCKS6AuthReply>();
 	code = enumCast<SOCKS6AuthReplyCode>(rawAuthReply->type);
 	
-	OptionsLength optionsLength(ntohs(rawAuthReply->optionsLength));
-	
-	options = OptionSet(bb, OptionSet::M_AUTH_REP, optionsLength);
+	options = OptionSet(bb, OptionSet::M_AUTH_REP, ntohs(rawAuthReply->optionsLength));
 }
 
 void AuthenticationReply::pack(ByteBuffer *bb) const

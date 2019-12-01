@@ -9,7 +9,10 @@ OptionSet::OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength)
 	: OptionSetBase(this, mode)
 {
 	if (optionsLength > SOCKS6_OPTIONS_LENGTH_MAX)
-		throw invalid_argument("Bad options length");
+		throw invalid_argument("Options length exceeds maximum value");
+	if (optionsLength % SOCKS6_ALIGNMENT)
+		throw invalid_argument("Options length not a multiple of " + SOCKS6_ALIGNMENT);
+
 	ByteBuffer optsBB(bb->get<uint8_t>(optionsLength), optionsLength);
 	
 	while (optsBB.getUsed() < optsBB.getTotalSize())
