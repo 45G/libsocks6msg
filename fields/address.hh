@@ -1,6 +1,7 @@
 #ifndef SOCKS6MSG_ADDRESS_HH
 #define SOCKS6MSG_ADDRESS_HH
 
+#include <assert.h>
 #include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <vector>
@@ -22,7 +23,24 @@ class Address
 	std::variant<in_addr, in6_addr, Padded<String>> u = in_addr({ 0 });
 	
 public:
-	size_t packedSize() const;
+	size_t packedSize() const
+	{
+		switch (type)
+		{
+		case SOCKS6_ADDR_IPV4:
+			return sizeof(in_addr);
+			
+		case SOCKS6_ADDR_IPV6:
+			return sizeof(in6_addr);
+			
+		case SOCKS6_ADDR_DOMAIN:
+			return std::get<Padded<String>>(u).packedSize();
+		}
+		
+		/* never happens */
+		assert(false);
+		return 0;
+	}
 	
 	void pack(ByteBuffer *bb) const;
 	

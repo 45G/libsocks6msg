@@ -28,16 +28,4 @@ void AuthenticationReply::pack(ByteBuffer *bb) const
 	options.pack(bb);
 }
 
-size_t AuthenticationReply::pack(uint8_t *buf, size_t bufSize) const
-{
-	ByteBuffer bb(buf, bufSize);
-	pack(&bb);
-	return bb.getUsed();
-}
-
-size_t AuthenticationReply::packedSize() const
-{
-	return sizeof(SOCKS6AuthReply) + options.packedSize();
-}
-
 }

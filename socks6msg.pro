@@ -21,7 +21,6 @@ SOURCES += \
     messages/opreply.cc \
     messages/request.cc \
     messages/usrpasswd.cc \
-    messages/version.cc \
     options/sessionoption.cc \
     messages/datagramheader.cc
 

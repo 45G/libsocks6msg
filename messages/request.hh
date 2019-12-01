@@ -24,9 +24,17 @@ struct Request
 	
 	void pack(ByteBuffer *bb) const;
 	
-	size_t pack(uint8_t *buf, size_t bufSize) const;
+	size_t pack(uint8_t *buf, size_t bufSize) const
+	{
+		ByteBuffer bb(buf, bufSize);
+		pack(&bb);
+		return bb.getUsed();
+	}
 	
-	size_t packedSize() const;
+	size_t packedSize() const
+	{
+		return sizeof(SOCKS6Request) + address.packedSize() + options.packedSize();
+	}
 };
 
 }

@@ -30,7 +30,12 @@ struct UserPasswordRequest: public UserPasswordBase
 	
 	void pack(ByteBuffer *bb) const;
 	
-	size_t pack(uint8_t *buf, size_t bufSize) const;
+	size_t pack(uint8_t *buf, size_t bufSize) const
+	{
+		ByteBuffer bb(buf, bufSize);
+		pack(&bb);
+		return bb.getUsed();
+	}
 	
 	size_t packedSize() const
 	{
@@ -47,7 +52,14 @@ struct UserPasswordReply: public UserPasswordBase
 	
 	UserPasswordReply(ByteBuffer *bb);
 	
-	void pack(ByteBuffer *bb);
+	void pack(ByteBuffer *bb) const;
+	
+	size_t pack(uint8_t *buf, size_t bufSize) const
+	{
+		ByteBuffer bb(buf, bufSize);
+		pack(&bb);
+		return bb.getUsed();
+	}
 	
 	static size_t packedSize()
 	{

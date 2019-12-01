@@ -9,16 +9,37 @@ namespace S6M
 
 struct Version
 {
-	static void check(ByteBuffer *bb);
+	static void check(ByteBuffer *bb)
+	{
+		SOCKS6Version *rawVer = bb->peek<SOCKS6Version>();
+		if (rawVer->version != SOCKS6_VERSION)
+			throw BadVersionException(rawVer->version);
+	}
 
-	static void parse(ByteBuffer *bb);
+	static void parse(ByteBuffer *bb)
+	{
+		SOCKS6Version *rawVer = bb->get<SOCKS6Version>();
+		if (rawVer->version != SOCKS6_VERSION)
+			throw BadVersionException(rawVer->version);
+	}
 	
 	static size_t packedSize()
 	{
 		return sizeof(SOCKS6Version);
 	}
 	
-	static void pack(ByteBuffer *bb);
+	static void pack(ByteBuffer *bb)
+	{
+		SOCKS6Version *rawVer = bb->get<SOCKS6Version>();
+		rawVer->version = SOCKS6_VERSION;
+	}
+	
+	static size_t pack(uint8_t *buf, size_t bufSize)
+	{
+		ByteBuffer bb(buf, bufSize);
+		pack(&bb);
+		return bb.getUsed();
+	}
 };
 
 }

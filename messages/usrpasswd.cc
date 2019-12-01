@@ -25,12 +25,7 @@ void UserPasswordRequest::pack(ByteBuffer *bb) const
 	password->pack(bb);
 }
 
-size_t UserPasswordRequest::pack(uint8_t *buf, size_t bufSize) const
-{
-	ByteBuffer bb(buf, bufSize);
-	pack(&bb);
-	return bb.getUsed();
-}
+
 
 UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
 {
@@ -43,7 +38,7 @@ UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
 	success = *status == 0x00;
 }
 
-void UserPasswordReply::pack(ByteBuffer *bb)
+void UserPasswordReply::pack(ByteBuffer *bb) const
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	uint8_t *status = bb->get<uint8_t>();

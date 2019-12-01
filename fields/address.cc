@@ -6,24 +6,6 @@ using namespace std;
 namespace S6M
 {
 
-size_t Address::packedSize() const
-{
-	switch (type)
-	{
-	case SOCKS6_ADDR_IPV4:
-		return sizeof(in_addr);
-		
-	case SOCKS6_ADDR_IPV6:
-		return sizeof(in6_addr);
-		
-	case SOCKS6_ADDR_DOMAIN:
-		return get<Padded<String>>(u).packedSize();
-	}
-	
-	/* never happens */
-	return 0;
-}
-
 void Address::pack(ByteBuffer *bb)  const
 {
 	switch (type)

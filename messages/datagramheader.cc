@@ -24,15 +24,3 @@ void S6M::DatagramHeader::pack(S6M::ByteBuffer *bb) const
 
 	address.pack(bb);
 }
-
-size_t S6M::DatagramHeader::pack(uint8_t *buf, size_t bufSize) const
-{
-	ByteBuffer bb(buf, bufSize);
-	pack(&bb);
-	return bb.getUsed();
-}
-
-size_t S6M::DatagramHeader::packedSize() const
-{
-	return sizeof(SOCKS6DatagramHeader) + address.packedSize();
-}

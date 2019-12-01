@@ -39,16 +39,4 @@ void OperationReply::pack(ByteBuffer *bb) const
 	options.pack(bb);
 }
 
-size_t OperationReply::pack(uint8_t *buf, size_t bufSize) const
-{
-	ByteBuffer bb(buf, bufSize);
-	pack(&bb);
-	return bb.getUsed();
-}
-
-size_t OperationReply::packedSize() const
-{
-	return sizeof(SOCKS6OperationReply) + address.packedSize() + options.packedSize();
-}
-
 }
