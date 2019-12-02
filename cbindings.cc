@@ -45,7 +45,7 @@ struct S6M_PrivateClutter
 {
 	string domain;
 	vector<S6M_StackOption> stackOpts;
-	vector<uint8_t> sessionID;
+	SessionID sessionID;
 	vector<SOCKS6Method> knownMethods;
 	string username;
 	string password;
@@ -216,7 +216,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 	if (cSet->session.tearDown)
 		cppSet->session.tearDown();
 	if (cSet->session.idLength)
-		cppSet->session.setID(vector<uint8_t>(cSet->session.id, cSet->session.id + cSet->session.idLength));
+		cppSet->session.setID(SessionID(cSet->session.id, cSet->session.id + cSet->session.idLength));
 	if (cSet->session.ok)
 		cppSet->session.signalOK();
 	if (cSet->session.rejected)

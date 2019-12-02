@@ -164,13 +164,13 @@ public:
 		return (bool)teardownOpt;
 	}
 	
-	void setID(const std::vector<uint8_t> &id)
+	void setID(const SessionID &id)
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
 		commitVariant(mandatoryOpt, [&]() { return SessionIDOption(id); });
 	}
 	
-	const std::vector<uint8_t> *getID() const
+	const SessionID *getID() const
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
 		

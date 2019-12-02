@@ -2,10 +2,16 @@
 #define SOCKS6MSG_SESSIONOPTION_HH
 
 #include <vector>
+#include <boost/container/small_vector.hpp>
 #include "option.hh"
 
 namespace S6M
 {
+
+static const int SESSION_ID_PREALLOC = 32;
+
+using
+SessionID = boost::container::small_vector<uint8_t, SESSION_ID_PREALLOC>;
 
 class SessionRequestOption: public SimpleOptionBase<SessionRequestOption, SOCKS6_OPTION_SESSION_REQUEST>
 {
@@ -15,15 +21,15 @@ public:
 
 class SessionIDOption: public Option
 {
-	std::vector<uint8_t> id;
+	SessionID id;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	SessionIDOption(const std::vector<uint8_t> &id);
+	SessionIDOption(const SessionID &id);
 	
-	const std::vector<uint8_t> *getID() const
+	const SessionID *getID() const
 	{
 		return &id;
 	}
