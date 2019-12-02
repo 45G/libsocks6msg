@@ -11,14 +11,14 @@ namespace S6M
 {
 
 template <typename ENUM>
-ENUM enumCast(int val)
+inline ENUM enumCast(int val)
 {
 	/* fail if instantiated */
 	switch ((ENUM)val) {}
 }
 
 template <>
-SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
+inline SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 {
 	SOCKS6StackLeg conv = (SOCKS6StackLeg)val;
 
@@ -34,7 +34,7 @@ SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val)
 }
 
 template <>
-SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
+inline SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 {
 	SOCKS6AuthReplyCode conv = (SOCKS6AuthReplyCode)val;
 
@@ -49,7 +49,7 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val)
 }
 
 template<>
-SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val)
+inline SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val)
 {
 	SOCKS6MPAvailability conv = (SOCKS6MPAvailability)val;
 
