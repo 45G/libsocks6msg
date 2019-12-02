@@ -12,7 +12,7 @@ OperationReply::OperationReply(ByteBuffer *bb)
 	
 	SOCKS6OperationReply *rawOpReply = bb->get<SOCKS6OperationReply>();
 	
-	code    = enumCast<SOCKS6OperationReplyCode>(rawOpReply->code);
+	code    = (SOCKS6OperationReplyCode)rawOpReply->code;
 	port    = ntohs(rawOpReply->bindPort);
 	address = Address((SOCKS6AddressType)rawOpReply->addressType, bb);
 	options = OptionSet(bb, OptionSet::M_OP_REP, ntohs(rawOpReply->optionsLength));

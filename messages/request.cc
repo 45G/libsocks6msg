@@ -12,7 +12,7 @@ Request::Request(ByteBuffer *bb)
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	
-	code    = enumCast<SOCKS6RequestCode>(rawRequest->commandCode);
+	code    = (SOCKS6RequestCode)rawRequest->commandCode;
 	port    = ntohs(rawRequest->port);
 	address = Address((SOCKS6AddressType)rawRequest->addressType, bb);
 	options = OptionSet(bb, OptionSet::M_REQ, ntohs(rawRequest->optionsLength));

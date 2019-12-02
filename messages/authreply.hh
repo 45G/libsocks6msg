@@ -9,7 +9,7 @@ namespace S6M
 
 struct AuthenticationReply
 {
-	SOCKS6AuthReplyCode code;
+	Enum<SOCKS6AuthReplyCode> code { SOCKS6_AUTH_REPLY_SUCCESS };
 
 	OptionSet options { OptionSet::M_AUTH_REP };
 
