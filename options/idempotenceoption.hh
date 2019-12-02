@@ -32,7 +32,7 @@ public:
 
 class IdempotenceWindowOption: public Option
 {
-	uint32_t winBase;
+	uint32_t   winBase;
 	WindowSize winSize;
 	
 protected:
