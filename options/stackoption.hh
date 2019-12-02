@@ -50,8 +50,8 @@ protected:
 	struct RawOption
 	{
 		SOCKS6StackOption stackOptionHead;
-		RAW value;
-		uint8_t padding[paddingOf(sizeof(SOCKS6StackOption) + sizeof(RAW))];
+		RAW               value;
+		uint8_t           padding[paddingOf(sizeof(SOCKS6StackOption) + sizeof(RAW))];
 	} __attribute__((packed));
 
 	virtual void fill(uint8_t *buf) const

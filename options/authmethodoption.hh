@@ -8,7 +8,7 @@ namespace S6M
 
 class AuthMethodAdvertOption: public Option
 {
-	uint16_t initialDataLen;
+	uint16_t               initialDataLen;
 	std::set<SOCKS6Method> methods;
 	
 protected:
