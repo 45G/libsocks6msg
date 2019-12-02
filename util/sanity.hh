@@ -1,8 +1,6 @@
 #ifndef SOCKS6MSG_SANITY_HH
 #define SOCKS6MSG_SANITY_HH
 
-#pragma GCC diagnostic error "-Wswitch"
-
 #include "socks6.h"
 #include "exceptions.hh"
 
@@ -30,6 +28,21 @@ SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val);
 
 template <>
 SOCKS6MPAvailability enumCast<SOCKS6MPAvailability>(int val);
+
+template <typename ENUM>
+class Enum
+{
+	ENUM val;
+
+public:
+	Enum(int val)
+		: val(enumCast<ENUM>(val)) {}
+
+	operator ENUM() const
+	{
+		return val;
+	}
+};
 
 }
 
