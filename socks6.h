@@ -200,8 +200,6 @@ enum SOCKS6StackOptionCode
 	SOCKS6_STACK_CODE_BACKLOG  = 3,
 
 	/* UDP */
-
-	/* TLS */
 };
 
 struct SOCKS6TOSOption

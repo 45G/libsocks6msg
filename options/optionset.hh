@@ -318,7 +318,6 @@ public:
 	
 	std::optional<typename OPT::Value> get(SOCKS6StackLeg leg) const
 	{
-		enforceMode(M_REQ, M_AUTH_REP);
 		switch(leg)
 		{
 		case SOCKS6_STACK_LEG_CLIENT_PROXY:
