@@ -11,8 +11,8 @@ namespace S6M
 class ByteBuffer
 {
 	uint8_t *buf;
-	size_t used;
-	size_t totalSize;
+	size_t  used;
+	size_t  totalSize;
 	
 public:
 	ByteBuffer(uint8_t *buf, size_t size)
