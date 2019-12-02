@@ -86,7 +86,7 @@ public:
 		RawOption *opt = rawOptCast<RawOption>(optBase, false);
 		enumCast<SOCKS6StackLeg>(opt->stackOptionHead.leg);
 		
-		T:: stackParse(opt, optionSet);
+		T::stackParse(opt, optionSet);
 	}
 
 	V getValue() const
