@@ -199,7 +199,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 			if (option->code == SOCKS6_STACK_CODE_TFO)
 				cppSet->stack.tfo.set(option->leg, option->value);
 			else if (option->code == SOCKS6_STACK_CODE_MP)
-				cppSet->stack.mp.set(option->leg, enumCast<SOCKS6MPAvailability>(option->value));
+				cppSet->stack.mp.set(option->leg, option->value);
 			else if (option->code == SOCKS6_STACK_CODE_BACKLOG)
 				cppSet->stack.backlog.set(option->leg, option->value);
 			else

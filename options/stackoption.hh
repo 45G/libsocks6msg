@@ -111,7 +111,7 @@ public:
 	using StackOptionBase::StackOptionBase;
 };
 
-class MPOption: public StackOptionBase<MPOption, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, SOCKS6MPAvailability, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
+class MPOption: public StackOptionBase<MPOption, SOCKS6_STACK_LEVEL_TCP, SOCKS6_STACK_CODE_MP, Enum<SOCKS6MPAvailability>, uint8_t, SOCKS6_STACK_LEG_PROXY_REMOTE>
 {
 public:
 	static void stackParse(RawOption *opt, OptionSet *optionSet);

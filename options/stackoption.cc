@@ -84,7 +84,7 @@ void TFOOption::stackParse(RawOption *opt, OptionSet *optionSet)
 
 void MPOption::stackParse(RawOption *opt, OptionSet *optionSet)
 {
-	optionSet->stack.mp.set((SOCKS6StackLeg)opt->stackOptionHead.leg, enumCast<SOCKS6MPAvailability>(opt->value));
+	optionSet->stack.mp.set((SOCKS6StackLeg)opt->stackOptionHead.leg, opt->value);
 }
 
 void BacklogOption::stackParse(RawOption *opt, OptionSet *optionSet)
