@@ -10,7 +10,6 @@ INCLUDEPATH += fields messages options util
 SOURCES += \
     options/option.cc \
     options/stackoption.cc \
-    util/sanity.cc \
     options/idempotenceoption.cc \
     options/authmethodoption.cc \
     options/authdataoption.cc \
