@@ -17,12 +17,12 @@ void SessionIDOption::fill(uint8_t *buf) const
 
 	SOCKS6SessionIDOption *opt = reinterpret_cast<SOCKS6SessionIDOption *>(buf);
 
-	for (int i = 0; i < (int)ticket.size(); i++)
-		opt->ticket[i] = ticket[i];
+	for (int i = 0; i < (int)id.size(); i++)
+		opt->ticket[i] = id[i];
 }
 
 SessionIDOption::SessionIDOption(const std::vector<uint8_t> &ticket)
-	: Option(SOCKS6_OPTION_SESSION_ID), ticket(ticket)
+	: Option(SOCKS6_OPTION_SESSION_ID), id(ticket)
 {
 	//TODO: convert to length_error
 	if (ticket.size() == 0)
@@ -35,16 +35,16 @@ SessionIDOption::SessionIDOption(const std::vector<uint8_t> &ticket)
 
 size_t SessionIDOption::packedSize() const
 {
-	return sizeof(SOCKS6SessionIDOption) + ticket.size();
+	return sizeof(SOCKS6SessionIDOption) + id.size();
 }
 
 void SessionIDOption::incrementalParse(SOCKS6Option *buf, OptionSet *optionSet)
 {
 	SOCKS6SessionIDOption *opt = rawOptCast<SOCKS6SessionIDOption>(buf);
 	
-	size_t ticketLen = ntohs(opt->optionHead.len) - sizeof(SOCKS6SessionIDOption);
-	vector<uint8_t> ticket(opt->ticket, opt->ticket + ticketLen);
-	optionSet->session.setID(move(ticket));
+	size_t idLen = ntohs(opt->optionHead.len) - sizeof(SOCKS6SessionIDOption);
+	vector<uint8_t> id(opt->ticket, opt->ticket + idLen);
+	optionSet->session.setID(move(id));
 }
 
 void SessionTeardownOption::simpleParse(OptionSet *optionSet)

@@ -177,7 +177,7 @@ public:
 		const SessionIDOption *opt = std::get_if<SessionIDOption>(&mandatoryOpt);
 		if (!opt)
 			return nullptr;
-		return opt->getTicket();
+		return opt->getID();
 	}
 	
 	void signalOK()

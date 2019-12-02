@@ -15,17 +15,17 @@ public:
 
 class SessionIDOption: public Option
 {
-	std::vector<uint8_t> ticket;
+	std::vector<uint8_t> id;
 	
 protected:
 	virtual void fill(uint8_t *buf) const;
 	
 public:
-	SessionIDOption(const std::vector<uint8_t> &ticket);
+	SessionIDOption(const std::vector<uint8_t> &id);
 	
-	const std::vector<uint8_t> *getTicket() const
+	const std::vector<uint8_t> *getID() const
 	{
-		return &ticket;
+		return &id;
 	}
 	
 	virtual size_t packedSize() const;
