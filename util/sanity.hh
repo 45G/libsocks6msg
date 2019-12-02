@@ -18,12 +18,6 @@ template <>
 SOCKS6StackLeg enumCast<SOCKS6StackLeg>(int val);
 
 template <>
-SOCKS6RequestCode enumCast<SOCKS6RequestCode>(int val);
-
-template <>
-SOCKS6OperationReplyCode enumCast<SOCKS6OperationReplyCode>(int val);
-
-template <>
 SOCKS6AuthReplyCode enumCast<SOCKS6AuthReplyCode>(int val);
 
 template <>
