@@ -23,8 +23,6 @@ void StackOption::incrementalParse(SOCKS6Option *baseOpt, OptionSet *optionSet)
 {
 	SOCKS6StackOption *opt = rawOptCast<SOCKS6StackOption>(baseOpt);
 	
-	enumCast<SOCKS6StackLeg>(opt->leg);
-	
 	switch (opt->level)
 	{
 	case SOCKS6_STACK_LEVEL_IP:

@@ -12,8 +12,8 @@ namespace S6M
 
 class StackOption: public Option
 {
-	SOCKS6StackLeg leg;
-	SOCKS6StackLevel level;
+	Enum<SOCKS6StackLeg>  leg;
+	SOCKS6StackLevel      level;
 	SOCKS6StackOptionCode code;
 
 protected:
@@ -84,7 +84,6 @@ public:
 	static void incrementalParse(SOCKS6StackOption *optBase, OptionSet *optionSet)
 	{
 		RawOption *opt = rawOptCast<RawOption>(optBase, false);
-		enumCast<SOCKS6StackLeg>(opt->stackOptionHead.leg);
 		
 		T::stackParse(opt, optionSet);
 	}
