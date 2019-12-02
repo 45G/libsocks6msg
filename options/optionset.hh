@@ -339,7 +339,6 @@ public:
 	template <SOCKS6StackLeg LEG = OPT::LEG_RESTRICT>
 	void set(typename OPT::Value value)
 	{
-		static_assert (LEG != SOCKS6_STACK_LEG_BOTH, "Option is not restricted to one leg");
 		set(LEG, value);
 	}
 	
