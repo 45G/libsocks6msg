@@ -168,10 +168,11 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	cSet->authMethods.initialDataLen = cppSet->authMethods.getInitialDataLen();
 	cSet->authMethods.selected = cppSet->authMethods.getSelected();
 	
-	if (cppSet->userPassword.getUsername() && cppSet->userPassword.getUsername()->length() > 0)
+	auto [user, passwd] = cppSet->userPassword.getCredentials();
+	if (user)
 	{
-		clutter->username = *(cppSet->userPassword.getUsername());
-		clutter->password = *(cppSet->userPassword.getPassword());
+		clutter->username = *user;
+		clutter->password = *passwd;
 		cSet->userPassword.username = clutter->username.c_str();
 		cSet->userPassword.passwd = clutter->password.c_str();
 	}

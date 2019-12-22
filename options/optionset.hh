@@ -373,18 +373,11 @@ public:
 		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
 	}
 	
-	const std::string *getUsername() const
+	std::pair<const std::string *, const std::string *> getCredentials() const
 	{
 		if (!req)
-			return nullptr;
-		return req->getUsername();
-	}
-	
-	const std::string *getPassword() const
-	{
-		if (!req)
-			return nullptr;
-		return req->getPassword();
+			return {};
+		return { req->getUsername(), req->getPassword() };
 	}
 	
 	void setReply(bool success)
