@@ -364,6 +364,7 @@ class UserPasswdOptionSet: public OptionSetBase
 {
 	std::optional<UsernamePasswdReqOption>   req;
 	std::optional<UsernamePasswdReplyOption> reply;
+	
 public:
 	using OptionSetBase::OptionSetBase;
 	
