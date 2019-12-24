@@ -373,6 +373,13 @@ public:
 		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
 	}
 	
+	void setCredentials(std::pair<const std::string *, const std::string *> creds)
+	{
+		enforceMode(M_REQ);
+		auto &[user, passwd] = creds;
+		commit(req, [&]() { return UsernamePasswdReqOption(*user, *passwd); });
+	}
+	
 	std::pair<const std::string *, const std::string *> getCredentials() const
 	{
 		if (!req)
