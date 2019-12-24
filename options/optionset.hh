@@ -282,7 +282,7 @@ public:
 	{
 		if (std::holds_alternative<IdempotenceAcceptedOption>(replyOpt))
 			return true;
-		if (std::holds_alternative< IdempotenceRejectedOption>(replyOpt))
+		if (std::holds_alternative<IdempotenceRejectedOption>(replyOpt))
 			return false;
 		return {};
 	}
