@@ -8,7 +8,7 @@
 namespace S6M
 {
 
-static const int SESSION_ID_PREALLOC = 32;
+static constexpr int SESSION_ID_PREALLOC = 32;
 
 using
 SessionID = boost::container::small_vector<uint8_t, SESSION_ID_PREALLOC>;

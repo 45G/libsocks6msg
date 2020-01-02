@@ -12,7 +12,7 @@ namespace S6M
 class UserPasswordBase
 {
 protected:
-	static const uint8_t VERSION = 0x01;
+	static constexpr uint8_t VERSION = 0x01;
 };
 
 struct UserPasswordRequest: public UserPasswordBase

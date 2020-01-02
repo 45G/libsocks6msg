@@ -63,9 +63,9 @@ protected:
 	}
 
 public:
-	static const SOCKS6StackLevel      LEVEL        = LVL;
-	static const SOCKS6StackOptionCode CODE         = C;
-	static const SOCKS6StackLeg        LEG_RESTRICT = LR;
+	static constexpr SOCKS6StackLevel      LEVEL        = LVL;
+	static constexpr SOCKS6StackOptionCode CODE         = C;
+	static constexpr SOCKS6StackLeg        LEG_RESTRICT = LR;
 	
 	typedef V Value;
 	

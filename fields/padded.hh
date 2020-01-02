@@ -16,7 +16,7 @@ static constexpr size_t paddingOf(size_t size)
 template <typename T, int HEAD_START = 0>
 class Padded: public T
 {
-	static const int ALIGN = 4;
+	static constexpr int ALIGN = 4;
 	
 public:
 	using T::T;
