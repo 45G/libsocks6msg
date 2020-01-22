@@ -52,7 +52,7 @@ public:
 	Address(in6_addr ipv6)
 		: type(SOCKS6_ADDR_IPV6), u(ipv6) {}
 	
-	Address(const std::string &domain)
+	Address(const std::string_view &domain)
 		: type(SOCKS6_ADDR_DOMAIN), u(domain) {}
 	
 	Address(SOCKS6AddressType type, ByteBuffer *bb);

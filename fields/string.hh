@@ -25,7 +25,7 @@ class String
 	}
 	
 public:
-	String(const std::string &str)
+	String(const std::string_view &str)
 		: str(str)
 	{
 		sanity();
