@@ -87,7 +87,7 @@ static Address S6M_Addr_Flush(const S6M_Address *cAddr)
 		return Address(cAddr->ipv6);
 		
 	case SOCKS6_ADDR_DOMAIN:
-		return Address(move(string(cAddr->domain)));
+		return Address(cAddr->domain);
 	}
 	
 	throw invalid_argument("Bad address type");
@@ -246,7 +246,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->authMethods.select(cSet->authMethods.selected);
 	
 	if (cSet->userPassword.username || cSet->userPassword.passwd)
-		cppSet->userPassword.setCredentials(string(cSet->userPassword.username), string(cSet->userPassword.passwd));
+		cppSet->userPassword.setCredentials(cSet->userPassword.username, cSet->userPassword.passwd);
 	if (cSet->userPassword.replied)
 		cppSet->userPassword.setReply(cSet->userPassword.success);
 }
@@ -510,7 +510,7 @@ ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(move(string(pwReq->username)), move(string(pwReq->passwd)));
+		UserPasswordRequest req(pwReq->username, pwReq->passwd);
 		
 		return req.packedSize();
 	}
@@ -527,7 +527,7 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(move(string(pwReq->username)), move(string(pwReq->passwd)));
+		UserPasswordRequest req(pwReq->username, pwReq->passwd);
 		req.pack(&bb);
 		
 		return bb.getUsed();

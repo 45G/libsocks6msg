@@ -20,7 +20,7 @@ struct UserPasswordRequest: public UserPasswordBase
 	std::optional<String> username;
 	std::optional<String> password;
 	
-	UserPasswordRequest(const std::string &username, const std::string &password)
+	UserPasswordRequest(const std::string_view &username, const std::string_view &password)
 		: username(username), password(password) {}
 	
 	UserPasswordRequest(const String &username, const String &password)
