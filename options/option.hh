@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <set>
 #include <vector>
-#include <string>
 #include <stdexcept>
 #include <boost/intrusive/list.hpp>
 #include "socks6.h"

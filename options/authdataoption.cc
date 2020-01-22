@@ -1,4 +1,3 @@
-#include <string>
 #include "authdataoption.hh"
 #include "optionset.hh"
 #include "exceptions.hh"

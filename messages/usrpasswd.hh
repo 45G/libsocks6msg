@@ -1,7 +1,6 @@
 #ifndef SOCKS6MSG_USRPASSWD_HH
 #define SOCKS6MSG_USRPASSWD_HH
 
-#include <string>
 #include <optional>
 #include "bytebuffer.hh"
 #include "string.hh"
