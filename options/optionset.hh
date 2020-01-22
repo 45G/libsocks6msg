@@ -368,24 +368,17 @@ class UserPasswdOptionSet: public OptionSetBase
 public:
 	using OptionSetBase::OptionSetBase;
 	
-	void setCredentials(const std::string_view &user, const std::string_view &passwd)
-	{
-		enforceMode(M_REQ);
-		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
-	}
-	
 	void setCredentials(const std::pair<std::string_view, const std::string_view> &creds)
 	{
 		enforceMode(M_REQ);
-		auto &[user, passwd] = creds;
-		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
+		commit(req, [&]() { return UsernamePasswdReqOption(creds); });
 	}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
 	{
 		if (!req)
 			return {};
-		return { req->getUsername(), req->getPassword() };
+		return req->getCredentials();
 	}
 	
 	void setReply(bool success)

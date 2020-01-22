@@ -246,7 +246,7 @@ static void S6M_OptionSet_Flush(OptionSet *cppSet, const S6M_OptionSet *cSet)
 		cppSet->authMethods.select(cSet->authMethods.selected);
 	
 	if (cSet->userPassword.username || cSet->userPassword.passwd)
-		cppSet->userPassword.setCredentials(cSet->userPassword.username, cSet->userPassword.passwd);
+		cppSet->userPassword.setCredentials({ cSet->userPassword.username, cSet->userPassword.passwd });
 	if (cSet->userPassword.replied)
 		cppSet->userPassword.setReply(cSet->userPassword.success);
 }
@@ -510,7 +510,7 @@ ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
 	
 	try
 	{
-		UserPasswordRequest req(pwReq->username, pwReq->passwd);
+		UserPasswordRequest req({ pwReq->username, pwReq->passwd });
 		
 		return req.packedSize();
 	}
@@ -527,7 +527,7 @@ ssize_t S6M_PasswdReq_pack(const S6M_PasswdReq *pwReq, uint8_t *buf, size_t size
 	{
 		ByteBuffer bb(buf, size);
 		
-		UserPasswordRequest req(pwReq->username, pwReq->passwd);
+		UserPasswordRequest req({ pwReq->username, pwReq->passwd });
 		req.pack(&bb);
 		
 		return bb.getUsed();
@@ -549,8 +549,9 @@ ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended();
 		try
 		{
-			pwReq->clutter.username = cppReq.username->getStr();
-			pwReq->clutter.passwd   = cppReq.password->getStr();
+			auto [user, passwd] = cppReq.getCredentials();
+			pwReq->clutter.username = user;
+			pwReq->clutter.passwd   = passwd;
 		}
 		catch (...)
 		{

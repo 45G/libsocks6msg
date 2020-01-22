@@ -14,18 +14,24 @@ protected:
 	static constexpr uint8_t VERSION = 0x01;
 };
 
-struct UserPasswordRequest: public UserPasswordBase
+class UserPasswordRequest: public UserPasswordBase
 {
 	std::optional<String> username;
 	std::optional<String> password;
 	
-	UserPasswordRequest(const std::string_view &username, const std::string_view &password)
-		: username(username), password(password) {}
-	
-	UserPasswordRequest(const String &username, const String &password)
-		: username(username), password(password) {}
+public:
+	UserPasswordRequest(const std::pair<std::string_view, std::string_view> &creds)
+		: username(creds.first), password(creds.second) {}
 	
 	UserPasswordRequest(ByteBuffer *bb);
+	
+	std::pair<std::string_view, std::string_view> getCredentials() const
+	{
+		if (!username)
+			return {};
+		return { username->getStr(), password->getStr() };
+		
+	}
 	
 	void pack(ByteBuffer *bb) const;
 	
