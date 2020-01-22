@@ -40,14 +40,14 @@ public:
 	
 	static void incrementalParse(SOCKS6AuthDataOption *baseOpt, OptionSet *optionSet);
 	
-	UsernamePasswdReqOption(const std::string &username, const std::string &passwd);
+	UsernamePasswdReqOption(const std::string_view &username, const std::string_view &passwf);
 
-	const std::string *getUsername() const
+	std::string_view getUsername() const
 	{
 		return req.username->getStr();
 	}
 
-	const std::string *getPassword() const
+	std::string_view getPassword() const
 	{
 		return req.password->getStr();
 	}

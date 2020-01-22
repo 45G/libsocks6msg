@@ -69,7 +69,7 @@ void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, Op
 		if (bb.getUsed() != expectedDataSize)
 			throw invalid_argument("Spurious bytes at the end of the option");
 		
-		optionSet->userPassword.setCredentials(*req.username->getStr(), *req.password->getStr());
+		optionSet->userPassword.setCredentials(req.username->getStr(), req.password->getStr());
 	}
 	catch (length_error &)
 	{
@@ -81,7 +81,7 @@ void UsernamePasswdReqOption::incrementalParse(SOCKS6AuthDataOption *baseOpt, Op
 	}
 }
 
-UsernamePasswdReqOption::UsernamePasswdReqOption(const string &username, const string &passwd)
+UsernamePasswdReqOption::UsernamePasswdReqOption(const string_view &username, const string_view &passwd)
 	: AuthDataOption(SOCKS6_METHOD_USRPASSWD), req(username, passwd) {}
 
 struct RawUsrPasswdReply

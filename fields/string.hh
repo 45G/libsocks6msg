@@ -55,9 +55,9 @@ public:
 		memcpy(rawStr, str.c_str(), *len);
 	}
 	
-	const std::string *getStr() const
+	std::string_view getStr() const
 	{
-		return &str;
+		return str;
 	}
 };
 

@@ -70,7 +70,7 @@ static void S6M_Addr_Fill(S6M_Address *cAddr, const Address &cppAddr, S6M_Privat
 		break;
 		
 	case SOCKS6_ADDR_DOMAIN:
-		clutter->domain = *(cppAddr.getDomain());
+		clutter->domain = cppAddr.getDomain();
 		cAddr->domain = clutter->domain.c_str();
 		break;
 	}
@@ -169,10 +169,10 @@ static void S6M_OptionSet_Fill(S6M_OptionSet *cSet, const OptionSet *cppSet, S6M
 	cSet->authMethods.selected = cppSet->authMethods.getSelected();
 	
 	auto [user, passwd] = cppSet->userPassword.getCredentials();
-	if (user)
+	if (user.length() > 0)
 	{
-		clutter->username = *user;
-		clutter->password = *passwd;
+		clutter->username = user;
+		clutter->password = passwd;
 		cSet->userPassword.username = clutter->username.c_str();
 		cSet->userPassword.passwd = clutter->password.c_str();
 	}
@@ -497,10 +497,11 @@ void S6M_OpReply_free(S6M_OpReply *opReply)
 
 struct S6M_PasswdReqExtended: public S6M_PasswdReq
 {
-	UserPasswordRequest cppReq;
-	
-	S6M_PasswdReqExtended(ByteBuffer *bb)
-		: cppReq(bb) {}
+	struct
+	{
+		string username;
+		string passwd;
+	} clutter;
 };
 
 ssize_t S6M_PasswdReq_packedSize(const S6M_PasswdReq *pwReq)
@@ -543,10 +544,22 @@ ssize_t S6M_PasswdReq_parse(uint8_t *buf, size_t size, S6M_PasswdReq **ppwReq)
 	try
 	{
 		ByteBuffer bb(buf, size);
-		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended(&bb);
+		UserPasswordRequest cppReq(&bb);
 		
-		pwReq->username = pwReq->cppReq.username->getStr()->c_str();
-		pwReq->passwd   = pwReq->cppReq.password->getStr()->c_str();
+		S6M_PasswdReqExtended *pwReq = new S6M_PasswdReqExtended();
+		try
+		{
+			pwReq->clutter.username = cppReq.username->getStr();
+			pwReq->clutter.passwd   = cppReq.password->getStr();
+		}
+		catch (...)
+		{
+			delete pwReq;
+			throw;
+		}
+		
+		pwReq->username = pwReq->clutter.username.c_str();
+		pwReq->passwd   = pwReq->clutter.passwd.c_str();
 		
 		*ppwReq = pwReq;
 		return bb.getUsed();

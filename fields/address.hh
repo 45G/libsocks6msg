@@ -72,7 +72,7 @@ public:
 		return std::get<in6_addr>(u);
 	}
 	
-	const std::string *getDomain() const
+	std::string_view getDomain() const
 	{
 		return std::get<Padded<String>>(u).getStr();
 	}
