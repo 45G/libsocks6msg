@@ -36,7 +36,7 @@ public:
 		uint8_t *len    = bb->get<uint8_t>();
 		uint8_t *rawStr = bb->get<uint8_t>(*len);
 		
-		str = std::string(reinterpret_cast<const char *>(rawStr), (size_t)*len);
+		str = std::move(std::string(reinterpret_cast<const char *>(rawStr), (size_t)*len));
 		
 		sanity();
 	}
