@@ -374,11 +374,11 @@ public:
 		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
 	}
 	
-	void setCredentials(const std::pair<const std::string *, const std::string *> &creds)
+	void setCredentials(const std::pair<std::string_view, const std::string_view> &creds)
 	{
 		enforceMode(M_REQ);
 		auto &[user, passwd] = creds;
-		commit(req, [&]() { return UsernamePasswdReqOption(*user, *passwd); });
+		commit(req, [&]() { return UsernamePasswdReqOption(user, passwd); });
 	}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
