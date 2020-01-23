@@ -306,6 +306,8 @@ struct SOCKS6DatagramHeader
 	uint8_t  address[0];
 } __attribute__((packed));
 
+#define SOCKS6_USERPASSWD_VERSION (0x01)
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

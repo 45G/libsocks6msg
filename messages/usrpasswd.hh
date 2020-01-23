@@ -7,7 +7,7 @@
 namespace S6M
 {
 
-class UserPasswordRequest: public MessageBase<0x01, uint8_t>
+class UserPasswordRequest: public MessageBase<SOCKS6_USERPASSWD_VERSION, uint8_t>
 {
 	String username;
 	String password;
@@ -25,7 +25,14 @@ public:
 		
 	}
 	
-	void pack(ByteBuffer *bb) const;
+	void pack(ByteBuffer *bb) const
+	{
+		uint8_t *ver = bb->get<uint8_t>();
+		*ver = SOCKS6_USERPASSWD_VERSION;
+		
+		username.pack(bb);
+		password.pack(bb);
+	}
 	
 	size_t pack(uint8_t *buf, size_t bufSize) const
 	{
@@ -40,7 +47,7 @@ public:
 	}
 };
 
-struct UserPasswordReply: public MessageBase<0x01, uint8_t>
+struct UserPasswordReply: public MessageBase<SOCKS6_USERPASSWD_VERSION, uint8_t>
 {
 	bool success;
 	
@@ -55,7 +62,14 @@ struct UserPasswordReply: public MessageBase<0x01, uint8_t>
 		success = *status == 0x00;
 	}
 	
-	void pack(ByteBuffer *bb) const;
+	void pack(ByteBuffer *bb) const
+	{
+		uint8_t *ver = bb->get<uint8_t>();
+		uint8_t *status = bb->get<uint8_t>();
+		
+		*ver    = SOCKS6_USERPASSWD_VERSION;
+		*status = success ? 0x00 : 0x01;
+	}
 	
 	size_t pack(uint8_t *buf, size_t bufSize) const
 	{
