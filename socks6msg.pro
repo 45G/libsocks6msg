@@ -18,7 +18,6 @@ SOURCES += \
     cbindings.cc \
     messages/authreply.cc \
     messages/opreply.cc \
-    messages/request.cc \
     messages/usrpasswd.cc \
     options/sessionoption.cc
 

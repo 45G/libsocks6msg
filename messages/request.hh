@@ -1,14 +1,14 @@
 #ifndef SOCKS6MSG_REQUEST_HH
 #define SOCKS6MSG_REQUEST_HH
 
-#include "bytebuffer.hh"
+#include "socksmessagebase.hh"
 #include "address.hh"
 #include "optionset.hh"
 
 namespace S6M
 {
 
-struct Request
+struct Request: public SOCKSMessageBase<SOCKS6Request>
 {
 	SOCKS6RequestCode code;
 	
@@ -20,9 +20,27 @@ struct Request
 	Request(SOCKS6RequestCode commandCode, Address address = Address(), uint16_t port = 0)
 		: code(commandCode), address(address), port(port) {}
 	
-	Request(ByteBuffer *bb);
+	Request(ByteBuffer *bb)
+		: SOCKSMessageBase(bb),
+		  code((SOCKS6RequestCode)rawMessage->commandCode),
+		  address((SOCKS6AddressType)rawMessage->addressType, bb),
+		  port(ntohs(rawMessage->port)),
+		  options(bb, OptionSet::M_REQ, ntohs(rawMessage->optionsLength)) {}
 	
-	void pack(ByteBuffer *bb) const;
+	void pack(ByteBuffer *bb) const
+	{
+		SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
+		
+		rawRequest->version       = SOCKS6_VERSION;
+		rawRequest->commandCode   = code;
+		rawRequest->optionsLength = htons(options.packedSize());
+		rawRequest->port          = htons(port);
+		rawRequest->padding       = 0;
+		rawRequest->addressType   = address.getType();
+		
+		address.pack(bb);
+		options.pack(bb);
+	}
 	
 	size_t pack(uint8_t *buf, size_t bufSize) const
 	{
