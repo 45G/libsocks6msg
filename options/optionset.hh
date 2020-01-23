@@ -452,8 +452,10 @@ struct OptionSet: protected OptionList, public OptionSetBase
 	
 	OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength);
 	
-	/* intrusive lists fuck this up */
+	/* intrusive lists fuck these up */
 	OptionSet(const OptionSet &) = delete;
+	
+	OptionSet &operator =(const OptionSet &) = delete;
 	
 	void pack(ByteBuffer *bb) const
 	{
