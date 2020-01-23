@@ -1,13 +1,13 @@
 #ifndef SOCKS6MSG_DATAGRAMHEADER_HH
 #define SOCKS6MSG_DATAGRAMHEADER_HH
 
-#include "bytebuffer.hh"
+#include "socksmessagebase.hh"
 #include "address.hh"
 
 namespace S6M
 {
 
-struct DatagramHeader
+struct DatagramHeader: public SOCKSMessageBase<SOCKS6DatagramHeader>
 {
 	uint64_t assocID;
 	Address  address;
@@ -16,9 +16,23 @@ struct DatagramHeader
 	DatagramHeader(uint64_t assocID, Address address = Address(), uint16_t port = 0)
 		: assocID(assocID), address(address), port(port) {}
 
-	DatagramHeader(ByteBuffer *bb);
+	DatagramHeader(ByteBuffer *bb)
+		: SOCKSMessageBase(bb),
+		  assocID(be64toh(rawMessage->assocID)),
+		  address((SOCKS6AddressType)rawMessage->addressType, bb),
+		  port(ntohs(rawMessage->port)) {}
 
-	void pack(ByteBuffer *bb) const;
+	void pack(ByteBuffer *bb) const
+	{
+		SOCKS6DatagramHeader *rawHeader = bb->get<SOCKS6DatagramHeader>();
+		
+		rawHeader->version     = SOCKS6_VERSION;
+		rawHeader->addressType = address.getType();
+		rawHeader->port        = htons(port);
+		rawHeader->assocID     = htobe64(assocID);
+		
+		address.pack(bb);
+	}
 
 	size_t pack(uint8_t *buf, size_t bufSize) const
 	{

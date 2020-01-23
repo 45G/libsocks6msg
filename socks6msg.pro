@@ -20,11 +20,11 @@ SOURCES += \
     messages/opreply.cc \
     messages/request.cc \
     messages/usrpasswd.cc \
-    options/sessionoption.cc \
-    messages/datagramheader.cc
+    options/sessionoption.cc
 
 HEADERS += \
     fields/versionchecker.hh \
+    messages/socksmessagebase.hh \
     socks6.h \
     socks6msg.h \
     socks6msg.hh \
