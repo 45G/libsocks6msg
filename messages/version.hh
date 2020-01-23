@@ -6,14 +6,12 @@
 namespace S6M
 {
 
-struct Version
+struct Version: public MessageBase<SOCKS6Version>
 {
-	static void parse(ByteBuffer *bb)
-	{
-		SOCKS6Version *rawVer = bb->get<SOCKS6Version>();
-		if (rawVer->version != SOCKS6_VERSION)
-			throw BadVersionException(rawVer->version);
-	}
+	Version() {}
+	
+	Version(ByteBuffer *bb)
+		: MessageBase(bb) {}
 	
 	static size_t packedSize()
 	{
