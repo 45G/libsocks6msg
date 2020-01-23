@@ -8,7 +8,7 @@
 namespace S6M
 {
 
-struct OperationReply: public SOCKSMessageBase<SOCKS6OperationReply>
+struct OperationReply: public MessageBase<SOCKS6OperationReply>
 {
 	SOCKS6OperationReplyCode code;
 	
@@ -21,7 +21,7 @@ struct OperationReply: public SOCKSMessageBase<SOCKS6OperationReply>
 		: code(code), address(address), port(port) {}
 	
 	OperationReply(ByteBuffer *bb)
-		: SOCKSMessageBase(bb),
+		: MessageBase(bb),
 		  code((SOCKS6OperationReplyCode)rawMessage->code),
 		  address((SOCKS6AddressType)rawMessage->addressType, bb),
 		  port(ntohs(rawMessage->bindPort)),

@@ -1,5 +1,5 @@
-#ifndef VERSIONCHECKER_HH
-#define VERSIONCHECKER_HH
+#ifndef SOCKS6MSG_VERSIONCHECKER_HH
+#define SOCKS6MSG_VERSIONCHECKER_HH
 
 #include "bytebuffer.hh"
 
@@ -21,4 +21,4 @@ struct VersionChecker
 
 }
 
-#endif // VERSIONCHECKER_HH
+#endif // SOCKS6MSG_VERSIONCHECKER_HH

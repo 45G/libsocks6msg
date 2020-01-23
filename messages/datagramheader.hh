@@ -7,7 +7,7 @@
 namespace S6M
 {
 
-struct DatagramHeader: public SOCKSMessageBase<SOCKS6DatagramHeader>
+struct DatagramHeader: public MessageBase<SOCKS6DatagramHeader>
 {
 	uint64_t assocID;
 	Address  address;
@@ -17,7 +17,7 @@ struct DatagramHeader: public SOCKSMessageBase<SOCKS6DatagramHeader>
 		: assocID(assocID), address(address), port(port) {}
 
 	DatagramHeader(ByteBuffer *bb)
-		: SOCKSMessageBase(bb),
+		: MessageBase(bb),
 		  assocID(be64toh(rawMessage->assocID)),
 		  address((SOCKS6AddressType)rawMessage->addressType, bb),
 		  port(ntohs(rawMessage->port)) {}

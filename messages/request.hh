@@ -8,7 +8,7 @@
 namespace S6M
 {
 
-struct Request: public SOCKSMessageBase<SOCKS6Request>
+struct Request: public MessageBase<SOCKS6Request>
 {
 	SOCKS6RequestCode code;
 	
@@ -21,7 +21,7 @@ struct Request: public SOCKSMessageBase<SOCKS6Request>
 		: code(commandCode), address(address), port(port) {}
 	
 	Request(ByteBuffer *bb)
-		: SOCKSMessageBase(bb),
+		: MessageBase(bb),
 		  code((SOCKS6RequestCode)rawMessage->commandCode),
 		  address((SOCKS6AddressType)rawMessage->addressType, bb),
 		  port(ntohs(rawMessage->port)),

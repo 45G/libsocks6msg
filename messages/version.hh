@@ -7,15 +7,8 @@
 namespace S6M
 {
 
-struct SOCKSVersion
+struct Version
 {
-	static void check(ByteBuffer *bb)
-	{
-		SOCKS6Version *rawVer = bb->peek<SOCKS6Version>();
-		if (rawVer->version != SOCKS6_VERSION)
-			throw BadVersionException(rawVer->version);
-	}
-
 	static void parse(ByteBuffer *bb)
 	{
 		SOCKS6Version *rawVer = bb->get<SOCKS6Version>();
