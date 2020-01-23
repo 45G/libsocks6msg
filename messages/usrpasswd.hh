@@ -19,7 +19,11 @@ protected:
 	UserPasswordBase() {}
 	
 	UserPasswordBase(ByteBuffer *bb)
-		: versionChecker(bb) {}
+		: versionChecker(bb)
+	{
+		/* consume version byte */
+		bb->get<uint8_t>();
+	}
 };
 
 class UserPasswordRequest: public UserPasswordBase
