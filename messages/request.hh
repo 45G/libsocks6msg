@@ -1,7 +1,7 @@
 #ifndef SOCKS6MSG_REQUEST_HH
 #define SOCKS6MSG_REQUEST_HH
 
-#include "socksmessagebase.hh"
+#include "messagebase.hh"
 #include "address.hh"
 #include "optionset.hh"
 

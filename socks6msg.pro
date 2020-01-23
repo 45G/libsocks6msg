@@ -21,7 +21,7 @@ SOURCES += \
 
 HEADERS += \
     fields/versionchecker.hh \
-    messages/socksmessagebase.hh \
+    messages/messagebase.hh \
     socks6.h \
     socks6msg.h \
     socks6msg.hh \

@@ -1,7 +1,7 @@
 #ifndef SOCKS6MSG_DATAGRAMHEADER_HH
 #define SOCKS6MSG_DATAGRAMHEADER_HH
 
-#include "socksmessagebase.hh"
+#include "messagebase.hh"
 #include "address.hh"
 
 namespace S6M
