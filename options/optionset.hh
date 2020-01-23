@@ -48,7 +48,7 @@ public:
 	};
 	
 protected:
-	OptionList *list;
+	OptionList *optionList;
 	Mode mode;
 	
 	void enforceMode(Mode mode1) const
@@ -85,7 +85,7 @@ protected:
 		vacant(field).emplace(arg...);
 		try
 		{
-			list->registerOption(&field.value());
+			optionList->registerOption(&field.value());
 		}
 		catch (...)
 		{
@@ -100,7 +100,7 @@ protected:
 		vacant(field) = lambda();
 		try
 		{
-			list->registerOption(&field.value());
+			optionList->registerOption(&field.value());
 		}
 		catch (...)
 		{
@@ -117,7 +117,7 @@ protected:
 		field1 = field2;
 		try
 		{
-			list->registerOption(&field1.value());
+			optionList->registerOption(&field1.value());
 		}
 		catch (...)
 		{
@@ -133,7 +133,7 @@ protected:
 		vacantVariant(field) = lambda();
 		try
 		{
-			list->registerOption(std::get_if<decltype(lambda())>(&field));
+			optionList->registerOption(std::get_if<decltype(lambda())>(&field));
 		}
 		catch (...)
 		{
@@ -143,8 +143,8 @@ protected:
 	}
 	
 public:
-	OptionSetBase(OptionList *list, Mode mode)
-		: list(list), mode(mode) {}
+	OptionSetBase(OptionList *optionList, Mode mode)
+		: optionList(optionList), mode(mode) {}
 };
 
 class SessionOptionSet: public OptionSetBase
@@ -367,10 +367,10 @@ public:
 
 struct StackOptionSet: public OptionSetBase
 {
-	StackOptionPair<TOSOption>     tos     { list, mode };
-	StackOptionPair<TFOOption>     tfo     { list, mode };
-	StackOptionPair<MPOption>      mp      { list, mode };
-	StackOptionPair<BacklogOption> backlog { list, mode };
+	StackOptionPair<TOSOption>     tos     { optionList, mode };
+	StackOptionPair<TFOOption>     tfo     { optionList, mode };
+	StackOptionPair<MPOption>      mp      { optionList, mode };
+	StackOptionPair<BacklogOption> backlog { optionList, mode };
 	
 	using OptionSetBase::OptionSetBase;
 };
