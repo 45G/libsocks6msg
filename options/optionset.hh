@@ -171,7 +171,7 @@ public:
 	void tearDown()
 	{
 		enforceMode(M_REQ);
-		commit(teardownOpt, [](){ return SessionTeardownOption(); });
+		commitEmplace(teardownOpt);
 	}
 	
 	bool tornDown() const
@@ -220,7 +220,7 @@ public:
 	void setUntrusted()
 	{
 		enforceMode(M_REQ);
-		commit(untrustedOpt, []() { return SessionUntrustedOption(); });
+		commitEmplace(untrustedOpt);
 	}
 	
 	bool isUntrusted() const
@@ -244,7 +244,7 @@ public:
 	void request(uint32_t size)
 	{
 		enforceMode(M_REQ);
-		commit(requestOpt, [=]() { return IdempotenceRequestOption(size); });
+		commitEmplace(requestOpt, size);
 	}
 	
 	uint32_t requestedSize() const
@@ -257,7 +257,7 @@ public:
 	void setToken(uint32_t token)
 	{
 		enforceMode(M_REQ);
-		commit(expenditureOpt, [=]() { return IdempotenceExpenditureOption(token); });
+		commitEmplace(expenditureOpt, token);
 	}
 	
 	std::optional<uint32_t> getToken() const
@@ -270,7 +270,7 @@ public:
 	void advertise(std::pair<uint32_t, uint32_t> window)
 	{
 		enforceMode(M_AUTH_REP);
-		commit(windowOpt, [=]() { return IdempotenceWindowOption(window); });
+		commitEmplace(windowOpt, window);
 	}
 	
 	std::pair<uint32_t, uint32_t> getAdvertised() const
@@ -399,7 +399,7 @@ public:
 	void setReply(bool success)
 	{
 		enforceMode(M_AUTH_REP);
-		commit(reply, [=]() { return UsernamePasswdReplyOption(success); });
+		commitEmplace(reply, success);
 	}
 	
 	std::optional<bool> getReply() const
@@ -443,7 +443,7 @@ public:
 	void select(SOCKS6Method method)
 	{
 		enforceMode(M_AUTH_REP);
-		commit(selectOption, [=]() { return AuthMethodSelectOption(method); });
+		commitEmplace(selectOption, method);
 	}
 	
 	SOCKS6Method getSelected() const
