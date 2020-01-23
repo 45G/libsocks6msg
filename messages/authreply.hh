@@ -7,7 +7,7 @@
 namespace S6M
 {
 
-struct AuthenticationReply: public MessageBase<SOCKS6AuthReply>
+struct AuthenticationReply: public MessageBase<SOCKS6_VERSION, SOCKS6AuthReply>
 {
 	Enum<SOCKS6AuthReplyCode> code { SOCKS6_AUTH_REPLY_SUCCESS };
 

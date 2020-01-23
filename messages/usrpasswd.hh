@@ -1,32 +1,13 @@
 #ifndef SOCKS6MSG_USRPASSWD_HH
 #define SOCKS6MSG_USRPASSWD_HH
 
-#include <optional>
-#include "bytebuffer.hh"
+#include "messagebase.hh"
 #include "string.hh"
-#include "versionchecker.hh"
 
 namespace S6M
 {
 
-class UserPasswordBase
-{
-protected:
-	static constexpr uint8_t VERSION = 0x01;
-	
-	VersionChecker<VERSION> versionChecker;
-	
-	UserPasswordBase() {}
-	
-	UserPasswordBase(ByteBuffer *bb)
-		: versionChecker(bb)
-	{
-		/* consume version byte */
-		bb->get<uint8_t>();
-	}
-};
-
-class UserPasswordRequest: public UserPasswordBase
+class UserPasswordRequest: public MessageBase<0x01, uint8_t>
 {
 	String username;
 	String password;
@@ -36,7 +17,7 @@ public:
 		: username(creds.first), password(creds.second) {}
 	
 	UserPasswordRequest(ByteBuffer *bb)
-		: UserPasswordBase(bb), username(bb), password(bb) {}
+		: MessageBase(bb), username(bb), password(bb) {}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
 	{
@@ -59,14 +40,20 @@ public:
 	}
 };
 
-struct UserPasswordReply: public UserPasswordBase
+struct UserPasswordReply: public MessageBase<0x01, uint8_t>
 {
 	bool success;
 	
 	UserPasswordReply(bool success)
 		: success(success) {}
 	
-	UserPasswordReply(ByteBuffer *bb);
+	UserPasswordReply(ByteBuffer *bb)
+		: MessageBase(bb)
+	{
+		uint8_t *status = bb->get<uint8_t>();
+		
+		success = *status == 0x00;
+	}
 	
 	void pack(ByteBuffer *bb) const;
 	

@@ -15,17 +15,6 @@ void UserPasswordRequest::pack(ByteBuffer *bb) const
 	password.pack(bb);
 }
 
-UserPasswordReply::UserPasswordReply(ByteBuffer *bb)
-{
-	uint8_t *ver = bb->get<uint8_t>();
-	if (*ver != VERSION)
-		throw BadVersionException(*ver);
-	
-	uint8_t *status = bb->get<uint8_t>();
-	
-	success = *status == 0x00;
-}
-
 void UserPasswordReply::pack(ByteBuffer *bb) const
 {
 	uint8_t *ver = bb->get<uint8_t>();

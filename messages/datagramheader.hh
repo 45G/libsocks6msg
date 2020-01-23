@@ -7,7 +7,7 @@
 namespace S6M
 {
 
-struct DatagramHeader: public MessageBase<SOCKS6DatagramHeader>
+struct DatagramHeader: public MessageBase<SOCKS6_VERSION, SOCKS6DatagramHeader>
 {
 	uint64_t assocID;
 	Address  address;

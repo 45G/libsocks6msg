@@ -8,7 +8,7 @@
 namespace S6M
 {
 
-struct OperationReply: public MessageBase<SOCKS6OperationReply>
+struct OperationReply: public MessageBase<SOCKS6_VERSION, SOCKS6OperationReply>
 {
 	SOCKS6OperationReplyCode code;
 	

@@ -7,11 +7,11 @@
 namespace S6M
 {
 
-template<typename RAW>
+template<uint8_t VER, typename RAW>
 class MessageBase
 {
 protected:
-	VersionChecker<SOCKS6_VERSION> versionChecker;
+	VersionChecker<VER> versionChecker;
 	
 	RAW *rawMessage = nullptr;
 	

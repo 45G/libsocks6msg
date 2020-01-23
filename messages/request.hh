@@ -8,7 +8,7 @@
 namespace S6M
 {
 
-struct Request: public MessageBase<SOCKS6Request>
+struct Request: public MessageBase<SOCKS6_VERSION, SOCKS6Request>
 {
 	SOCKS6RequestCode code;
 	
