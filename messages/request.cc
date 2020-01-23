@@ -8,7 +8,7 @@ namespace S6M
 
 Request::Request(ByteBuffer *bb)
 {
-	Version::check(bb);
+	SOCKSVersion::check(bb);
 	
 	SOCKS6Request *rawRequest = bb->get<SOCKS6Request>();
 	

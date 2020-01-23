@@ -5,7 +5,7 @@
 
 S6M::DatagramHeader::DatagramHeader(S6M::ByteBuffer *bb)
 {
-	Version::check(bb);
+	SOCKSVersion::check(bb);
 
 	SOCKS6DatagramHeader *rawHeader = bb->get<SOCKS6DatagramHeader>();
 	

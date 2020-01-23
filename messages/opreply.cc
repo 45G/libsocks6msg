@@ -8,7 +8,7 @@ namespace S6M
 
 OperationReply::OperationReply(ByteBuffer *bb)
 {
-	Version::check(bb);
+	SOCKSVersion::check(bb);
 	
 	SOCKS6OperationReply *rawOpReply = bb->get<SOCKS6OperationReply>();
 	

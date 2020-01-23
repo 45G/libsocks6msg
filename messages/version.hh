@@ -7,7 +7,7 @@
 namespace S6M
 {
 
-struct Version
+struct SOCKSVersion
 {
 	static void check(ByteBuffer *bb)
 	{

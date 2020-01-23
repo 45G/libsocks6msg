@@ -24,6 +24,7 @@ SOURCES += \
     messages/datagramheader.cc
 
 HEADERS += \
+    fields/versionchecker.hh \
     socks6.h \
     socks6msg.h \
     socks6msg.hh \

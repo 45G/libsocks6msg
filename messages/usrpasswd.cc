@@ -6,23 +6,13 @@ using namespace std;
 namespace S6M
 {
 
-UserPasswordRequest::UserPasswordRequest(ByteBuffer *bb)
-{
-	uint8_t *ver = bb->get<uint8_t>();
-	if (*ver != VERSION)
-		throw BadVersionException(*ver);
-	
-	username = String(bb);
-	password = String(bb);
-}
-
 void UserPasswordRequest::pack(ByteBuffer *bb) const
 {
 	uint8_t *ver = bb->get<uint8_t>();
 	*ver = VERSION;
 	
-	username->pack(bb);
-	password->pack(bb);
+	username.pack(bb);
+	password.pack(bb);
 }
 
 UserPasswordReply::UserPasswordReply(ByteBuffer *bb)

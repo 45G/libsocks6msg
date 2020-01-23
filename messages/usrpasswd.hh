@@ -4,6 +4,7 @@
 #include <optional>
 #include "bytebuffer.hh"
 #include "string.hh"
+#include "versionchecker.hh"
 
 namespace S6M
 {
@@ -12,24 +13,30 @@ class UserPasswordBase
 {
 protected:
 	static constexpr uint8_t VERSION = 0x01;
+	
+	VersionChecker<VERSION> versionChecker;
+	
+	UserPasswordBase() {}
+	
+	UserPasswordBase(ByteBuffer *bb)
+		: versionChecker(bb) {}
 };
 
 class UserPasswordRequest: public UserPasswordBase
 {
-	std::optional<String> username;
-	std::optional<String> password;
+	String username;
+	String password;
 	
 public:
 	UserPasswordRequest(const std::pair<std::string_view, std::string_view> &creds)
 		: username(creds.first), password(creds.second) {}
 	
-	UserPasswordRequest(ByteBuffer *bb);
+	UserPasswordRequest(ByteBuffer *bb)
+		: UserPasswordBase(bb), username(bb), password(bb) {}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
 	{
-		if (!username)
-			return {};
-		return { username->getStr(), password->getStr() };
+		return { username.getStr(), password.getStr() };
 		
 	}
 	
@@ -44,7 +51,7 @@ public:
 	
 	size_t packedSize() const
 	{
-		return 1 + username->packedSize() + password->packedSize();
+		return 1 + username.packedSize() + password.packedSize();
 	}
 };
 
