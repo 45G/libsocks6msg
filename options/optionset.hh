@@ -79,6 +79,21 @@ protected:
 		return t;
 	}
 	
+	template <typename T, typename... ARG>
+	void commitEmplace(std::optional<T> &field, ARG... arg)
+	{
+		vacant(field).emplace(arg...);
+		try
+		{
+			list->registerOption(&field.value());
+		}
+		catch (...)
+		{
+			field.reset();
+			throw;
+		}
+	}
+	
 	template <typename T, typename L>
 	void commit(std::optional<T> &field, L lambda)
 	{
@@ -452,10 +467,15 @@ struct OptionSet: protected OptionList, public OptionSetBase
 	
 	OptionSet(ByteBuffer *bb, Mode mode, uint16_t optionsLength);
 	
-	/* intrusive lists fuck these up */
+	/* intrusive lists fuck this up */
 	OptionSet(const OptionSet &) = delete;
 	
+	OptionSet(OptionSet &&) = default;
+	
+	/* intrusive lists fuck this up */
 	OptionSet &operator =(const OptionSet &) = delete;
+	
+	OptionSet &operator =(OptionSet &&) = default;
 	
 	void pack(ByteBuffer *bb) const
 	{
