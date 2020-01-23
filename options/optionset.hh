@@ -470,12 +470,8 @@ struct OptionSet: protected OptionList, public OptionSetBase
 	/* intrusive lists fuck this up */
 	OptionSet(const OptionSet &) = delete;
 	
-	OptionSet(OptionSet &&) = default;
-	
 	/* intrusive lists fuck this up */
 	OptionSet &operator =(const OptionSet &) = delete;
-	
-	OptionSet &operator =(OptionSet &&) = default;
 	
 	void pack(ByteBuffer *bb) const
 	{
