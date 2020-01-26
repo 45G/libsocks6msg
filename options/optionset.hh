@@ -80,24 +80,9 @@ protected:
 	}
 	
 	template <typename T, typename... ARG>
-	void commitEmplace(std::optional<T> &field, ARG... arg)
+	void commitEmplace(std::optional<T> &field, const ARG &... arg)
 	{
 		vacant(field).emplace(arg...);
-		try
-		{
-			optionList->registerOption(&field.value());
-		}
-		catch (...)
-		{
-			field.reset();
-			throw;
-		}
-	}
-	
-	template <typename T, typename L>
-	void commit(std::optional<T> &field, L lambda)
-	{
-		vacant(field) = lambda();
 		try
 		{
 			optionList->registerOption(&field.value());
@@ -320,10 +305,10 @@ public:
 		switch(leg)
 		{
 		case SOCKS6_STACK_LEG_CLIENT_PROXY:
-			commit(clientProxy, [&]() { return OPT(leg, value); });
+			commitEmplace(clientProxy, leg, value);
 			return;
 		case SOCKS6_STACK_LEG_PROXY_REMOTE:
-			commit(proxyRemote, [&]() { return OPT(leg, value); });
+			commitEmplace(proxyRemote, leg, value);
 			return;
 		case SOCKS6_STACK_LEG_BOTH:
 			commit(clientProxy, proxyRemote, [&]() { return OPT(leg, value); });
@@ -386,7 +371,7 @@ public:
 	void setCredentials(const std::pair<std::string_view, const std::string_view> &creds)
 	{
 		enforceMode(M_REQ);
-		commit(req, [&]() { return UsernamePasswdReqOption(creds); });
+		commitEmplace(req, creds);
 	}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
@@ -430,7 +415,7 @@ public:
 	void advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 	{
 		enforceMode(M_REQ);
-		commit(advertOption, [&]() { return AuthMethodAdvertOption(initialDataLen, methods); });
+		commitEmplace(advertOption, initialDataLen, methods);
 	}
 
 	uint16_t getInitialDataLen() const
