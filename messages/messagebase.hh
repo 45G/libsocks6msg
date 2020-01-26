@@ -2,7 +2,7 @@
 #define SOCKS6MSG_MESSAGEBASE_HH
 
 #include "socks6.h"
-#include "versionchecker.hh"
+#include "bytebuffer.hh"
 
 namespace S6M
 {
@@ -11,16 +11,17 @@ template<uint8_t VER, typename RAW>
 class MessageBase
 {
 protected:
-	VersionChecker<VER> versionChecker;
-	
 	static __thread RAW *rawMessage;
 	
 	MessageBase() {}
 	
 	/* not signal-safe */
 	MessageBase(ByteBuffer *bb)
-		: versionChecker(bb)
 	{
+		uint8_t *ver = bb->peek<uint8_t>();
+		if (*ver != VER)
+			throw BadVersionException(*ver);
+		
 		rawMessage = bb->get<RAW>();
 	}
 };

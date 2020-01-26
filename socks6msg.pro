@@ -19,7 +19,6 @@ SOURCES += \
     options/sessionoption.cc
 
 HEADERS += \
-    fields/versionchecker.hh \
     messages/messagebase.hh \
     socks6.h \
     socks6msg.h \
