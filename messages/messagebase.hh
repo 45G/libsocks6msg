@@ -13,12 +13,16 @@ class MessageBase
 protected:
 	VersionChecker<VER> versionChecker;
 	
-	RAW *rawMessage = nullptr;
+	static __thread RAW *rawMessage;
 	
 	MessageBase() {}
 	
+	/* not signal-safe */
 	MessageBase(ByteBuffer *bb)
-		: versionChecker(bb), rawMessage(bb->get<RAW>()) {}
+		: versionChecker(bb)
+	{
+		rawMessage = bb->get<RAW>();
+	}
 };
 
 }
