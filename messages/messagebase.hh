@@ -11,11 +11,10 @@ template<uint8_t VER, typename RAW>
 class MessageBase
 {
 protected:
-	static __thread RAW *rawMessage;
+	RAW *rawMessage;
 	
 	MessageBase() {}
 	
-	/* not signal-safe */
 	MessageBase(ByteBuffer *bb)
 	{
 		uint8_t *ver = bb->peek<uint8_t>();
