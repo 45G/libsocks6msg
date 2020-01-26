@@ -112,13 +112,13 @@ protected:
 		}
 	}
 	
-	template <typename V, typename L>
-	void commitVariant(V &field, L lambda)
+	template <typename T, typename V, typename ... ARG>
+	void commitEmplaceV(V &field, const ARG &... arg)
 	{
-		vacantVariant(field) = lambda();
+		vacantVariant(field).template emplace<T>(arg...);
 		try
 		{
-			optionList->registerOption(std::get_if<decltype(lambda())>(&field));
+			optionList->registerOption(std::get_if<T>(&field));
 		}
 		catch (...)
 		{
@@ -145,7 +145,7 @@ public:
 	void request()
 	{
 		enforceMode(M_REQ);
-		commitVariant(mandatoryOpt, []() { return SessionRequestOption(); });
+		commitEmplaceV<SessionRequestOption>(mandatoryOpt);
 	}
 	
 	bool requested() const
@@ -167,7 +167,7 @@ public:
 	void setID(const SessionID &id)
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
-		commitVariant(mandatoryOpt, [&]() { return SessionIDOption(id); });
+		commitEmplaceV<SessionIDOption>(mandatoryOpt, id);
 	}
 	
 	const SessionID *getID() const
@@ -183,7 +183,7 @@ public:
 	void signalOK()
 	{
 		enforceMode(M_AUTH_REP);
-		commitVariant(mandatoryOpt, []() { return SessionOKOption(); });
+		commitEmplaceV<SessionOKOption>(mandatoryOpt);
 	}
 	
 	bool isOK() const
@@ -194,7 +194,7 @@ public:
 	void signalReject()
 	{
 		enforceMode(M_AUTH_REP);
-		commitVariant(mandatoryOpt, []() { return SessionInvalidOption(); });
+		commitEmplaceV<SessionInvalidOption>(mandatoryOpt);
 	}
 	
 	bool rejected() const
@@ -270,11 +270,11 @@ public:
 		enforceMode(M_AUTH_REP);
 		if (accepted)
 		{
-			commitVariant(replyOpt, []() { return IdempotenceAcceptedOption(); });
+			commitEmplaceV<IdempotenceAcceptedOption>(replyOpt);
 		}
 		else
 		{
-			commitVariant(replyOpt, []() { return IdempotenceRejectedOption(); });
+			commitEmplaceV<IdempotenceRejectedOption>(replyOpt);
 		}
 	}
 	
