@@ -80,7 +80,7 @@ protected:
 	}
 	
 	template <typename T, typename ... ARG>
-	void commitEmplace(std::optional<T> &field, const ARG &... arg)
+	void commit(std::optional<T> &field, const ARG &... arg)
 	{
 		vacant(field).emplace(arg...);
 		try
@@ -95,7 +95,7 @@ protected:
 	}
 	
 	template <typename T, typename ... ARG>
-	void commitEmplace2(std::optional<T> &field1, std::optional<T> &field2, const ARG &... arg)
+	void commit2(std::optional<T> &field1, std::optional<T> &field2, const ARG &... arg)
 	{
 		vacant(field1);
 		vacant(field2).emplace(arg...);
@@ -113,7 +113,7 @@ protected:
 	}
 	
 	template <typename T, typename V, typename ... ARG>
-	void commitEmplaceV(V &field, const ARG &... arg)
+	void commitV(V &field, const ARG &... arg)
 	{
 		vacantVariant(field).template emplace<T>(arg...);
 		try
@@ -145,7 +145,7 @@ public:
 	void request()
 	{
 		enforceMode(M_REQ);
-		commitEmplaceV<SessionRequestOption>(mandatoryOpt);
+		commitV<SessionRequestOption>(mandatoryOpt);
 	}
 	
 	bool requested() const
@@ -156,7 +156,7 @@ public:
 	void tearDown()
 	{
 		enforceMode(M_REQ);
-		commitEmplace(teardownOpt);
+		commit(teardownOpt);
 	}
 	
 	bool tornDown() const
@@ -167,7 +167,7 @@ public:
 	void setID(const SessionID &id)
 	{
 		enforceMode(M_REQ, M_AUTH_REP);
-		commitEmplaceV<SessionIDOption>(mandatoryOpt, id);
+		commitV<SessionIDOption>(mandatoryOpt, id);
 	}
 	
 	const SessionID *getID() const
@@ -183,7 +183,7 @@ public:
 	void signalOK()
 	{
 		enforceMode(M_AUTH_REP);
-		commitEmplaceV<SessionOKOption>(mandatoryOpt);
+		commitV<SessionOKOption>(mandatoryOpt);
 	}
 	
 	bool isOK() const
@@ -194,7 +194,7 @@ public:
 	void signalReject()
 	{
 		enforceMode(M_AUTH_REP);
-		commitEmplaceV<SessionInvalidOption>(mandatoryOpt);
+		commitV<SessionInvalidOption>(mandatoryOpt);
 	}
 	
 	bool rejected() const
@@ -205,7 +205,7 @@ public:
 	void setUntrusted()
 	{
 		enforceMode(M_REQ);
-		commitEmplace(untrustedOpt);
+		commit(untrustedOpt);
 	}
 	
 	bool isUntrusted() const
@@ -229,7 +229,7 @@ public:
 	void request(uint32_t size)
 	{
 		enforceMode(M_REQ);
-		commitEmplace(requestOpt, size);
+		commit(requestOpt, size);
 	}
 	
 	uint32_t requestedSize() const
@@ -242,7 +242,7 @@ public:
 	void setToken(uint32_t token)
 	{
 		enforceMode(M_REQ);
-		commitEmplace(expenditureOpt, token);
+		commit(expenditureOpt, token);
 	}
 	
 	std::optional<uint32_t> getToken() const
@@ -255,7 +255,7 @@ public:
 	void advertise(std::pair<uint32_t, uint32_t> window)
 	{
 		enforceMode(M_AUTH_REP);
-		commitEmplace(windowOpt, window);
+		commit(windowOpt, window);
 	}
 	
 	std::pair<uint32_t, uint32_t> getAdvertised() const
@@ -270,11 +270,11 @@ public:
 		enforceMode(M_AUTH_REP);
 		if (accepted)
 		{
-			commitEmplaceV<IdempotenceAcceptedOption>(replyOpt);
+			commitV<IdempotenceAcceptedOption>(replyOpt);
 		}
 		else
 		{
-			commitEmplaceV<IdempotenceRejectedOption>(replyOpt);
+			commitV<IdempotenceRejectedOption>(replyOpt);
 		}
 	}
 	
@@ -305,13 +305,13 @@ public:
 		switch(leg)
 		{
 		case SOCKS6_STACK_LEG_CLIENT_PROXY:
-			commitEmplace(clientProxy, leg, value);
+			commit(clientProxy, leg, value);
 			return;
 		case SOCKS6_STACK_LEG_PROXY_REMOTE:
-			commitEmplace(proxyRemote, leg, value);
+			commit(proxyRemote, leg, value);
 			return;
 		case SOCKS6_STACK_LEG_BOTH:
-			commitEmplace2(clientProxy, proxyRemote, leg, value);
+			commit2(clientProxy, proxyRemote, leg, value);
 			return;
 		}
 	}
@@ -371,7 +371,7 @@ public:
 	void setCredentials(const std::pair<std::string_view, const std::string_view> &creds)
 	{
 		enforceMode(M_REQ);
-		commitEmplace(req, creds);
+		commit(req, creds);
 	}
 	
 	std::pair<std::string_view, std::string_view> getCredentials() const
@@ -384,7 +384,7 @@ public:
 	void setReply(bool success)
 	{
 		enforceMode(M_AUTH_REP);
-		commitEmplace(reply, success);
+		commit(reply, success);
 	}
 	
 	std::optional<bool> getReply() const
@@ -415,7 +415,7 @@ public:
 	void advertise(const std::set<SOCKS6Method> &methods, uint16_t initialDataLen)
 	{
 		enforceMode(M_REQ);
-		commitEmplace(advertOption, initialDataLen, methods);
+		commit(advertOption, initialDataLen, methods);
 	}
 
 	uint16_t getInitialDataLen() const
@@ -428,7 +428,7 @@ public:
 	void select(SOCKS6Method method)
 	{
 		enforceMode(M_AUTH_REP);
-		commitEmplace(selectOption, method);
+		commit(selectOption, method);
 	}
 	
 	SOCKS6Method getSelected() const
