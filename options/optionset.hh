@@ -79,7 +79,7 @@ protected:
 		return t;
 	}
 	
-	template <typename T, typename... ARG>
+	template <typename T, typename ... ARG>
 	void commitEmplace(std::optional<T> &field, const ARG &... arg)
 	{
 		vacant(field).emplace(arg...);
@@ -94,11 +94,11 @@ protected:
 		}
 	}
 	
-	template <typename T, typename L>
-	void commit(std::optional<T> &field1, std::optional<T> &field2, L lambda)
+	template <typename T, typename ... ARG>
+	void commitEmplace2(std::optional<T> &field1, std::optional<T> &field2, const ARG &... arg)
 	{
 		vacant(field1);
-		vacant(field2) = lambda();
+		vacant(field2).emplace(arg...);
 		field1 = field2;
 		try
 		{
@@ -311,7 +311,7 @@ public:
 			commitEmplace(proxyRemote, leg, value);
 			return;
 		case SOCKS6_STACK_LEG_BOTH:
-			commit(clientProxy, proxyRemote, [&]() { return OPT(leg, value); });
+			commitEmplace2(clientProxy, proxyRemote, leg, value);
 			return;
 		}
 	}
