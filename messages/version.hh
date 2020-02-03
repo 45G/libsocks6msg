@@ -6,7 +6,7 @@
 namespace S6M
 {
 
-struct Version: public MessageBase<SOCKS6Version>
+struct Version: public MessageBase<SOCKS6_VERSION, SOCKS6Version>
 {
 	Version() {}
 	
