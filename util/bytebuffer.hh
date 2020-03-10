@@ -18,9 +18,6 @@ public:
 	ByteBuffer(uint8_t *buf, size_t size)
 		: buf(buf), used(0), totalSize(size) {}
 	
-	ByteBuffer(const ByteBuffer &other)
-		: buf(other.buf), used(other.used), totalSize(other.totalSize) {}
-	
 	uint8_t *getBuf() const
 	{
 		return buf;
